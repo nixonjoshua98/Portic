@@ -32,14 +32,14 @@ namespace Portic.Transport.RabbitMQ.Topology
                     return ChannelPool;
                 }
 
-                Connection ??= await _configuration.CreateConnectionAsync(cancellationToken);
+                var connection = Connection ??= await _configuration.CreateConnectionAsync(cancellationToken);
 
-                if (Connection is null)
+                if (connection is null)
                 {
                     throw new InvalidOperationException("Failed to create RabbitMQ connection.");
                 }
 
-                ChannelPool = new RabbitMQChannelPool(Connection);
+                ChannelPool = new RabbitMQChannelPool(connection);
 
                 return ChannelPool;
             }
