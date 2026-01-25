@@ -42,6 +42,7 @@ namespace Portic.Transport.RabbitMQ.Topology
                     }
                 }
 
+                // Connection is guaranteed to be non-null here
                 ChannelPool = new RabbitMQChannelPool(Connection);
 
                 return ChannelPool;
