@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Props/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/Samples/">
+    <Project Path="Portic.Samples/Portic.Samples.Alpha/Portic.Samples.Alpha.csproj" />
+  </Folder>
+  <Folder Name="/Samples/Props/">
+    <File Path="Portic.Samples/Directory.Build.props" />
+    <File Path="Portic.Samples/Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/Workflows/">
+    <File Path="../.github/workflows/PublishNuget.yaml" />
+  </Folder>
+  <Project Path="Portic.Transport.RabbitMQ/Portic.Transport.RabbitMQ.csproj" />
+  <Project Path="Portic/Portic.csproj" />
+</Solution>
