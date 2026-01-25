@@ -14,6 +14,8 @@ namespace Portic.Configuration
 
         public IMessageConsumerConfigurator WithEndpointName(string endpointName)
         {
+            ArgumentException.ThrowIfNullOrEmpty(endpointName, nameof(endpointName));
+
             EndpointName = endpointName;
 
             _configurator.ConfigureEndpoint(endpointName);
