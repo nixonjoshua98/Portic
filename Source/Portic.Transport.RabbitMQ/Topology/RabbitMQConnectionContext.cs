@@ -10,15 +10,14 @@ namespace Portic.Transport.RabbitMQ.Topology
     {
         private readonly SemaphoreSlim ConnectionLock = new(1, 1);
 
-        private IConnection? Connection;
-
-        private RabbitMQChannelPool ChannelPool = null!;
+        private IConnection? _connection;
+        private RabbitMQChannelPool? _channelPool;
 
         public async ValueTask<IRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
         {
-            _ = await GetConnectionAsync(cancellationToken); // Force
+            var channelPool = await GetChannelPoolAsync(cancellationToken);
 
-            return await ChannelPool.RentAsync(cancellationToken);
+            return await channelPool.RentAsync(cancellationToken);
         }
 
         public async ValueTask<IChannel> CreateChannelAsync(RabbitMQChannelOptions options, CancellationToken cancellationToken = default)
@@ -32,17 +31,34 @@ namespace Portic.Transport.RabbitMQ.Topology
             return channel;
         }
 
-        public async ValueTask<IConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
+        private async ValueTask<RabbitMQChannelPool> GetChannelPoolAsync(CancellationToken cancellationToken = default)
         {
+            // Skip accessing the connection + lock
+            if (_channelPool is not null)
+            {
+                return _channelPool;
+            }
+
+            var connection = await GetConnectionAsync(cancellationToken);
+
+            return _channelPool ??= new RabbitMQChannelPool(connection);
+        }
+
+        private async ValueTask<IConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
+        {
+            // Skip acquiring the lock
+            if (_connection is not null)
+            {
+                return _connection;
+            }
+
             try
             {
                 await ConnectionLock.WaitAsync(cancellationToken);
 
-                Connection ??= await _configuration.CreateConnectionAsync(cancellationToken);
+                _connection ??= await _configuration.CreateConnectionAsync(cancellationToken);
 
-                ChannelPool ??= new RabbitMQChannelPool(Connection);
-
-                return Connection ?? throw new InvalidOperationException("Failed to create RabbitMQ connection.");
+                return _connection ?? throw new InvalidOperationException("Failed to create RabbitMQ connection.");
             }
             finally
             {
