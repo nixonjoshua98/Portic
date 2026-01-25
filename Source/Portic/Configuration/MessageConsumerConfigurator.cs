@@ -16,7 +16,7 @@ namespace Portic.Configuration
         {
             if (string.IsNullOrWhiteSpace(endpointName))
             {
-                throw new ArgumentException("Endpoint name cannot be null or empty.", nameof(endpointName));
+                throw new ArgumentException("Endpoint name cannot be null, empty, or whitespace.", nameof(endpointName));
             }
 
             EndpointName = endpointName;
