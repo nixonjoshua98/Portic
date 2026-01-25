@@ -14,6 +14,11 @@ namespace Portic.Configuration
 
         public IMessageConsumerConfigurator WithEndpointName(string endpointName)
         {
+            if (string.IsNullOrWhiteSpace(endpointName))
+            {
+                throw new ArgumentException("Endpoint name cannot be null or empty.", nameof(endpointName));
+            }
+
             EndpointName = endpointName;
 
             _configurator.ConfigureEndpoint(endpointName);
