@@ -46,7 +46,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 RabbitMQTransportLog.LogMessageConsumed(
                     _logger,
                     consumerConfig.Message.Name,
-                    sw.Elapsed.Milliseconds
+                    sw.Elapsed.TotalMilliseconds
                 );
             }
             catch (Exception)
