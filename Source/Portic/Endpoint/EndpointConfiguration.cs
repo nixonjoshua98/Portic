@@ -7,10 +7,10 @@ namespace Portic.Endpoint
     public sealed class EndpointConfiguration(
         string name,
         IEnumerable<IConsumerConfiguration> consumers,
-        IReadonlyCustomPropertyBag properties
+        IReadOnlyCustomPropertyBag properties
     ) : IEndpointConfiguration
     {
-        private readonly IReadonlyCustomPropertyBag Properties = properties;
+        private readonly IReadOnlyCustomPropertyBag Properties = properties;
 
         public string Name { get; } = name;
         public IReadOnlyDictionary<string, IConsumerConfiguration> Consumers { get; } = consumers.ToDictionary(x => x.Message.Name);
