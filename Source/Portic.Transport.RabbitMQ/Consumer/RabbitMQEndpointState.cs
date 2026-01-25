@@ -2,9 +2,6 @@
 using Portic.Transport.RabbitMQ.Models;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Net;
-using System.Threading;
-using System.Threading.Channels;
 
 namespace Portic.Transport.RabbitMQ.Consumer
 {
@@ -26,18 +23,18 @@ namespace Portic.Transport.RabbitMQ.Consumer
             Channel = channel;
             Endpoint = endpoint;
             ConsumeFunc = consumeFunc;
+            CancellationToken = cancellationToken;
 
             EventConsumer = new AsyncEventingBasicConsumer(channel);
 
             EventConsumer.ReceivedAsync += EventConsumer_ReceivedAsync;
-            CancellationToken = cancellationToken;
         }
 
         public async Task BasicConsumeAsync()
         {
             await Channel.BasicConsumeAsync(
                 Endpoint.Name,
-                autoAck: true,
+                autoAck: false,
                 consumerTag: string.Empty,
                 noLocal: false,
                 exclusive: true,

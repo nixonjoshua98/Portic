@@ -1,10 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Portic.Extensions;
 using Portic.Samples.Alpha;
 using Portic.Transport.RabbitMQ.Extensions;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+builder.Logging
+    .SetMinimumLevel(LogLevel.Debug);
 
 builder.Services.AddHostedService<PingPublisher>();
 

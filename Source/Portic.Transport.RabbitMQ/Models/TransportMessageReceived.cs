@@ -2,6 +2,7 @@
 using Portic.Endpoint;
 using Portic.Transport.RabbitMQ.Consumer;
 using Portic.Transport.RabbitMQ.Extensions;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Diagnostics.CodeAnalysis;
 
@@ -12,15 +13,15 @@ namespace Portic.Transport.RabbitMQ.Models
         BasicDeliverEventArgs deliverArgs
     )
     {
-        public readonly RabbitMQEndpointState State = state;
+        public readonly IChannel Channel = state.Channel;
 
         public readonly IEndpointConfiguration EndpointConfiguration = state.Endpoint;
 
-        private readonly BasicDeliverEventArgs DeliverArgs = deliverArgs;
-
         public readonly string? MessageName = deliverArgs.GetMessageName();
 
-        public ReadOnlySpan<byte> Body => DeliverArgs.Body.Span;
+        public readonly ulong DeliveryTag = deliverArgs.DeliveryTag;
+
+        public ReadOnlySpan<byte> Body => deliverArgs.Body.Span;
 
         public bool TryGetConsumerConfiguration([NotNullWhen(true)] out IConsumerConfiguration? consumer)
         {

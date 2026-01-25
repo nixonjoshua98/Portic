@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Portic.Consumer;
 using Portic.Exceptions;
 using Portic.Serializer;
+using Portic.Transport.RabbitMQ.Logging;
 using Portic.Transport.RabbitMQ.Models;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Portic.Transport.RabbitMQ.Consumer
@@ -11,7 +14,8 @@ namespace Portic.Transport.RabbitMQ.Consumer
     internal sealed class RabbitMQMessageConsumer(
         IServiceScopeFactory _scopeFactory,
         IMessageConsumerContextFactory _contextFactory,
-        IPorticSerializer _serializer
+        IPorticSerializer _serializer,
+        ILogger<RabbitMQMessageConsumer> _logger
     ) : IRabbitMQMessageConsumer
     {
         private static readonly MethodInfo ConsumeGenericMethodInfo;
@@ -26,16 +30,40 @@ namespace Portic.Transport.RabbitMQ.Consumer
 
         public async Task ConsumeAsync(TransportMessageReceived message, CancellationToken cancellationToken)
         {
-            if (!message.TryGetConsumerConfiguration(out var consumerConfiguration))
+            if (!message.TryGetConsumerConfiguration(out var consumerConfig))
             {
                 throw MessageConsumerNotFoundException.FromName(message.MessageName);
             }
 
-            var messageConfig = consumerConfiguration.Message;
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                await ExecuteConsumerAsync(message, consumerConfig, cancellationToken);
+
+                await message.Channel.BasicAckAsync(message.DeliveryTag, false, cancellationToken);
+
+                RabbitMQTransportLog.LogMessageConsumed(
+                    _logger,
+                    consumerConfig.Message.Name,
+                    sw.Elapsed.Milliseconds
+                );
+            }
+            catch (Exception)
+            {
+                await message.Channel.BasicNackAsync(message.DeliveryTag, false, true, cancellationToken);
+
+                throw;
+            }
+        }
+
+        private async Task ExecuteConsumerAsync(TransportMessageReceived message, IConsumerConfiguration consumerConfig, CancellationToken cancellationToken)
+        {
+            var messageConfig = consumerConfig.Message;
 
             var genericConsumeMethod = GetGenericConsumeMethod(messageConfig.MessageType);
 
-            object[] methodArgs = [messageConfig.Name, message, consumerConfiguration, cancellationToken];
+            object[] methodArgs = [messageConfig.Name, message, consumerConfig, cancellationToken];
 
             var genericConsumeResult = genericConsumeMethod.Invoke(this, methodArgs) as Task;
 
