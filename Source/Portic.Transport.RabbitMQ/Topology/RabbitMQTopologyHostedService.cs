@@ -13,7 +13,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         {
             foreach (var endpoint in _configuration.Endpoints)
             {
-                var state = await _topologyFactory.CreateEndpointStateAsync(endpoint, cancellationToken);
+                await _topologyFactory.CreateEndpointStateAsync(endpoint, cancellationToken);
             }
         }
 

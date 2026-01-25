@@ -6,20 +6,15 @@ using System.Collections.Concurrent;
 
 namespace Portic.Configuration
 {
-    internal sealed class PorticConfigurator : IPorticConfigurator
+    internal sealed class PorticConfigurator(IServiceCollection services) : IPorticConfigurator
     {
-        public IServiceCollection Services { get; }
+        public IServiceCollection Services { get; } = services;
 
         private readonly ConcurrentDictionary<Type, MessageConfigurator> MessageConfigurators = [];
 
         private readonly ConcurrentDictionary<Type, MessageConsumerConfigurator> ConsumerBuilders = [];
 
         private readonly ConcurrentDictionary<string, EndpointConfigurator> EndpointConfigurators = [];
-
-        public PorticConfigurator(IServiceCollection services)
-        {
-            Services = services;
-        }
 
         public IMessageConfigurator ConfigureMessage<TMessage>()
         {
@@ -75,8 +70,6 @@ namespace Portic.Configuration
             var messageConfigurators = MessageConfigurators
                 .ToDictionary(x => x.Key, x => x.Value.Build());
 
-            // Message is quaranteed to be configured before the consumer,
-            // even if its only the defaults
             var consumerConfigurations = ConsumerBuilders.Values
                 .Select(c => c.Build(messageConfigurators[c.MessageType]))
                 .ToList();
@@ -88,7 +81,6 @@ namespace Portic.Configuration
                 .ToList();
 
             return new PorticConfiguration(
-                consumerConfigurations,
                 [.. messageConfigurators.Values],
                 endpoints
             );

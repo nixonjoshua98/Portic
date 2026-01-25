@@ -1,5 +1,4 @@
-﻿using Portic.Consumer;
-using Portic.Endpoint;
+﻿using Portic.Endpoint;
 using Portic.Transport.RabbitMQ.Consumer;
 
 namespace Portic.Transport.RabbitMQ.Abstractions

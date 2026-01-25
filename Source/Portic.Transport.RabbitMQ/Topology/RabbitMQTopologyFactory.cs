@@ -13,7 +13,10 @@ namespace Portic.Transport.RabbitMQ.Topology
     {
         public async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointConfiguration endpoint, CancellationToken cancellationToken)
         {
-            var channel = await _connectionContext.CreateChannelAsync(cancellationToken);
+            var channel = await _connectionContext.CreateChannelAsync(
+                endpoint.CreateChannelOptions(),
+                cancellationToken
+            );
 
             var queue = await channel.QueueDeclareAsync(endpoint, cancellationToken);
 
@@ -26,11 +29,9 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             foreach (var (_, consumer) in endpoint.Consumers)
             {
-                var exchangeName = consumer.Message.GetName();
+                await channel.ExchangeDeclareAsync(consumer.Message.Name, ExchangeType.Fanout, cancellationToken: cancellationToken);
 
-                await channel.ExchangeDeclareAsync(exchangeName, ExchangeType.Fanout, cancellationToken: cancellationToken);
-
-                await channel.QueueBindAsync(queue.QueueName, exchangeName, string.Empty, cancellationToken: cancellationToken);
+                await channel.QueueBindAsync(queue.QueueName, consumer.Message.Name, string.Empty, cancellationToken: cancellationToken);
             }
 
             await state.BasicConsumeAsync();

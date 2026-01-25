@@ -3,25 +3,14 @@ using Portic.Consumer;
 
 namespace Portic.Configuration
 {
-    internal sealed class MessageConsumerConfigurator : IMessageConsumerConfigurator
+    internal sealed class MessageConsumerConfigurator(IPorticConfigurator configurator, Type consumerType, Type messageType) : IMessageConsumerConfigurator
     {
-        private readonly IPorticConfigurator _configurator;
+        private readonly IPorticConfigurator _configurator = configurator;
 
-        public Type ConsumerType { get; }
-        public Type MessageType { get; }
+        public Type ConsumerType { get; } = consumerType;
+        public Type MessageType { get; } = messageType;
 
-        public string EndpointName { get; private set; }
-
-        public MessageConsumerConfigurator(IPorticConfigurator configurator, Type consumerType, Type messageConfigurator)
-        {
-            _configurator = configurator;
-
-            ConsumerType = consumerType;
-            MessageType = messageConfigurator;
-
-            EndpointName = messageConfigurator.FullName
-                ?? throw new InvalidOperationException("Message type must have a full name");
-        }
+        public string EndpointName { get; private set; } = messageType.FullName ?? messageType.Name;
 
         public IMessageConsumerConfigurator WithEndpointName(string endpointName)
         {
@@ -32,9 +21,9 @@ namespace Portic.Configuration
             return this;
         }
 
-        public IMessageConsumerConfiguration Build(IMessageConfiguration message)
+        public IConsumerConfiguration Build(IMessageConfiguration message)
         {
-            return new MessageConsumerConfiguration(
+            return new ConsumerConfiguration(
                 message, 
                 ConsumerType,
                 EndpointName

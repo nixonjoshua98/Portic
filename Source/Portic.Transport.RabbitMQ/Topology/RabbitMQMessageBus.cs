@@ -24,15 +24,13 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             var payloadBytes = _serializer.SerializeToBytes(payload);
 
-            var messageName = messageConfiguration.GetName();
-
             var properties = new BasicProperties()
-                .SetMessageName(messageName);
+                .SetMessageName(messageConfiguration.Name);
 
-            await using var channel = await _connectionContext.CreateChannelAsync(cancellationToken);
+            using var rented = await _connectionContext.RentChannelAsync(cancellationToken);
 
-            await channel.BasicPublishAsync(
-                messageName,
+            await rented.Channel.BasicPublishAsync(
+                messageConfiguration.Name,
                 string.Empty,
                 mandatory: true,
                 properties,

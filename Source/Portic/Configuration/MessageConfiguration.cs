@@ -2,18 +2,9 @@
 
 namespace Portic.Configuration
 {
-    internal sealed class MessageConfiguration : IMessageConfiguration
+    internal sealed class MessageConfiguration(string name, Type messageType) : IMessageConfiguration
     {
-        public Type MessageType { get; }
-
-        public MessageConfiguration(Type messageType)
-        {
-            MessageType = messageType;
-        }
-
-        public string GetName()
-        {
-            return MessageType.FullName!;
-        }
+        public Type MessageType { get; } = messageType;
+        public string Name { get; } = name;
     }
 }
