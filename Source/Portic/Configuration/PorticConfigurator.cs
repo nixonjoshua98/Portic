@@ -65,10 +65,26 @@ namespace Portic.Configuration
             );
         }
 
+        Dictionary<Type, IMessageConfiguration> CreateMessageConfigurations()
+        {
+            var duplicateMessageName = MessageConfigurators.Values
+                .GroupBy(x => x.Name)
+                .Where(x => x.Count() > 1)
+                .Select(x => x.Key)
+                .FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(duplicateMessageName))
+            {
+                throw new InvalidOperationException($"Duplicate message name detected: '{duplicateMessageName}'. Message names must be unique.");
+            }
+
+            return MessageConfigurators
+                .ToDictionary(x => x.Key, x => x.Value.Build());
+        }
+
         public IPorticConfiguration Build()
         {
-            var messages = MessageConfigurators
-                .ToDictionary(x => x.Key, x => x.Value.Build());
+            var messages = CreateMessageConfigurations();
 
             var consumers = ConsumerBuilders.Values
                 .Select(c => c.Build(messages[c.MessageType]))

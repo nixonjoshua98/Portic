@@ -13,7 +13,7 @@ namespace Portic.Transport.RabbitMQ.Models
         BasicDeliverEventArgs deliverArgs
     )
     {
-        public readonly IChannel Channel = state.Channel;
+        public readonly IChannel Channel = state.GetChannelOrThrow();
 
         public readonly IEndpointConfiguration EndpointConfiguration = state.Endpoint;
 

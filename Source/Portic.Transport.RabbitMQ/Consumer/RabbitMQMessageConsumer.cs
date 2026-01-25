@@ -33,7 +33,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
             {
                 if (!message.TryGetConsumerConfiguration(out var consumerConfig))
                 {
-                    throw ConsumerNotFoundException.FromName(message.MessageName);
+                    throw UnknownMessageException.FromName(message.MessageName);
                 }
 
                 await ExecuteConsumerAsync(message, consumerConfig, cancellationToken);
@@ -82,8 +82,8 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 cancellationToken
             );
 
-            var consumerInst = ActivatorUtilities.CreateInstance(scope.ServiceProvider, consumerConfiguration.ConsumerType) as IMessageConsumer<TMessage>
-                ?? throw ConsumerNotFoundException.FromName(messageName);
+            var consumerInst = ActivatorUtilities.CreateInstance(scope.ServiceProvider, consumerConfiguration.ConsumerType) as IConsumer<TMessage>
+                ?? throw UnknownMessageException.FromName(messageName);
 
             await consumerInst.ConsumeAsync(context);
         }

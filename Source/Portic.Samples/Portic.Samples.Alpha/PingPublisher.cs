@@ -7,17 +7,13 @@ namespace Portic.Samples.Alpha
         IMessageTransport _messageBus
     ) : BackgroundService
     {
-        private readonly TimeSpan PingInterval = TimeSpan.FromMilliseconds(1.0 / 250);
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var pingMessage = new PingMessage();
+                await _messageBus.PublishAsync(new PingMessage(), stoppingToken);
 
-                await _messageBus.PublishAsync(pingMessage, stoppingToken);
-
-                await Task.Delay(PingInterval, stoppingToken);
+                await Task.Delay(1000, stoppingToken);
             }
         }
     }

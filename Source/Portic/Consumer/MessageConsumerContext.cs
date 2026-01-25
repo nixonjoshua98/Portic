@@ -2,7 +2,7 @@
 
 namespace Portic.Consumer
 {
-    internal sealed class MessageConsumerContext<TMessage> : IMessageConsumerContext<TMessage>
+    internal sealed class MessageConsumerContext<TMessage> : IConsumerContext<TMessage>
     {
         public TMessage Message { get; }
         public TimeSpan Latency { get; }

@@ -4,11 +4,9 @@ using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
-    internal sealed class RabbitMQConnectionContext(
-        IRabbitMQTransportConfiguration _configuration
-    ) : IRabbitMQConnectionContext
+    internal sealed class RabbitMQConnectionContext(IRabbitMQTransportConfiguration _configuration) : IRabbitMQConnectionContext, IAsyncDisposable
     {
-        private readonly SemaphoreSlim ConnectionLock = new(1, 1);
+        private readonly SemaphoreSlim _connectionLock = new(1, 1);
 
         private IConnection? _connection;
         private RabbitMQChannelPool? _channelPool;
@@ -54,7 +52,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             try
             {
-                await ConnectionLock.WaitAsync(cancellationToken);
+                await _connectionLock.WaitAsync(cancellationToken);
 
                 _connection ??= await _configuration.CreateConnectionAsync(cancellationToken);
 
@@ -62,8 +60,19 @@ namespace Portic.Transport.RabbitMQ.Topology
             }
             finally
             {
-                ConnectionLock.Release();
+                _connectionLock.Release();
             }
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await (_channelPool?.DisposeAsync() ?? ValueTask.CompletedTask);
+
+            _channelPool = null;
+
+            await (_connection?.DisposeAsync() ?? ValueTask.CompletedTask);
+
+            _connection = null;
         }
     }
 }
