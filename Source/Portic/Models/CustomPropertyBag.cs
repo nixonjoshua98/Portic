@@ -1,8 +1,10 @@
-﻿namespace Portic.Models
+﻿using System.Collections.Concurrent;
+
+namespace Portic.Models
 {
     internal sealed class CustomPropertyBag : ICustomPropertyBag
     {
-        private readonly Dictionary<string, object> _properties = [];
+        private readonly ConcurrentDictionary<string, object> _properties = new();
 
         public void SetProperty(string key, object value)
         {
