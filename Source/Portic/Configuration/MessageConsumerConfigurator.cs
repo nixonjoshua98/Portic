@@ -24,7 +24,7 @@ namespace Portic.Configuration
         public IConsumerConfiguration Build(IMessageConfiguration message)
         {
             return new ConsumerConfiguration(
-                message, 
+                message,
                 ConsumerType,
                 EndpointName
             );

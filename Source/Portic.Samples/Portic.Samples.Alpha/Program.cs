@@ -15,7 +15,8 @@ builder.Services.AddHostedService<PingPublisher>();
 builder.Services.AddPortic(configurator =>
 {
     configurator.ConfigureEndpoint("PingEndpoint")
-        .WithPrefetchCount(16);
+        .WithPrefetchCount(64)
+        .WithChannelCount(2);
 
     configurator.ConfigureConsumer<PingMessage, PingConsumer>()
         .WithEndpointName("PingEndpoint");

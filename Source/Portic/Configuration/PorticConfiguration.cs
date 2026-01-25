@@ -1,15 +1,14 @@
 ﻿using Portic.Abstractions;
-using Portic.Consumer;
 using Portic.Endpoint;
 
 namespace Portic.Configuration
 {
     internal sealed class PorticConfiguration(
-        IReadOnlyList<IMessageConfiguration> messages,
+        IReadOnlyDictionary<Type, IMessageConfiguration> messages,
         IReadOnlyList<IEndpointConfiguration> endpoints
     ) : IPorticConfiguration
     {
-        public IReadOnlyList<IMessageConfiguration> Messages { get; } = messages;
+        private readonly IReadOnlyDictionary<Type, IMessageConfiguration> Messages = messages;
 
         public IReadOnlyList<IEndpointConfiguration> Endpoints =>
             [.. endpoints.Where(e => e.Consumers.Any())];
@@ -18,8 +17,7 @@ namespace Portic.Configuration
         {
             var messageType = typeof(TMessage);
 
-            return Messages.FirstOrDefault(m => m.MessageType == messageType)
-                ?? throw new InvalidOperationException($"No message configuration found for message type: {messageType.FullName}");
+            return Messages[messageType];
         }
     }
 }

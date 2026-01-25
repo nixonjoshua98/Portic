@@ -67,21 +67,21 @@ namespace Portic.Configuration
 
         public IPorticConfiguration Build()
         {
-            var messageConfigurators = MessageConfigurators
+            var messages = MessageConfigurators
                 .ToDictionary(x => x.Key, x => x.Value.Build());
 
-            var consumerConfigurations = ConsumerBuilders.Values
-                .Select(c => c.Build(messageConfigurators[c.MessageType]))
+            var consumers = ConsumerBuilders.Values
+                .Select(c => c.Build(messages[c.MessageType]))
                 .ToList();
 
             var endpoints = EndpointConfigurators.Values
                 .Select(endpoint => endpoint.Build(
-                    consumerConfigurations.Where(consumer => consumer.EndpointName == endpoint.Name)
+                    consumers.Where(consumer => consumer.EndpointName == endpoint.Name)
                 ))
                 .ToList();
 
             return new PorticConfiguration(
-                [.. messageConfigurators.Values],
+                messages,
                 endpoints
             );
         }

@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Portic.Transport.RabbitMQ.Models
 {
     internal sealed class TransportMessageReceived(
-        RabbitMQEndpointState state, 
+        RabbitMQEndpointConsumerState state,
         BasicDeliverEventArgs deliverArgs
     )
     {

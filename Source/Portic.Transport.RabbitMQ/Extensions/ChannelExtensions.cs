@@ -1,6 +1,4 @@
-﻿using Portic.Consumer;
-using Portic.Endpoint;
-using Portic.Transport.RabbitMQ.Extensions;
+﻿using Portic.Endpoint;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Extensions
@@ -10,9 +8,10 @@ namespace Portic.Transport.RabbitMQ.Extensions
         public static async Task<QueueDeclareOk> QueueDeclareAsync(this IChannel channel, IEndpointConfiguration endpoint, CancellationToken cancellationToken)
         {
             return await channel.QueueDeclareAsync(
-                endpoint.Name,
-                exclusive: true,
-                autoDelete: true,
+                queue: endpoint.Name,
+                durable: endpoint.GetDurable(),
+                exclusive: false,
+                autoDelete: endpoint.GetAutoDelete(),
                 cancellationToken: cancellationToken
             );
         }

@@ -1,4 +1,5 @@
-﻿using Portic.Endpoint;
+﻿using Portic.Consumer;
+using Portic.Endpoint;
 using Portic.Transport.RabbitMQ.Abstractions;
 using Portic.Transport.RabbitMQ.Consumer;
 using Portic.Transport.RabbitMQ.Extensions;
@@ -13,30 +14,42 @@ namespace Portic.Transport.RabbitMQ.Topology
     {
         public async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointConfiguration endpoint, CancellationToken cancellationToken)
         {
-            var channel = await _connectionContext.CreateChannelAsync(
-                endpoint.CreateChannelOptions(),
-                cancellationToken
-            );
-
-            var queue = await channel.QueueDeclareAsync(endpoint, cancellationToken);
-
-            var state = new RabbitMQEndpointState(
-                channel, 
-                endpoint,
-                _messageConsumer.ConsumeAsync,
-                cancellationToken
-            );
-
             foreach (var (_, consumer) in endpoint.Consumers)
             {
-                await channel.ExchangeDeclareAsync(consumer.Message.Name, ExchangeType.Fanout, cancellationToken: cancellationToken);
-
-                await channel.QueueBindAsync(queue.QueueName, consumer.Message.Name, string.Empty, cancellationToken: cancellationToken);
+                await BindQueuesToExchangeAsync(endpoint, consumer, cancellationToken);
             }
 
-            await state.BasicConsumeAsync();
+            int consumerCount = endpoint.GetChannelCount();
+
+            var state = new RabbitMQEndpointState(
+                endpoint,
+                _messageConsumer.ConsumeAsync
+            );
+
+            for (int i = 0; i < consumerCount; i++)
+            {
+                var channel = await _connectionContext.CreateChannelAsync(
+                    endpoint.CreateChannelOptions(),
+                    cancellationToken
+                );
+
+                var consumerState = state.AddConsumer(channel, cancellationToken);
+
+                await consumerState.BasicConsumeAsync();
+            }
 
             return state;
+        }
+
+        private async Task BindQueuesToExchangeAsync(IEndpointConfiguration endpoint, IConsumerConfiguration consumer, CancellationToken cancellationToken)
+        {
+            using var rented = await _connectionContext.RentChannelAsync(cancellationToken);
+
+            var queue = await rented.Channel.QueueDeclareAsync(endpoint, cancellationToken);
+
+            await rented.Channel.ExchangeDeclareAsync(consumer.Message.Name, ExchangeType.Fanout, cancellationToken: cancellationToken);
+
+            await rented.Channel.QueueBindAsync(queue.QueueName, consumer.Message.Name, string.Empty, cancellationToken: cancellationToken);
         }
     }
 }

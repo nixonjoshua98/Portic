@@ -1,7 +1,7 @@
-﻿using Portic.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Abstractions;
+using Portic.Configuration;
 using Portic.Consumer;
 using Portic.Serializer;
 

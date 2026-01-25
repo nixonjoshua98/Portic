@@ -4,13 +4,13 @@ using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Configuration
 {
-    internal sealed class RabbitMQBusBuilder : IRabbitMQBusBuilder, IRabbitMQBusConfiguration
+    internal sealed class RabbitMQTransport : IRabbitMQTransportConfigurator, IRabbitMQTransportConfiguration
     {
         private readonly IPorticConfigurator Builder;
 
         private readonly ConnectionFactory ConnectionFactory = new();
 
-        public RabbitMQBusBuilder(IPorticConfigurator builder)
+        public RabbitMQTransport(IPorticConfigurator builder)
         {
             Builder = builder;
         }
@@ -20,7 +20,7 @@ namespace Portic.Transport.RabbitMQ.Configuration
             return await ConnectionFactory.CreateConnectionAsync(cancellationToken);
         }
 
-        public IRabbitMQBusConfiguration Build()
+        public IRabbitMQTransportConfiguration Build()
         {
             return this;
         }

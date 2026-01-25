@@ -1,15 +1,14 @@
-﻿using Portic.Samples.Alpha;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Hosting;
 using Portic.Transport;
 
 namespace Portic.Samples.Alpha
 {
     internal sealed class PingPublisher(
-        IMessageBus _messageBus,
-        ILogger<PingPublisher> _logger
+        IMessageTransport _messageBus
     ) : BackgroundService
     {
+        readonly TimeSpan PingInterval = TimeSpan.FromMilliseconds(1 / 100);
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -18,7 +17,7 @@ namespace Portic.Samples.Alpha
 
                 await _messageBus.PublishAsync(pingMessage, stoppingToken);
 
-                _logger.LogInformation("Ping : Published");
+                await Task.Delay(PingInterval, stoppingToken);
             }
         }
     }

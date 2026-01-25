@@ -5,24 +5,26 @@ namespace Portic.Endpoint
 {
     internal sealed class EndpointConfigurator : IEndpointConfigurator
     {
-        public string Name { get; private set; }
+        private readonly CustomPropertyBag Properties = new CustomPropertyBag();
 
-        public ICustomPropertyBag Properties { get; } = new CustomPropertyBag();
+        public string Name { get; private set; }
 
         public EndpointConfigurator(string endpointName)
         {
             Name = endpointName;
         }
 
-        public void SetProperty(string key, object value)
+        public IEndpointConfigurator SetProperty(string key, object value)
         {
             Properties.SetProperty(key, value);
+
+            return this;
         }
 
         public IEndpointConfiguration Build(IEnumerable<IConsumerConfiguration> consumers)
         {
             return new EndpointConfiguration(
-                Name, 
+                Name,
                 consumers,
                 Properties
             );

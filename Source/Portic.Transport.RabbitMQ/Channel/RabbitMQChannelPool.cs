@@ -3,10 +3,10 @@ using System.Collections.Concurrent;
 
 namespace Portic.Transport.RabbitMQ.Channel
 {
-    internal sealed class RabbitMQChannelPool(IConnection connection, int maxPoolSize = 100)
+    internal sealed class RabbitMQChannelPool(IConnection connection, int maxPoolSize = 256)
     {
         private readonly IConnection _connection = connection;
-        private readonly ConcurrentQueue<RabbitMQRentableChannel> _idleChannels = new();
+        private readonly ConcurrentQueue<IChannel> _idleChannels = new();
         private readonly SemaphoreSlim _creationLock = new(maxPoolSize, maxPoolSize);
 
         public async Task<IRentedChannel> RentAsync(CancellationToken cancellationToken)
@@ -20,7 +20,7 @@ namespace Portic.Transport.RabbitMQ.Channel
 
             try
             {
-                var newChannel = await CreateChannelAsync(cancellationToken);
+                var newChannel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
                 return new RabbitMQRentedChannel(this, newChannel);
             }
@@ -30,33 +30,9 @@ namespace Portic.Transport.RabbitMQ.Channel
             }
         }
 
-        public void Release(RabbitMQRentableChannel channel)
+        public void Release(IChannel channel)
         {
             _idleChannels.Enqueue(channel);
-        }
-
-        private async Task<RabbitMQRentableChannel> CreateChannelAsync(CancellationToken cancellationToken)
-        {
-            var channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
-
-            return new RabbitMQRentableChannel(channel);
-        }
-    }
-
-    internal sealed class RabbitMQRentableChannel(IChannel channel)
-    {
-        public readonly IChannel Channel = channel;
-        
-        public bool IsInUse { get; private set; } = false;
-
-        public void Rent()
-        {
-            IsInUse = true;
-        }
-
-        public void Release()
-        {
-            IsInUse = false;
         }
     }
 
@@ -66,15 +42,15 @@ namespace Portic.Transport.RabbitMQ.Channel
     }
 
     internal sealed class RabbitMQRentedChannel(
-        RabbitMQChannelPool Pool, 
-        RabbitMQRentableChannel rentable
+        RabbitMQChannelPool Pool,
+        IChannel channel
     ) : IRentedChannel
     {
-        public IChannel Channel => rentable.Channel;
+        public IChannel Channel => channel;
 
         public void Dispose()
         {
-            Pool.Release(rentable);
+            Pool.Release(channel);
         }
     }
 }

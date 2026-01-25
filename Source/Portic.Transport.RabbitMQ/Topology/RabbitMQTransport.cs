@@ -7,11 +7,11 @@ using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
-    internal sealed class RabbitMQMessageBus(
+    internal sealed class RabbitMQTransport(
         IRabbitMQConnectionContext _connectionContext,
         IPorticConfiguration _configuration,
         IPorticSerializer _serializer
-    ) : IMessageBus
+    ) : IMessageTransport
     {
         public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
         {
@@ -32,7 +32,7 @@ namespace Portic.Transport.RabbitMQ.Topology
             await rented.Channel.BasicPublishAsync(
                 messageConfiguration.Name,
                 string.Empty,
-                mandatory: true,
+                mandatory: false,
                 properties,
                 payloadBytes,
                 cancellationToken: cancellationToken

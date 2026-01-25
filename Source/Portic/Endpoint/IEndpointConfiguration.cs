@@ -1,9 +1,5 @@
 ﻿using Portic.Consumer;
-using Portic.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace Portic.Endpoint
 {
@@ -13,6 +9,6 @@ namespace Portic.Endpoint
         IReadOnlyDictionary<string, IConsumerConfiguration> Consumers { get; }
 
         T GetPropertyOrDefault<T>(string key, T defaultValue);
-        bool TryGetConsumerForMessage(string messageName, [NotNullWhen(true)] out IConsumerConfiguration? consumer);
+        bool TryGetConsumerForMessage(string? messageName, [NotNullWhen(true)] out IConsumerConfiguration? consumer);
     }
 }

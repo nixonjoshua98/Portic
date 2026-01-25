@@ -5,7 +5,7 @@ using RabbitMQ.Client;
 namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQConnectionContext(
-        IRabbitMQBusConfiguration _configuration
+        IRabbitMQTransportConfiguration _configuration
     ) : IRabbitMQConnectionContext
     {
         private readonly SemaphoreSlim ConnectionLock = new(1, 1);
@@ -16,6 +16,8 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         public async ValueTask<IRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
         {
+            _ = await GetConnectionAsync(cancellationToken); // Force
+
             return await ChannelPool.RentAsync(cancellationToken);
         }
 

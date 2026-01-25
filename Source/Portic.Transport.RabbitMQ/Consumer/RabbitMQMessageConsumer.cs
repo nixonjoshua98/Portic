@@ -30,15 +30,15 @@ namespace Portic.Transport.RabbitMQ.Consumer
 
         public async Task ConsumeAsync(TransportMessageReceived message, CancellationToken cancellationToken)
         {
-            if (!message.TryGetConsumerConfiguration(out var consumerConfig))
-            {
-                throw MessageConsumerNotFoundException.FromName(message.MessageName);
-            }
-
             var sw = Stopwatch.StartNew();
 
             try
             {
+                if (!message.TryGetConsumerConfiguration(out var consumerConfig))
+                {
+                    throw MessageConsumerNotFoundException.FromName(message.MessageName);
+                }
+
                 await ExecuteConsumerAsync(message, consumerConfig, cancellationToken);
 
                 await message.Channel.BasicAckAsync(message.DeliveryTag, false, cancellationToken);

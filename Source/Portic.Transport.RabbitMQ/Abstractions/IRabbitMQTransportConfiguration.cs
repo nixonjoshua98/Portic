@@ -2,7 +2,7 @@
 
 namespace Portic.Transport.RabbitMQ.Abstractions
 {
-    internal interface IRabbitMQBusConfiguration
+    internal interface IRabbitMQTransportConfiguration
     {
         Task<IConnection> CreateConnectionAsync(CancellationToken cancellationToken);
     }

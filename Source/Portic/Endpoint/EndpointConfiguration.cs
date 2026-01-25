@@ -10,14 +10,22 @@ namespace Portic.Endpoint
         IReadonlyCustomPropertyBag properties
     ) : IEndpointConfiguration
     {
+        private readonly IReadonlyCustomPropertyBag Properties = properties;
+
         public string Name { get; } = name;
-        public IReadonlyCustomPropertyBag Properties { get; } = properties;
         public IReadOnlyDictionary<string, IConsumerConfiguration> Consumers { get; } = consumers.ToDictionary(x => x.Message.Name);
 
         public T GetPropertyOrDefault<T>(string key, T defaultValue) => Properties.GetOrDefault(key, defaultValue);
 
-        public bool TryGetConsumerForMessage(string messageName, [NotNullWhen(true)] out IConsumerConfiguration? consumer)
+        public bool TryGetConsumerForMessage(string? messageName, [NotNullWhen(true)] out IConsumerConfiguration? consumer)
         {
+            if (string.IsNullOrEmpty(messageName))
+            {
+                consumer = null;
+
+                return false;
+            }
+
             return Consumers.TryGetValue(messageName, out consumer);
         }
     }

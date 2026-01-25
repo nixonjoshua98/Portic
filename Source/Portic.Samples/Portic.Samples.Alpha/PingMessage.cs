@@ -1,4 +1,4 @@
 ﻿namespace Portic.Samples.Alpha
 {
-    internal sealed class PingMessage;
+    public sealed class PingMessage;
 }
