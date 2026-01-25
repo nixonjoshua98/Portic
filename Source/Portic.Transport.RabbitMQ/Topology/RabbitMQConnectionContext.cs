@@ -12,13 +12,36 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         private IConnection? Connection;
 
-        private RabbitMQChannelPool ChannelPool = null!;
+        private RabbitMQChannelPool? ChannelPool;
 
         public async ValueTask<IRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
         {
-            _ = await GetConnectionAsync(cancellationToken); // Force
+            var channelPool = await GetChannelPoolAsync(cancellationToken);
 
-            return await ChannelPool.RentAsync(cancellationToken);
+            return await channelPool.RentAsync(cancellationToken);
+        }
+
+        private async ValueTask<RabbitMQChannelPool> GetChannelPoolAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await ConnectionLock.WaitAsync(cancellationToken);
+
+                if (ChannelPool is not null)
+                {
+                    return ChannelPool;
+                }
+
+                Connection ??= await _configuration.CreateConnectionAsync(cancellationToken);
+
+                ChannelPool = new RabbitMQChannelPool(Connection);
+
+                return ChannelPool;
+            }
+            finally
+            {
+                ConnectionLock.Release();
+            }
         }
 
         public async ValueTask<IChannel> CreateChannelAsync(RabbitMQChannelOptions options, CancellationToken cancellationToken = default)
@@ -39,8 +62,6 @@ namespace Portic.Transport.RabbitMQ.Topology
                 await ConnectionLock.WaitAsync(cancellationToken);
 
                 Connection ??= await _configuration.CreateConnectionAsync(cancellationToken);
-
-                ChannelPool ??= new RabbitMQChannelPool(Connection);
 
                 return Connection ?? throw new InvalidOperationException("Failed to create RabbitMQ connection.");
             }
