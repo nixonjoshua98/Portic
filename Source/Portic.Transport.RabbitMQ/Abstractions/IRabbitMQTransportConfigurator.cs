@@ -1,6 +1,6 @@
 ﻿namespace Portic.Transport.RabbitMQ.Abstractions
 {
-    public interface IRabbitMQBusBuilder
+    public interface IRabbitMQTransportConfigurator
     {
 
     }

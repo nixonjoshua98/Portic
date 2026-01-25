@@ -1,13 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using Portic.Consumer;
+﻿using Portic.Consumer;
 
 namespace Portic.Samples.Alpha
 {
-    internal sealed class PingConsumer(ILogger<PingConsumer> _logger) : IMessageConsumer<PingMessage>
+    internal sealed class PingConsumer : IMessageConsumer<PingMessage>
     {
-        public async ValueTask ConsumeAsync(IMessageConsumerContext<PingMessage> context)
+        public ValueTask ConsumeAsync(IMessageConsumerContext<PingMessage> context)
         {
-            _logger.LogInformation("Ping : Consumed : {Latency:F2}ms", context.Latency.TotalMilliseconds);
+            return ValueTask.CompletedTask;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Portic.Consumer;
+using Portic.Endpoint;
 
 namespace Portic.Abstractions
 {
@@ -7,8 +8,8 @@ namespace Portic.Abstractions
     {
         IServiceCollection Services { get; }
 
-        IMessageConsumerBuilder ConfigureConsumer<TMessage, TMessageConsumer>();
-
+        IMessageConsumerConfigurator ConfigureConsumer<TMessage, TMessageConsumer>();
+        IEndpointConfigurator ConfigureEndpoint(string endpointName);
         IMessageConfigurator ConfigureMessage<TMessage>();
     }
 }

@@ -1,11 +1,11 @@
 ﻿namespace Portic.Transport.RabbitMQ.Models
 {
-    internal sealed class TransportPayload<TMessage> : ITransportPayload<TMessage>
+    internal sealed class TransportMessagePayload<TMessage> : ITransportPayload<TMessage>
     {
         public TMessage Message { get; set; }
         public DateTimeOffset PublishedAt { get; set; }
 
-        public TransportPayload(TMessage message, DateTimeOffset publishedAt)
+        public TransportMessagePayload(TMessage message, DateTimeOffset publishedAt)
         {
             Message = message;
             PublishedAt = publishedAt;

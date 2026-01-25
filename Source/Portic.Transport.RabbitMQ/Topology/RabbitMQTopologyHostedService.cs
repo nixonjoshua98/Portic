@@ -1,47 +1,19 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Portic.Abstractions;
 using Portic.Transport.RabbitMQ.Abstractions;
-using Portic.Transport.RabbitMQ.Consumer;
-using RabbitMQ.Client.Events;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQTopologyHostedService(
-        IPorticConfiguration _dispatchConfiguration,
-        IRabbitMQTopologyFactory _topologyFactory,
-        IRabbitMQConnectionContext _connectionContext,
-        IRabbitMQMessageConsumer _messageConsumer
+        IPorticConfiguration _configuration,
+        IRabbitMQTopologyFactory _topologyFactory
     ) : IHostedLifecycleService
     {
         public async Task StartingAsync(CancellationToken cancellationToken)
         {
-            await _topologyFactory.CreateTopologyAsync(_dispatchConfiguration.Consumers, cancellationToken);
-
-            var queues = _dispatchConfiguration.Consumers
-                .Select(x => x.GetQueueName())
-                .Distinct();
-
-            foreach (var queueName in queues)
+            foreach (var endpoint in _configuration.Endpoints)
             {
-                var channel = await _connectionContext.CreateChannelAsync(cancellationToken);
-
-                var asyncConsumer = new AsyncEventingBasicConsumer(channel);
-
-                await channel.BasicConsumeAsync(
-                    queueName,
-                    autoAck: true,
-                    consumerTag: string.Empty,
-                    noLocal: false,
-                    exclusive: true,
-                    arguments: null,
-                    consumer: asyncConsumer,
-                    cancellationToken: cancellationToken
-                );
-
-                asyncConsumer.ReceivedAsync += async (sender, eventArgs) =>
-                {
-                    await _messageConsumer.ConsumeAsync(eventArgs, eventArgs.CancellationToken);
-                };
+                await _topologyFactory.CreateEndpointStateAsync(endpoint, cancellationToken);
             }
         }
 

@@ -3,17 +3,14 @@ using Portic.Consumer;
 
 namespace Portic.Configuration
 {
-    internal sealed class ConsumerConfiguration : IMessageConsumerConfiguration
+    internal sealed class ConsumerConfiguration(
+        IMessageConfiguration message,
+        Type consumer,
+        string endpointName
+    ) : IConsumerConfiguration
     {
-        public IMessageConfiguration Message { get; }
-        public Type ConsumerType { get; }
-
-        public ConsumerConfiguration(IMessageConfiguration message, Type consumer)
-        {
-            Message = message;
-            ConsumerType = consumer;
-        }
-
-        public string GetQueueName() => ConsumerType.FullName!;
+        public IMessageConfiguration Message { get; } = message;
+        public Type ConsumerType { get; } = consumer;
+        public string EndpointName { get; } = endpointName;
     }
 }

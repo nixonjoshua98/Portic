@@ -1,8 +1,8 @@
-﻿using Portic.Transport.RabbitMQ.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Abstractions;
 using Portic.Transport.RabbitMQ.Abstractions;
+using Portic.Transport.RabbitMQ.Configuration;
 using Portic.Transport.RabbitMQ.Consumer;
 using Portic.Transport.RabbitMQ.Topology;
 
@@ -10,9 +10,9 @@ namespace Portic.Transport.RabbitMQ.Extensions
 {
     public static class ConsumerBuilderExtensions
     {
-        public static IPorticConfigurator UsingRabbitMQ(this IPorticConfigurator builder, Action<IRabbitMQBusBuilder> callback)
+        public static IPorticConfigurator UsingRabbitMQ(this IPorticConfigurator builder, Action<IRabbitMQTransportConfigurator> callback)
         {
-            var busBuilder = new RabbitMQBusBuilder(builder);
+            var busBuilder = new Configuration.RabbitMQTransport(builder);
 
             callback(busBuilder);
 
@@ -27,7 +27,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
         {
             services.AddHostedService<RabbitMQTopologyHostedService>();
 
-            services.TryAddSingleton<IMessageBus, RabbitMQMessageBus>();
+            services.TryAddSingleton<IMessageTransport, Topology.RabbitMQTransport>();
 
             services.TryAddSingleton<IRabbitMQMessageConsumer, RabbitMQMessageConsumer>();
 

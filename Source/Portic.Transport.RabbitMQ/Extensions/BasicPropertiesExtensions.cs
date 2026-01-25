@@ -6,7 +6,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
 {
     internal static class BasicPropertiesExtensions
     {
-        const string MessageNameKey = "d-messagename";
+        const string MessageNameKey = "p-messagename";
 
         public static BasicProperties SetMessageName(this BasicProperties properties, string name)
         {
@@ -25,6 +25,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
             {
                 return null;
             }
+
             else if (properties.Headers.TryGetValue(MessageNameKey, out var headerValue) && headerValue is byte[] headerBytes)
             {
                 return Encoding.UTF8.GetString(headerBytes);

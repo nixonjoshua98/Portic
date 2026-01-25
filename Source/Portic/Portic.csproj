@@ -8,7 +8,7 @@
 
 	<PropertyGroup>
 		<PackageId>Portic</PackageId>
-		<Description>The high-performance, lightweight, contract-first messaging gateway for .NET</Description>
+		<Description>The lightweight, contract-first messaging framework for .NET</Description>
 	</PropertyGroup>
 
 	<ItemGroup>

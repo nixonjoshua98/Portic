@@ -1,9 +1,9 @@
-﻿using RabbitMQ.Client.Events;
+﻿using Portic.Transport.RabbitMQ.Models;
 
 namespace Portic.Transport.RabbitMQ.Consumer
 {
     internal interface IRabbitMQMessageConsumer
     {
-        Task ConsumeAsync(BasicDeliverEventArgs args, CancellationToken cancellationToken);
+        Task ConsumeAsync(TransportMessageReceived message, CancellationToken cancellationToken);
     }
 }

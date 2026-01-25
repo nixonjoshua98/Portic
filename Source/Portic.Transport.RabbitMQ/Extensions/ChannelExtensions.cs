@@ -1,17 +1,17 @@
-﻿using Portic.Consumer;
-using Portic.Transport.RabbitMQ.Extensions;
+﻿using Portic.Endpoint;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Extensions
 {
     internal static class ChannelExtensions
     {
-        public static async Task<QueueDeclareOk> QueueDeclareAsync(this IChannel channel, IMessageConsumerConfiguration configuration, CancellationToken cancellationToken)
+        public static async Task<QueueDeclareOk> QueueDeclareAsync(this IChannel channel, IEndpointConfiguration endpoint, CancellationToken cancellationToken)
         {
             return await channel.QueueDeclareAsync(
-                configuration.GetQueueName(),
-                exclusive: true,
-                autoDelete: true,
+                queue: endpoint.Name,
+                durable: endpoint.GetDurable(),
+                exclusive: false,
+                autoDelete: endpoint.GetAutoDelete(),
                 cancellationToken: cancellationToken
             );
         }
