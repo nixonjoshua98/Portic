@@ -1,9 +1,11 @@
 ﻿using Portic.Consumer;
+using Portic.Endpoint;
+using Portic.Transport.RabbitMQ.Consumer;
 
 namespace Portic.Transport.RabbitMQ.Abstractions
 {
     internal interface IRabbitMQTopologyFactory
     {
-        Task CreateTopologyAsync(IEnumerable<IMessageConsumerConfiguration> consumers, CancellationToken cancellationToken);
+        Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointConfiguration endpoint, CancellationToken cancellationToken);
     }
 }

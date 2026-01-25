@@ -1,20 +1,21 @@
 ﻿using Portic.Abstractions;
 using Portic.Consumer;
+using Portic.Endpoint;
 
 namespace Portic.Configuration
 {
-    internal sealed class PorticConfiguration : IPorticConfiguration
+    internal sealed class PorticConfiguration(
+        IReadOnlyList<IMessageConsumerConfiguration> consumers,
+        IReadOnlyList<IMessageConfiguration> messages,
+        IReadOnlyList<IEndpointConfiguration> endpoints
+    ) : IPorticConfiguration
     {
-        public IReadOnlyList<IMessageConsumerConfiguration> Consumers { get; }
-        public IReadOnlyList<IMessageConfiguration> Messages { get; }
+        public IReadOnlyList<IMessageConsumerConfiguration> Consumers { get; } = consumers;
 
-        public PorticConfiguration(
-            IReadOnlyList<IMessageConsumerConfiguration> consumers,
-            IReadOnlyList<IMessageConfiguration> messages)
-        {
-            Consumers = consumers;
-            Messages = messages;
-        }
+        public IReadOnlyList<IMessageConfiguration> Messages { get; } = messages;
+
+        public IReadOnlyList<IEndpointConfiguration> Endpoints =>
+            [.. endpoints.Where(e => e.Consumers.Any())];
 
         public IMessageConfiguration GetMessageConfiguration<TMessage>()
         {

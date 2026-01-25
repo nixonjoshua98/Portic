@@ -3,9 +3,7 @@ using Portic.Abstractions;
 using Portic.Consumer;
 using Portic.Exceptions;
 using Portic.Serializer;
-using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Models;
-using RabbitMQ.Client.Events;
 using System.Collections.Concurrent;
 using System.Reflection;
 
@@ -28,25 +26,23 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 throw new Exception("Failed to find ConsumeGenericAsync method.");
         }
 
-        public async Task ConsumeAsync(BasicDeliverEventArgs args, CancellationToken cancellationToken)
+        public async Task ConsumeAsync(TransportMessageReceived message, CancellationToken cancellationToken)
         {
-            var messageName = args.GetMessageName();
-
-            if (string.IsNullOrEmpty(messageName))
+            if (string.IsNullOrEmpty(message.MessageName))
             {
-                throw InvalidMessageNameException.FromName(messageName);
+                throw InvalidMessageNameException.FromName(message.MessageName);
             }
 
-            var messageConfiguration = _configuration.GetMessageConfiguration(messageName);
+            var messageConfiguration = _configuration.GetMessageConfiguration(message.MessageName);
 
             var consumerConfiguration = _configuration.GetConsumerForMessage(messageConfiguration)
-                ?? throw MessageConsumerNotFoundException.FromName(messageName);
+                ?? throw MessageConsumerNotFoundException.FromName(message.MessageName);
 
-            await ExecuteConsumeGenericAsync(args, consumerConfiguration, cancellationToken);
+            await ExecuteConsumeGenericAsync(message, consumerConfiguration, cancellationToken);
         }
 
         private async Task ExecuteConsumeGenericAsync(
-            BasicDeliverEventArgs args,
+            TransportMessageReceived message,
             IMessageConsumerConfiguration consumerConfiguration,
             CancellationToken cancellationToken)
         {
@@ -56,7 +52,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
 
             var genericConsumeMethod = GetGenericConsumeMethod(messageConfiguration.MessageType);
 
-            object[] methodArgs = [messageName, args, consumerConfiguration, cancellationToken];
+            object[] methodArgs = [messageName, message, consumerConfiguration, cancellationToken];
 
             var genericConsumeResult = genericConsumeMethod.Invoke(this, methodArgs) as Task
                 ?? throw MessageConsumerNotFoundException.FromName(messageName);
@@ -66,11 +62,11 @@ namespace Portic.Transport.RabbitMQ.Consumer
 
         private async Task ConsumeGenericAsync<TMessage>(
             string messageName,
-            BasicDeliverEventArgs args,
+            TransportMessageReceived message,
             IMessageConsumerConfiguration consumerConfiguration,
             CancellationToken cancellationToken)
         {
-            var payload = _serializer.Deserialize<TransportPayload<TMessage>>(args.Body.Span);
+            var payload = _serializer.Deserialize<TransportMessagePayload<TMessage>>(message.Body);
 
             await using var scope = _scopeFactory.CreateAsyncScope();
 

@@ -1,4 +1,5 @@
 ﻿using Portic.Consumer;
+using Portic.Endpoint;
 
 namespace Portic.Abstractions
 {
@@ -6,6 +7,7 @@ namespace Portic.Abstractions
     {
         IReadOnlyList<IMessageConsumerConfiguration> Consumers { get; }
         IReadOnlyList<IMessageConfiguration> Messages { get; }
+        IReadOnlyList<IEndpointConfiguration> Endpoints { get; }
 
         IMessageConsumerConfiguration? GetConsumerForMessage(IMessageConfiguration messageConfiguration);
         IMessageConfiguration GetMessageConfiguration<TMessage>();

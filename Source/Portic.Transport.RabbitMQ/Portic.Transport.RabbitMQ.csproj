@@ -8,7 +8,7 @@
 
 	<PropertyGroup>
 		<PackageId>Portic.Transport.RabbitMQ</PackageId>
-		<Description>The high-performance RabbitMQ transport for Portic</Description>
+		<Description>The RabbitMQ transport for Portic</Description>
 	</PropertyGroup>
 
 	<ItemGroup>

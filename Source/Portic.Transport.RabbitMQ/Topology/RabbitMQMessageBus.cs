@@ -17,7 +17,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         {
             var messageConfiguration = _configuration.GetMessageConfiguration<TMessage>();
 
-            var payload = new TransportPayload<TMessage>(
+            var payload = new TransportMessagePayload<TMessage>(
                 message,
                 DateTimeOffset.UtcNow
             );

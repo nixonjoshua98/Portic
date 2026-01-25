@@ -6,7 +6,6 @@ namespace Portic.Consumer
     {
         IMessageConfiguration Message { get; }
         Type ConsumerType { get; }
-
-        string GetQueueName();
+        string EndpointName { get; }
     }
 }

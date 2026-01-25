@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Portic.Abstractions;
 using Portic.Consumer;
+using Portic.Endpoint;
 using System.Collections.Concurrent;
 
 namespace Portic.Configuration
@@ -11,31 +12,55 @@ namespace Portic.Configuration
 
         private readonly ConcurrentDictionary<Type, MessageConfigurator> MessageConfigurators = [];
 
-        public readonly ConcurrentDictionary<Type, ConsumerConfigurator> ConsumerBuilders = [];
+        private readonly ConcurrentDictionary<Type, MessageConsumerConfigurator> ConsumerBuilders = [];
+
+        private readonly ConcurrentDictionary<string, EndpointConfigurator> EndpointConfigurators = [];
 
         public PorticConfigurator(IServiceCollection services)
         {
             Services = services;
         }
 
-        public IMessageConsumerBuilder ConfigureConsumer<TMessage, TMessageConsumer>()
+        public IMessageConfigurator ConfigureMessage<TMessage>()
         {
-            var messageConfigurator = ConfigureMessage<TMessage>();
-
-            return ConfigureConsumer<TMessageConsumer>(messageConfigurator.MessageType);
+            return GetMessageConfigurator<TMessage>();
         }
 
-        private ConsumerConfigurator ConfigureConsumer<TConsumer>(Type messageType)
+        public IEndpointConfigurator ConfigureEndpoint(string endpointName)
+        {
+            return GetEndpointConfigurator(endpointName);
+        }
+
+        public IMessageConsumerConfigurator ConfigureConsumer<TMessage, TMessageConsumer>()
+        {
+            var message = ConfigureMessage<TMessage>();
+
+            var consumer = GetConsumerConfigurator<TMessageConsumer>(message.MessageType);
+
+            ConfigureEndpoint(consumer.EndpointName);
+
+            return consumer;
+        }
+
+        private MessageConsumerConfigurator GetConsumerConfigurator<TConsumer>(Type messageType)
         {
             var consumerType = typeof(TConsumer);
 
             return ConsumerBuilders.GetOrAdd(
                 consumerType,
-                _ => new ConsumerConfigurator(consumerType, messageType)
+                _ => new MessageConsumerConfigurator(this, consumerType, messageType)
             );
         }
 
-        public IMessageConfigurator ConfigureMessage<TMessage>()
+        private EndpointConfigurator GetEndpointConfigurator(string endpointName)
+        {
+            return EndpointConfigurators.GetOrAdd(
+                endpointName,
+                _ => new EndpointConfigurator(endpointName)
+            );
+        }
+
+        private MessageConfigurator GetMessageConfigurator<TMessage>()
         {
             var messageType = typeof(TMessage);
 
@@ -56,9 +81,16 @@ namespace Portic.Configuration
                 .Select(c => c.Build(messageConfigurators[c.MessageType]))
                 .ToList();
 
+            var endpoints = EndpointConfigurators.Values
+                .Select(endpoint => endpoint.Build(
+                    consumerConfigurations.Where(consumer => consumer.EndpointName == endpoint.Name)
+                ))
+                .ToList();
+
             return new PorticConfiguration(
                 consumerConfigurations,
-                [.. messageConfigurators.Values]
+                [.. messageConfigurators.Values],
+                endpoints
             );
         }
     }
