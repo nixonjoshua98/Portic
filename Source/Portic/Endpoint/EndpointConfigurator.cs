@@ -5,7 +5,7 @@ namespace Portic.Endpoint
 {
     internal sealed class EndpointConfigurator : IEndpointConfigurator
     {
-        private readonly CustomPropertyBag Properties = new CustomPropertyBag();
+        private readonly CustomPropertyBag Properties = new();
 
         public string Name { get; private set; }
 

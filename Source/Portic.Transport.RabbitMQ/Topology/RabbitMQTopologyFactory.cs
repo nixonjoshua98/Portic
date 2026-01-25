@@ -1,15 +1,18 @@
-﻿using Portic.Consumer;
+﻿using Microsoft.Extensions.Logging;
+using Portic.Consumer;
 using Portic.Endpoint;
 using Portic.Transport.RabbitMQ.Abstractions;
 using Portic.Transport.RabbitMQ.Consumer;
 using Portic.Transport.RabbitMQ.Extensions;
+using Portic.Transport.RabbitMQ.Logging;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQTopologyFactory(
         IRabbitMQConnectionContext _connectionContext,
-        IRabbitMQMessageConsumer _messageConsumer
+        IRabbitMQMessageConsumer _messageConsumer,
+        ILogger<RabbitMQTopologyFactory> _logger
     ) : IRabbitMQTopologyFactory
     {
         public async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointConfiguration endpoint, CancellationToken cancellationToken)
@@ -50,6 +53,12 @@ namespace Portic.Transport.RabbitMQ.Topology
             await rented.Channel.ExchangeDeclareAsync(consumer.Message.Name, ExchangeType.Fanout, cancellationToken: cancellationToken);
 
             await rented.Channel.QueueBindAsync(queue.QueueName, consumer.Message.Name, string.Empty, cancellationToken: cancellationToken);
+
+            RabbitMQTransportLog.LogExchangeBoundToQueue(
+                _logger,
+                queue.QueueName,
+                consumer.Message.Name
+            );
         }
     }
 }

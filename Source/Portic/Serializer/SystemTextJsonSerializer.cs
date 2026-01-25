@@ -4,7 +4,7 @@ namespace Portic.Serializer
 {
     internal sealed class SystemTextJsonSerializer : IPorticSerializer
     {
-        private readonly JsonSerializerOptions _serializerOptions = new JsonSerializerOptions
+        private readonly JsonSerializerOptions _serializerOptions = new()
         {
             WriteIndented = true
         };

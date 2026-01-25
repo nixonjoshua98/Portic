@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Portic.Endpoint
 {
-    public sealed class EndpointConfiguration(
+    internal sealed class EndpointConfiguration(
         string name,
         IEnumerable<IConsumerConfiguration> consumers,
         IReadOnlyCustomPropertyBag properties
