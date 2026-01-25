@@ -5,34 +5,36 @@ using RabbitMQ.Client.Events;
 
 namespace Portic.Transport.RabbitMQ.Consumer
 {
-    internal sealed class RabbitMQEndpointConsumerState
-    {
-        public readonly IChannel Channel;
+    internal sealed class RabbitMQEndpointConsumerState : IDisposable
+    {       
+        private bool _isDisposed;
+
+        public IChannel? Channel { get; private set; }
+
         public readonly IEndpointConfiguration Endpoint;
 
         private readonly AsyncEventingBasicConsumer EventConsumer;
-        private readonly CancellationToken CancellationToken;
         private readonly Func<TransportMessageReceived, CancellationToken, Task> ConsumeFunc;
 
         public RabbitMQEndpointConsumerState(
             IChannel channel,
             IEndpointConfiguration endpoint,
-            Func<TransportMessageReceived, CancellationToken, Task> consumeFunc,
-            CancellationToken cancellationToken)
+            Func<TransportMessageReceived, CancellationToken, Task> consumeFunc)
         {
             Channel = channel;
             Endpoint = endpoint;
             ConsumeFunc = consumeFunc;
-            CancellationToken = cancellationToken;
 
             EventConsumer = new AsyncEventingBasicConsumer(channel);
 
             EventConsumer.ReceivedAsync += EventConsumer_ReceivedAsync;
         }
 
-        public async Task BasicConsumeAsync()
+        public async Task BasicConsumeAsync(CancellationToken cancellationToken)
         {
-            await Channel.BasicConsumeAsync(
+            var channel = GetChannelOrThrow();
+
+            await channel.BasicConsumeAsync(
                 Endpoint.Name,
                 autoAck: false,
                 consumerTag: string.Empty,
@@ -40,12 +42,14 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 exclusive: false,
                 arguments: null,
                 consumer: EventConsumer,
-                cancellationToken: CancellationToken
+                cancellationToken: cancellationToken
             );
         }
 
         private async Task EventConsumer_ReceivedAsync(object sender, BasicDeliverEventArgs args)
         {
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
+
             await ConsumeFunc(
                 new TransportMessageReceived(
                     this,
@@ -53,6 +57,33 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 ),
                 args.CancellationToken
             );
+        }
+
+        public IChannel GetChannelOrThrow()
+        {
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
+
+            return Channel ?? throw new InvalidOperationException($"Assigned channel for endpoint consumer '{Endpoint.Name}' is null.");
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    Channel?.Dispose();
+                }
+
+                Channel = null;
+                _isDisposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

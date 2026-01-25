@@ -8,38 +8,54 @@ namespace Portic.Transport.RabbitMQ.Extensions
         private const string PrefetchCountKey = "rmq-prefetchcount";
         private const string ChannelCountKey = "rmq-channelcount";
         private const string AutoDeleteKey = "rmq-autodelete";
+        private const string ExclusiveKey = "rmq-exclusive";
         private const string DurableKey = "rmq-durable";
 
-        public static IEndpointConfigurator WithPrefetchCount(this IEndpointConfigurator configurator, ushort value) =>
-            configurator.SetProperty(PrefetchCountKey, value);
-
-        internal static ushort GetPrefetchCount(this IEndpointConfiguration configurator) =>
-            configurator.GetPropertyOrDefault<ushort>(PrefetchCountKey, 1);
-
-        public static IEndpointConfigurator WithAutoDelete(this IEndpointConfigurator configurator, bool value = true) =>
-            configurator.SetProperty(AutoDeleteKey, value);
-
-        internal static bool GetAutoDelete(this IEndpointConfiguration configurator) =>
-            configurator.GetPropertyOrDefault(AutoDeleteKey, false);
-
-        public static IEndpointConfigurator WithDurable(this IEndpointConfigurator configurator, bool value = true) =>
-            configurator.SetProperty(DurableKey, value);
-
-        internal static bool GetDurable(this IEndpointConfiguration configurator) =>
-            configurator.GetPropertyOrDefault(DurableKey, true);
-
-        public static IEndpointConfigurator WithChannelCount(this IEndpointConfigurator configurator, byte value) =>
-            configurator.SetProperty(ChannelCountKey, value);
-
-        internal static byte GetChannelCount(this IEndpointConfiguration configurator) =>
-            configurator.GetPropertyOrDefault<byte>(ChannelCountKey, 1);
-
-        internal static RabbitMQChannelOptions CreateChannelOptions(this IEndpointConfiguration endpoint)
+        extension(IEndpointConfigurator configurator)
         {
-            return new RabbitMQChannelOptions(
-                0,
-                endpoint.GetPrefetchCount()
-            );
+            public IEndpointConfigurator WithPrefetchCount(ushort value) =>
+                configurator.SetProperty(PrefetchCountKey, value);
+
+            public IEndpointConfigurator WithAutoDelete(bool value = true) =>
+                configurator.SetProperty(AutoDeleteKey, value);
+
+            public IEndpointConfigurator WithDurable(bool value = true) =>
+                configurator.SetProperty(DurableKey, value);
+
+            public IEndpointConfigurator WithChannelCount(byte value) =>
+                configurator.SetProperty(ChannelCountKey, value);
+
+            public IEndpointConfigurator WithExclusive(bool value = true) =>
+                configurator.SetProperty(ExclusiveKey, value);
+        }
+
+        extension(IEndpointConfiguration configurator)
+        {
+            internal ushort PrefetchCount =>
+                configurator.GetPropertyOrDefault<ushort>(PrefetchCountKey, 1);
+
+            internal bool AutoDelete =>
+                configurator.GetPropertyOrDefault(AutoDeleteKey, false);
+
+            internal bool Durable =>
+                configurator.GetPropertyOrDefault(DurableKey, true);
+
+            internal byte ChannelCount =>
+                configurator.GetPropertyOrDefault<byte>(ChannelCountKey, 1);
+
+            internal bool Exclusive =>
+                configurator.GetPropertyOrDefault(ExclusiveKey, false);
+        }
+
+        extension(IEndpointConfiguration endpoint)
+        {
+            internal RabbitMQChannelOptions CreateChannelOptions()
+            {
+                return new RabbitMQChannelOptions(
+                    0,
+                    endpoint.PrefetchCount
+                );
+            }
         }
     }
 }

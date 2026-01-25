@@ -3,7 +3,10 @@ using System.Collections.Concurrent;
 
 namespace Portic.Transport.RabbitMQ.Channel
 {
-    internal sealed class RabbitMQChannelPool(IConnection connection, int maxPoolSize = 256)
+    internal sealed class RabbitMQChannelPool(
+        IConnection connection, 
+        int maxPoolSize = 256
+    ) : IAsyncDisposable
     {
         private readonly IConnection _connection = connection;
         private readonly ConcurrentQueue<IChannel> _idleChannels = new();
@@ -33,6 +36,21 @@ namespace Portic.Transport.RabbitMQ.Channel
         public void Release(IChannel channel)
         {
             _idleChannels.Enqueue(channel);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            foreach (var channel in _idleChannels)
+            {
+                try
+                {
+                    await (channel?.DisposeAsync() ?? ValueTask.CompletedTask);
+                }
+                catch (Exception)
+                {
+                    // Swallow
+                }
+            }
         }
     }
 

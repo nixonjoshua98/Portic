@@ -22,23 +22,21 @@ namespace Portic.Transport.RabbitMQ.Topology
                 await BindQueuesToExchangeAsync(endpoint, consumer, cancellationToken);
             }
 
-            int consumerCount = endpoint.GetChannelCount();
-
             var state = new RabbitMQEndpointState(
                 endpoint,
                 _messageConsumer.ConsumeAsync
             );
 
-            for (int i = 0; i < consumerCount; i++)
+            for (int i = 0; i < endpoint.ChannelCount; i++)
             {
                 var channel = await _connectionContext.CreateChannelAsync(
                     endpoint.CreateChannelOptions(),
                     cancellationToken
                 );
 
-                var consumerState = state.AddConsumer(channel, cancellationToken);
+                var consumerState = state.AddConsumer(channel);
 
-                await consumerState.BasicConsumeAsync();
+                await consumerState.BasicConsumeAsync(cancellationToken);
             }
 
             return state;

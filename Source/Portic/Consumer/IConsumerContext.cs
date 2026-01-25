@@ -1,6 +1,6 @@
 ﻿namespace Portic.Consumer
 {
-    public interface IMessageConsumerContext<TMessage>
+    public interface IConsumerContext<TMessage>
     {
         TMessage Message { get; }
         TimeSpan Latency { get; }

@@ -2,9 +2,9 @@
 
 namespace Portic.Samples.Alpha
 {
-    internal sealed class PingConsumer : IMessageConsumer<PingMessage>
+    internal sealed class PingConsumer : IConsumer<PingMessage>
     {
-        public ValueTask ConsumeAsync(IMessageConsumerContext<PingMessage> context)
+        public ValueTask ConsumeAsync(IConsumerContext<PingMessage> context)
         {
             return ValueTask.CompletedTask;
         }

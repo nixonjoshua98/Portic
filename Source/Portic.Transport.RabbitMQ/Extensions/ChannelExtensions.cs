@@ -9,9 +9,9 @@ namespace Portic.Transport.RabbitMQ.Extensions
         {
             return await channel.QueueDeclareAsync(
                 queue: endpoint.Name,
-                durable: endpoint.GetDurable(),
-                exclusive: false,
-                autoDelete: endpoint.GetAutoDelete(),
+                durable: endpoint.Durable,
+                exclusive: endpoint.Exclusive,
+                autoDelete: endpoint.AutoDelete,
                 cancellationToken: cancellationToken
             );
         }

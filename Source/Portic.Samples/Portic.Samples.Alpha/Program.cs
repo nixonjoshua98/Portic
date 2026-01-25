@@ -18,10 +18,14 @@ builder.Services.AddHostedService<PingPublisher>();
 
 builder.Services.AddPortic(configurator =>
 {
+    configurator.ConfigureMessage<PingMessage>()
+        .WithName("Ping");
+
     configurator.ConfigureConsumer<PingMessage, PingConsumer>()
         .WithEndpointName("PingEndpoint");
 
     configurator.ConfigureEndpoint("PingEndpoint")
+        .WithExclusive()
         .WithPrefetchCount(32);
 
     configurator.UsingRabbitMQ(configurator =>
