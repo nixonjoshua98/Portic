@@ -1,6 +1,6 @@
 ﻿namespace Portic.Models
 {
-    internal sealed class CustomPropertyBag : ICustomPropertyBag
+    internal sealed class CustomPropertyBag : IReadOnlyCustomPropertyBag
     {
         private readonly Dictionary<string, object> _properties = [];
 
@@ -12,8 +12,7 @@
         public T GetOrDefault<T>(string key, T defaultValue)
         {
             return _properties.TryGetValue(key, out var value) && value is T typedValue ?
-                typedValue :
-                defaultValue;
+                typedValue : defaultValue;
         }
     }
 }

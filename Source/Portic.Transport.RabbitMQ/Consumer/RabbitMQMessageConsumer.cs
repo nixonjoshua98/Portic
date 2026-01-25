@@ -6,7 +6,6 @@ using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Logging;
 using Portic.Transport.RabbitMQ.Models;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Reflection;
 
 namespace Portic.Transport.RabbitMQ.Consumer
@@ -30,13 +29,11 @@ namespace Portic.Transport.RabbitMQ.Consumer
 
         public async Task ConsumeAsync(TransportMessageReceived message, CancellationToken cancellationToken)
         {
-            var sw = Stopwatch.StartNew();
-
             try
             {
                 if (!message.TryGetConsumerConfiguration(out var consumerConfig))
                 {
-                    throw MessageConsumerNotFoundException.FromName(message.MessageName);
+                    throw ConsumerNotFoundException.FromName(message.MessageName);
                 }
 
                 await ExecuteConsumerAsync(message, consumerConfig, cancellationToken);
@@ -46,7 +43,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 RabbitMQTransportLog.LogMessageConsumed(
                     _logger,
                     consumerConfig.Message.Name,
-                    sw.Elapsed.TotalMilliseconds
+                    message.EndpointConfiguration.Name
                 );
             }
             catch (Exception)
@@ -86,7 +83,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
             );
 
             var consumerInst = ActivatorUtilities.CreateInstance(scope.ServiceProvider, consumerConfiguration.ConsumerType) as IMessageConsumer<TMessage>
-                ?? throw MessageConsumerNotFoundException.FromName(messageName);
+                ?? throw ConsumerNotFoundException.FromName(messageName);
 
             await consumerInst.ConsumeAsync(context);
         }

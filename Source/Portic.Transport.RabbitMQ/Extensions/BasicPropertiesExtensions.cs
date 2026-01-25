@@ -6,7 +6,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
 {
     internal static class BasicPropertiesExtensions
     {
-        const string MessageNameKey = "p-messagename";
+        private const string MessageNameKey = "p-messagename";
 
         public static BasicProperties SetMessageName(this BasicProperties properties, string name)
         {

@@ -8,9 +8,14 @@
 
 Portic is a lightweight, contract-first messaging framework for .NET. Built, it prioritizes strict message schema integrity and low-latency routing. By stripping away infrastructure bloat, Portic provides a high-performance, decoupled foundation for modern microservices.
 
-## 📦 Installation
+## ⚠️ Versioning
 
-Install the core library + RabbitMQ transport via NuGet:
+Portic is currently in **early development**. The API is subject to change and may introduce breaking changes until version 1.0 is released. 
+
+## 📦 Installation
+*Installing the core package alongside a transport package is not mandatory, as it will be included as part of the transport*
+
+Install via NuGet
 
 ```bash
 dotnet add package Portic

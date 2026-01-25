@@ -22,7 +22,7 @@ namespace Portic.Extensions
             return services;
         }
 
-        static void AddCoreServices(IServiceCollection services)
+        private static void AddCoreServices(IServiceCollection services)
         {
             services.TryAddSingleton<IMessageConsumerContextFactory, MessageConsumerContextFactory>();
 

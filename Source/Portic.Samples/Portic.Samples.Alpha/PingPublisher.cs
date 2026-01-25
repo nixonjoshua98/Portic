@@ -7,7 +7,7 @@ namespace Portic.Samples.Alpha
         IMessageTransport _messageBus
     ) : BackgroundService
     {
-        readonly TimeSpan PingInterval = TimeSpan.FromMilliseconds(10);
+        private readonly TimeSpan PingInterval = TimeSpan.FromMilliseconds(1.0 / 250);
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
