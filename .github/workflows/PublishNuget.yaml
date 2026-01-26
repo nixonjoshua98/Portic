@@ -1,6 +1,8 @@
 name: PublishNuget
 
 on:
+  workflow_dispatch:
+    
   release:
     types:
       - published
@@ -38,6 +40,9 @@ jobs:
       - name: Pack NuGet packages
         run: |
           dotnet pack Source/Portic/Portic.csproj --configuration Release --no-build -o ${{ env.DIST_PATH }}
+
+          dotnet pack Source/Portic.Middleware.Polly/Portic.Middleware.Polly.csproj --configuration Release --no-build -o ${{ env.DIST_PATH }}
+
           dotnet pack Source/Portic.Transport.RabbitMQ/Portic.Transport.RabbitMQ.csproj --configuration Release --no-build -o ${{ env.DIST_PATH }}
 
       - name: Push to NuGet.org
