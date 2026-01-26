@@ -41,7 +41,7 @@ namespace Portic.Middleware.Polly.Middleware
         {
             /*
              * When executing a consumer in a retry policy, each consumer execution should run in
-             * it's own scoped. This ensures any state changes from the previous attempt do not leak,
+             * its own scope. This ensures any state changes from the previous attempt do not leak,
              * such as DbContext tracking changes. 
              * We could maybe consider making this configurable in the future.
              */
