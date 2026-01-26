@@ -11,6 +11,8 @@ namespace Portic.Abstractions
         IConsumerConfigurator ConfigureConsumer<TMessage, TMessageConsumer>();
         IEndpointConfigurator ConfigureEndpoint(string endpointName);
         IMessageConfigurator ConfigureMessage<TMessage>();
+        bool HasProperty(string key);
+        IPorticConfigurator SetProperty(string key, object value);
         IPorticConfigurator Use<TMiddleware>() where TMiddleware : IConsumerMiddleware;
     }
 }

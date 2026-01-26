@@ -9,6 +9,7 @@ namespace Portic.Consumer
         CancellationToken cancellationToken
     ) : IConsumerContext<TMessage>
     {
+        public string MessageId { get; } = payload.MessageId;
         public string MessageName { get; } = consumerConfiguration.Message.Name;
         public TMessage Message { get; } = payload.Message;
         public CancellationToken CancellationToken { get; } = cancellationToken;

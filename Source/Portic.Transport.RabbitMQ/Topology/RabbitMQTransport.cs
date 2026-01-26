@@ -17,8 +17,8 @@ namespace Portic.Transport.RabbitMQ.Topology
             var messageConfiguration = _configuration.GetMessageConfiguration<TMessage>();
 
             var payload = new TransportMessagePayload<TMessage>(
-                message,
-                DateTimeOffset.UtcNow
+                Guid.CreateVersion7().ToString(),
+                message
             );
 
             var payloadBytes = _serializer.SerializeToBytes(payload);

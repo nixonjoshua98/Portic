@@ -2,12 +2,15 @@
 using Portic.Abstractions;
 using Portic.Consumer;
 using Portic.Endpoint;
+using Portic.Models;
 using System.Collections.Concurrent;
 
 namespace Portic.Configuration
 {
     internal sealed class PorticConfigurator(IServiceCollection services) : IPorticConfigurator
     {
+        private readonly CustomPropertyBag Properties = new();
+
         public IServiceCollection Services { get; } = services;
 
         private readonly ConcurrentDictionary<Type, MessageConfigurator> MessageConfigurators = [];
@@ -44,6 +47,18 @@ namespace Portic.Configuration
             Middleware.Add(typeof(TMiddleware));
 
             return this;
+        }
+
+        public IPorticConfigurator SetProperty(string key, object value)
+        {
+            Properties.SetProperty(key, value);
+
+            return this;
+        }
+
+        public bool HasProperty(string key)
+        {
+            return Properties.ContainsKey(key);
         }
 
         private MessageConsumerConfigurator GetConsumerConfigurator<TConsumer>(Type messageType)
