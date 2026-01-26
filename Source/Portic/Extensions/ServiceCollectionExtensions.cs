@@ -24,7 +24,9 @@ namespace Portic.Extensions
 
         private static void AddCoreServices(IServiceCollection services)
         {
-            services.TryAddSingleton<IMessageConsumerContextFactory, MessageConsumerContextFactory>();
+            services.TryAddSingleton<IConsumerExecutor, ConsumerExecutor>();
+
+            services.TryAddSingleton<IConsumerContextFactory, ConsumerContextFactory>();
 
             services.TryAddSingleton<IPorticSerializer, SystemTextJsonSerializer>();
         }

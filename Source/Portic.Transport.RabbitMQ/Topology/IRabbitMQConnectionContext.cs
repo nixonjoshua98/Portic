@@ -1,7 +1,7 @@
 ﻿using Portic.Transport.RabbitMQ.Channel;
 using RabbitMQ.Client;
 
-namespace Portic.Transport.RabbitMQ.Abstractions
+namespace Portic.Transport.RabbitMQ.Topology
 {
     internal interface IRabbitMQConnectionContext
     {

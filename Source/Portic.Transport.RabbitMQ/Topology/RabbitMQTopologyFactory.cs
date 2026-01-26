@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Portic.Consumer;
 using Portic.Endpoint;
-using Portic.Transport.RabbitMQ.Abstractions;
 using Portic.Transport.RabbitMQ.Consumer;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Logging;
@@ -11,7 +10,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQTopologyFactory(
         IRabbitMQConnectionContext _connectionContext,
-        IRabbitMQMessageConsumer _messageConsumer,
+        IRabbitMQConsumerExecutor _messageConsumer,
         ILogger<RabbitMQTopologyFactory> _logger
     ) : IRabbitMQTopologyFactory
     {
@@ -24,7 +23,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             var state = new RabbitMQEndpointState(
                 endpoint,
-                _messageConsumer.ConsumeAsync
+                _messageConsumer.ExecuteAsync
             );
 
             for (int i = 0; i < endpoint.ChannelCount; i++)
@@ -52,7 +51,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             await rented.Channel.QueueBindAsync(queue.QueueName, consumer.Message.Name, string.Empty, cancellationToken: cancellationToken);
 
-            RabbitMQTransportLog.LogExchangeBoundToQueue(
+            LoggingExtensions.LogExchangeBoundToQueue(
                 _logger,
                 queue.QueueName,
                 consumer.Message.Name

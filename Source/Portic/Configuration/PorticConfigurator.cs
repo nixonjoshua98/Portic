@@ -2,12 +2,15 @@
 using Portic.Abstractions;
 using Portic.Consumer;
 using Portic.Endpoint;
+using Portic.Models;
 using System.Collections.Concurrent;
 
 namespace Portic.Configuration
 {
     internal sealed class PorticConfigurator(IServiceCollection services) : IPorticConfigurator
     {
+        private readonly CustomPropertyBag Properties = new();
+
         public IServiceCollection Services { get; } = services;
 
         private readonly ConcurrentDictionary<Type, MessageConfigurator> MessageConfigurators = [];
@@ -15,6 +18,8 @@ namespace Portic.Configuration
         private readonly ConcurrentDictionary<Type, MessageConsumerConfigurator> ConsumerBuilders = [];
 
         private readonly ConcurrentDictionary<string, EndpointConfigurator> EndpointConfigurators = [];
+
+        private readonly List<Type> Middleware = [];
 
         public IMessageConfigurator ConfigureMessage<TMessage>()
         {
@@ -26,7 +31,7 @@ namespace Portic.Configuration
             return GetEndpointConfigurator(endpointName);
         }
 
-        public IMessageConsumerConfigurator ConfigureConsumer<TMessage, TMessageConsumer>()
+        public IConsumerConfigurator ConfigureConsumer<TMessage, TMessageConsumer>()
         {
             var message = ConfigureMessage<TMessage>();
 
@@ -35,6 +40,25 @@ namespace Portic.Configuration
             ConfigureEndpoint(consumer.EndpointName);
 
             return consumer;
+        }
+
+        public IPorticConfigurator Use<TMiddleware>() where TMiddleware : IConsumerMiddleware
+        {
+            Middleware.Add(typeof(TMiddleware));
+
+            return this;
+        }
+
+        public IPorticConfigurator SetProperty(string key, object value)
+        {
+            Properties.SetProperty(key, value);
+
+            return this;
+        }
+
+        public bool HasProperty(string key)
+        {
+            return Properties.ContainsKey(key);
         }
 
         private MessageConsumerConfigurator GetConsumerConfigurator<TConsumer>(Type messageType)
@@ -65,7 +89,7 @@ namespace Portic.Configuration
             );
         }
 
-        Dictionary<Type, IMessageConfiguration> CreateMessageConfigurations()
+        private Dictionary<Type, IMessageConfiguration> CreateMessageConfigurations()
         {
             var duplicateMessageName = MessageConfigurators.Values
                 .GroupBy(x => x.Name)
@@ -98,7 +122,8 @@ namespace Portic.Configuration
 
             return new PorticConfiguration(
                 messages,
-                endpoints
+                endpoints,
+                Middleware
             );
         }
     }

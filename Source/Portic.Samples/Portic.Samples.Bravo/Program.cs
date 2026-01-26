@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Portic.Extensions;
-using Portic.Samples.Alpha;
+using Portic.Middleware.Polly.Extensions;
+using Portic.Samples.Bravo;
 using Portic.Transport.RabbitMQ.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
+    .MinimumLevel.Information()
     .WriteTo.Console()
     .CreateLogger();
 
@@ -19,6 +20,10 @@ builder.Services.AddHostedService<PingPublisher>();
 builder.Services.AddPortic(configurator =>
 {
     configurator.ConfigureConsumer<PingMessage, PingConsumer>();
+
+    configurator.Use<LoggingMiddleware>();
+
+    configurator.UsePolly(3);
 
     configurator.UsingRabbitMQ();
 });

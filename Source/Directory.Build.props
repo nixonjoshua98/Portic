@@ -15,7 +15,7 @@
 		<RepositoryUrl>https://github.com/nixonjoshua98/Portic</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-		<Version>0.1.0-alpha</Version>
+		<Version>0.2.0-alpha</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

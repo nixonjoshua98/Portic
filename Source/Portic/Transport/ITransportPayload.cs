@@ -2,7 +2,7 @@
 {
     public interface ITransportPayload<TMessage>
     {
-        DateTimeOffset PublishedAt { get; }
         TMessage Message { get; }
+        string MessageId { get; }
     }
 }

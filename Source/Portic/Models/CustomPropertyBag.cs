@@ -14,5 +14,10 @@
             return _properties.TryGetValue(key, out var value) && value is T typedValue ?
                 typedValue : defaultValue;
         }
+
+        public bool ContainsKey(string key)
+        {
+            return _properties.ContainsKey(key);
+        }
     }
 }

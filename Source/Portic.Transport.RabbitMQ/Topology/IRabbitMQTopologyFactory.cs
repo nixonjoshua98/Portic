@@ -1,7 +1,7 @@
 ﻿using Portic.Endpoint;
 using Portic.Transport.RabbitMQ.Consumer;
 
-namespace Portic.Transport.RabbitMQ.Abstractions
+namespace Portic.Transport.RabbitMQ.Topology
 {
     internal interface IRabbitMQTopologyFactory
     {

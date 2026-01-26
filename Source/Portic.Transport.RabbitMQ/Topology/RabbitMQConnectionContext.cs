@@ -1,5 +1,4 @@
-﻿using Portic.Transport.RabbitMQ.Abstractions;
-using Portic.Transport.RabbitMQ.Channel;
+﻿using Portic.Transport.RabbitMQ.Channel;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology

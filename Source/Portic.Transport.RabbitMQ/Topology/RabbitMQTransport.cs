@@ -1,6 +1,5 @@
 ﻿using Portic.Abstractions;
 using Portic.Serializer;
-using Portic.Transport.RabbitMQ.Abstractions;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Models;
 using RabbitMQ.Client;
@@ -18,8 +17,8 @@ namespace Portic.Transport.RabbitMQ.Topology
             var messageConfiguration = _configuration.GetMessageConfiguration<TMessage>();
 
             var payload = new TransportMessagePayload<TMessage>(
-                message,
-                DateTimeOffset.UtcNow
+                Guid.CreateVersion7().ToString(),
+                message
             );
 
             var payloadBytes = _serializer.SerializeToBytes(payload);

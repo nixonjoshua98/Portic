@@ -6,11 +6,34 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/nixonjoshua98/Portic/PublishNuget.yaml?style=flat-square)](https://github.com/nixonjoshua98/Portic/actions)
 
-Portic is a lightweight, contract-first messaging framework for .NET. Built, it prioritizes strict message schema integrity and low-latency routing. By stripping away infrastructure bloat, Portic provides a high-performance, decoupled foundation for modern microservices.
+Portic is a lightweight, contract-first messaging framework for .NET prioritising strict message schema integrity.
 
 ## ⚠️ Versioning
+Portic is currently in **early development**. The API is subject to change and may introduce breaking changes as part of minor version bumps.
 
-Portic is currently in **early development**. The API is subject to change and may introduce breaking changes until version 1.0 is released. 
+## 📚 Quick Start + Samples
+For complete working examples, check out the [Samples](/Source/Portic.Samples).
+
+```cs
+builder.Services.AddPortic(configurator =>
+{
+    configurator.ConfigureConsumer<PingMessage, PingConsumer>();
+
+    configurator.UsingRabbitMQ();
+});
+
+...
+
+public class MyDependency(IMessageTransport _transport)
+{
+    public async Task PublishPing() 
+    {
+        await _transport.PublishAsync(
+            new PingMessage()
+        );
+    }
+}
+```
 
 ## 📦 Installation
 *Installing the core package alongside a transport package is not mandatory, as it will be included as part of the transport*
