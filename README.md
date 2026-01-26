@@ -12,7 +12,7 @@ Portic is a lightweight, contract-first messaging framework for .NET prioritisin
 Portic is currently in **early development**. The API is subject to change and may introduce breaking changes as part of minor version bumps.
 
 ## 📚 Quick Start + Samples
-For complete working examples, check out the [Samples](/Source/Portic.Samples).
+For complete working examples, check out the [Samples](https://github.com/nixonjoshua98/Portic/tree/master/Source/Portic.Samples).
 
 ```cs
 builder.Services.AddPortic(configurator =>
