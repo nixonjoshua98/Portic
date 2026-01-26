@@ -51,7 +51,7 @@ namespace Portic.Configuration
 
         public IPorticConfigurator SetProperty(string key, object value)
         {
-            Properties.SetProperty(key, value);
+            Properties.Set(key, value);
 
             return this;
         }

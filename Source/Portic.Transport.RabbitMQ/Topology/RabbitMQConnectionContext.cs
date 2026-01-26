@@ -10,7 +10,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         private IConnection? _connection;
         private RabbitMQChannelPool? _channelPool;
 
-        public async ValueTask<IRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
+        public async ValueTask<IRabbitMQRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
         {
             var channelPool = await GetChannelPoolAsync(cancellationToken);
 

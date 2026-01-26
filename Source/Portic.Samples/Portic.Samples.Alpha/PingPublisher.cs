@@ -13,7 +13,7 @@ namespace Portic.Samples.Alpha
             {
                 await _messageBus.PublishAsync(new PingMessage(), stoppingToken);
 
-                await Task.Delay(1000, stoppingToken);
+                await Task.Delay(500, stoppingToken);
             }
         }
     }

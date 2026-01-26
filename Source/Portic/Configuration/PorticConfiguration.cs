@@ -16,6 +16,8 @@ namespace Portic.Configuration
 
         public IReadOnlyList<Type> Middleware { get; } = globalMiddlewareTypes;
 
+        public byte MaxDeliveryAttempts => 3;
+
         public IMessageConfiguration GetMessageConfiguration<TMessage>()
         {
             var messageType = typeof(TMessage);

@@ -9,6 +9,16 @@ namespace Portic.Transport.RabbitMQ.Extensions
 {
     public static class ConsumerBuilderExtensions
     {
+        /// <summary>
+        /// Configures the builder to use RabbitMQ as the transport for messaging and allows optional customization of
+        /// the RabbitMQ transport settings.
+        /// </summary>
+        /// <remarks>Call this method to enable RabbitMQ transport for your application's messaging
+        /// infrastructure. The optional callback provides access to advanced RabbitMQ configuration options before the
+        /// transport is registered.</remarks>
+        /// <param name="builder">The configurator used to register services and configure messaging for the application.</param>
+        /// <param name="callback">An optional callback to further configure RabbitMQ transport options. If null, default settings are used.</param>
+        /// <returns>The same configurator instance, enabling further configuration chaining.</returns>
         public static IPorticConfigurator UsingRabbitMQ(this IPorticConfigurator builder, Action<IRabbitMQTransportConfigurator>? callback = null)
         {
             var busBuilder = new RabbitMQTransportConfiguration(builder);

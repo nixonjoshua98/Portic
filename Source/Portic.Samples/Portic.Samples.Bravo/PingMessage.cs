@@ -1,4 +1,4 @@
 ﻿namespace Portic.Samples.Bravo
 {
-    public sealed class PingMessage;
+    public sealed record PingMessage(int Value);
 }

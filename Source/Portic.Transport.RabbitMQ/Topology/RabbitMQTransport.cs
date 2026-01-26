@@ -14,24 +14,24 @@ namespace Portic.Transport.RabbitMQ.Topology
     {
         public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
         {
-            var messageConfiguration = _configuration.GetMessageConfiguration<TMessage>();
+            var configuration = _configuration.GetMessageConfiguration<TMessage>();
 
-            var payload = new TransportMessagePayload<TMessage>(
+            var body = new RabbitMQMessageBody<TMessage>(
                 Guid.CreateVersion7().ToString(),
                 message
             );
 
-            var payloadBytes = _serializer.SerializeToBytes(payload);
+            var payloadBytes = _serializer.SerializeToBytes(body);
 
             var properties = new BasicProperties()
-                .SetMessageName(messageConfiguration.Name);
+                .SetMessageName(configuration.Name);
 
             using var rented = await _connectionContext.RentChannelAsync(cancellationToken);
 
             await rented.Channel.BasicPublishAsync(
-                messageConfiguration.Name,
+                configuration.Name,
                 string.Empty,
-                mandatory: false,
+                mandatory: configuration.Mandatory,
                 properties,
                 payloadBytes,
                 cancellationToken: cancellationToken

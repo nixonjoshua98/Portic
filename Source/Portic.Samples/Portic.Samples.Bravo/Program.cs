@@ -23,7 +23,7 @@ builder.Services.AddPortic(configurator =>
 
     configurator.Use<LoggingMiddleware>();
 
-    configurator.UsePolly(3);
+    configurator.UseRetryCount(1);
 
     configurator.UsingRabbitMQ();
 });

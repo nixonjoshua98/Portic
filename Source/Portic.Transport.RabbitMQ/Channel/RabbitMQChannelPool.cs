@@ -12,7 +12,7 @@ namespace Portic.Transport.RabbitMQ.Channel
         private readonly ConcurrentQueue<IChannel> _idleChannels = new();
         private readonly SemaphoreSlim _creationLock = new(maxPoolSize, maxPoolSize);
 
-        public async Task<IRentedChannel> RentAsync(CancellationToken cancellationToken)
+        public async Task<IRabbitMQRentedChannel> RentAsync(CancellationToken cancellationToken)
         {
             if (_idleChannels.TryDequeue(out var channel))
             {
@@ -51,24 +51,6 @@ namespace Portic.Transport.RabbitMQ.Channel
                     // Swallow
                 }
             }
-        }
-    }
-
-    internal interface IRentedChannel : IDisposable
-    {
-        IChannel Channel { get; }
-    }
-
-    internal sealed class RabbitMQRentedChannel(
-        RabbitMQChannelPool Pool,
-        IChannel channel
-    ) : IRentedChannel
-    {
-        public IChannel Channel => channel;
-
-        public void Dispose()
-        {
-            Pool.Release(channel);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Portic.Endpoint
 
         public IEndpointConfigurator SetProperty(string key, object value)
         {
-            Properties.SetProperty(key, value);
+            Properties.Set(key, value);
 
             return this;
         }

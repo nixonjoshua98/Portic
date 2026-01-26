@@ -1,11 +1,14 @@
-﻿using Portic.Consumer;
+﻿using Microsoft.Extensions.Logging;
+using Portic.Consumer;
 
 namespace Portic.Samples.Alpha
 {
-    internal sealed class PingConsumer : IConsumer<PingMessage>
+    internal sealed class PingConsumer(ILogger<PingConsumer> _logger) : IConsumer<PingMessage>
     {
         public ValueTask ConsumeAsync(IConsumerContext<PingMessage> context)
         {
+            _logger.LogInformation("Pong!");
+
             return ValueTask.CompletedTask;
         }
     }

@@ -11,6 +11,9 @@
     <File Path="Portic.Samples/Directory.Build.props" />
     <File Path="Portic.Samples/Directory.Packages.props" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Folder Name="/Workflows/">
     <File Path="../.github/workflows/PublishNuget.yaml" />
   </Folder>

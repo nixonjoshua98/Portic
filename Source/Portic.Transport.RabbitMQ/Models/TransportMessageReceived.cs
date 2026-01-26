@@ -17,7 +17,9 @@ namespace Portic.Transport.RabbitMQ.Models
 
         public readonly IEndpointConfiguration EndpointConfiguration = state.Endpoint;
 
-        public readonly string? MessageName = deliverArgs.GetMessageName();
+        public readonly string? MessageName = deliverArgs.BasicProperties.GetMessageName();
+
+        public readonly byte DeliveryCount = deliverArgs.BasicProperties.GetDeliveryCount();
 
         public readonly ulong DeliveryTag = deliverArgs.DeliveryTag;
 

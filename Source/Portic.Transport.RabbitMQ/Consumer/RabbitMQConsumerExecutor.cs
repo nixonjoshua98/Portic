@@ -40,8 +40,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
 
                 await message.Channel.BasicAckAsync(message.DeliveryTag, false, cancellationToken);
 
-                LoggingExtensions.LogMessageConsumed(
-                    _logger,
+                _logger.LogMessageConsumed(
                     consumerConfig.Message.Name,
                     message.EndpointConfiguration.Name
                 );
@@ -71,14 +70,17 @@ namespace Portic.Transport.RabbitMQ.Consumer
             CancellationToken cancellationToken
         )
         {
-            var payload = _serializer.Deserialize<TransportMessagePayload<TMessage>>(message.Body);
+            var body = _serializer.Deserialize<RabbitMQMessageBody<TMessage>>(message.Body);
 
             await using var scope = _scopeFactory.CreateAsyncScope();
 
-            var context = new ConsumerExecutorContext<TMessage>(
-                payload,
+            var context = new ConsumerContext<TMessage>(
+                body.MessageId,
+                body.Message,
+                message.DeliveryCount,
                 scope.ServiceProvider,
-                consumerConfiguration
+                consumerConfiguration,
+                cancellationToken
             );
 
             await _consumerExecutor.ExecuteAsync(context, cancellationToken);
