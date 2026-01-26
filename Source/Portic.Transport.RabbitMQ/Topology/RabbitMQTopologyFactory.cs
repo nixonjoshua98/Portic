@@ -51,7 +51,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             await rented.Channel.QueueBindAsync(queue.QueueName, consumer.Message.Name, string.Empty, cancellationToken: cancellationToken);
 
-            RabbitMQTransportLog.LogExchangeBoundToQueue(
+            LoggingExtensions.LogExchangeBoundToQueue(
                 _logger,
                 queue.QueueName,
                 consumer.Message.Name

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Polly;
 using Portic.Consumer;
 using Portic.Middleware.Polly.Configuration;
-using Portic.Middleware.Polly.Logging;
+using Portic.Middleware.Polly.Extensions;
 
 namespace Portic.Middleware.Polly.Middleware
 {
@@ -17,9 +17,13 @@ namespace Portic.Middleware.Polly.Middleware
 
         public async Task InvokeAsync(IConsumerContext context, ConsumerMiddlewareDelegate next)
         {
+            var resilienceContext = ResilienceContextPool.Shared.Get(context.CancellationToken);
+
             try
             {
-                await _pipeline.ExecuteAsync(async _ => await ExecuteAsync(context, next), context.CancellationToken);
+                resilienceContext.SetLoggingProperties(context, _logger);
+
+                await _pipeline.ExecuteAsync(async _ => await ExecuteAsync(context, next), resilienceContext);
             }
             catch (Exception ex)
             {
@@ -27,10 +31,21 @@ namespace Portic.Middleware.Polly.Middleware
 
                 throw;
             }
+            finally
+            {
+                ResilienceContextPool.Shared.Return(resilienceContext);
+            }
         }
 
         private static async Task ExecuteAsync(IConsumerContext context, ConsumerMiddlewareDelegate next)
         {
+            /*
+             * When executing a consumer in a retry policy, each consumer execution should run in
+             * it's own scoped. This ensures any state changes from the previous attempt do not leak,
+             * such as DbContext tracking changes. 
+             * We could maybe consider making this configurable in the future.
+             */
+
             var originalServiceProvider = context.Services;
 
             await using var scope = context.Services.CreateAsyncScope();

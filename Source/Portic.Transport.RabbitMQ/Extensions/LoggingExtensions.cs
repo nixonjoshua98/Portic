@@ -2,7 +2,7 @@
 
 namespace Portic.Transport.RabbitMQ.Logging
 {
-    internal static partial class RabbitMQTransportLog
+    internal static partial class LoggingExtensions
     {
         [LoggerMessage(Level = LogLevel.Debug, Message = "Message '{MessageName}' has been consumed from queue '{QueueName}'")]
         public static partial void LogMessageConsumed(ILogger logger, string messageName, string queueName);

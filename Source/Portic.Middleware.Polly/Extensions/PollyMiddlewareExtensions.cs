@@ -9,9 +9,9 @@ namespace Portic.Middleware.Polly.Extensions
 {
     public static class PollyMiddlewareExtensions
     {
-        const string PollyMiddlewareAdded = "polly-middleware-added";
+        private const string PollyMiddlewareAdded = "polly-middleware-added";
 
-        public static IPorticConfigurator UsePolly(this IPorticConfigurator configurator, ResiliencePipeline pipeline)
+        private static IPorticConfigurator UsePolly(IPorticConfigurator configurator, ResiliencePipeline pipeline)
         {
             ArgumentNullException.ThrowIfNull(pipeline, nameof(pipeline));
 
@@ -52,9 +52,22 @@ namespace Portic.Middleware.Polly.Extensions
             {
                 config.Builder.AddRetry(new RetryStrategyOptions
                 {
-                    MaxRetryAttempts = retryCount
+                    MaxRetryAttempts = retryCount,
+                    OnRetry = args => OnPollyPolicRetryAsync(retryCount, args)
                 });
             });
+        }
+
+        private static ValueTask OnPollyPolicRetryAsync(int retryCount, OnRetryArguments<object> args)
+        {
+            if (args.Context.TryGetLoggingProperties(out var context, out var logger))
+            {
+                var delay = args.RetryDelay.TotalMilliseconds;
+
+                logger.LogRetryAttempt(context.MessageId, context.MessageName, args.AttemptNumber + 1, retryCount, delay);
+            }
+
+            return ValueTask.CompletedTask;
         }
     }
 }

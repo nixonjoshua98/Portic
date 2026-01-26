@@ -1,7 +1,7 @@
 ﻿namespace Portic.Transport.RabbitMQ.Models
 {
     internal sealed class TransportMessagePayload<TMessage>(
-        string messageId, 
+        string messageId,
         TMessage message
     ) : ITransportPayload<TMessage>
     {

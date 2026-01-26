@@ -1,7 +1,7 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.2" />
-    <PackageVersion Include="Polly" Version="8.5.0" />
+    <PackageVersion Include="Polly" Version="8.6.5" />
     <PackageVersion Include="RabbitMQ.Client" Version="7.2.0" />
   </ItemGroup>
 </Project>

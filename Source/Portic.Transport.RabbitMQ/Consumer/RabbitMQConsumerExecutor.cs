@@ -40,7 +40,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
 
                 await message.Channel.BasicAckAsync(message.DeliveryTag, false, cancellationToken);
 
-                RabbitMQTransportLog.LogMessageConsumed(
+                LoggingExtensions.LogMessageConsumed(
                     _logger,
                     consumerConfig.Message.Name,
                     message.EndpointConfiguration.Name
