@@ -53,12 +53,12 @@ namespace Portic.Middleware.Polly.Extensions
                 config.Builder.AddRetry(new RetryStrategyOptions
                 {
                     MaxRetryAttempts = retryCount,
-                    OnRetry = args => OnPollyPolicRetryAsync(retryCount, args)
+                    OnRetry = args => OnPollyPolicyRetryAsync(retryCount, args)
                 });
             });
         }
 
-        private static ValueTask OnPollyPolicRetryAsync(int retryCount, OnRetryArguments<object> args)
+        private static ValueTask OnPollyPolicyRetryAsync(int retryCount, OnRetryArguments<object> args)
         {
             if (args.Context.TryGetLoggingProperties(out var context, out var logger))
             {
