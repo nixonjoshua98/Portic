@@ -2,12 +2,11 @@
 
 namespace Portic.Consumer
 {
-    internal sealed class MessageConsumerContextFactory : IMessageConsumerContextFactory
+    internal sealed class ConsumerContextFactory : IConsumerContextFactory
     {
         public IConsumerContext<TMessage> CreateContext<TMessage>(ITransportPayload<TMessage> payload, CancellationToken cancellationToken)
         {
-            return new MessageConsumerContext<TMessage>(
-                DateTimeOffset.UtcNow,
+            return new ConsumerContext<TMessage>(
                 payload,
                 cancellationToken
             );

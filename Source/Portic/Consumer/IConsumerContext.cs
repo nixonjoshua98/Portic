@@ -1,9 +1,14 @@
 ﻿namespace Portic.Consumer
 {
-    public interface IConsumerContext<TMessage>
+    public interface IConsumerContext
     {
-        TMessage Message { get; }
-        TimeSpan Latency { get; }
+        object Message { get; }
+
         CancellationToken CancellationToken { get; }
+    }
+
+    public interface IConsumerContext<TMessage> : IConsumerContext
+    {
+        new TMessage Message { get; }
     }
 }

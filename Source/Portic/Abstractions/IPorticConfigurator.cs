@@ -8,7 +8,7 @@ namespace Portic.Abstractions
     {
         IServiceCollection Services { get; }
 
-        IMessageConsumerConfigurator ConfigureConsumer<TMessage, TMessageConsumer>();
+        IConsumerConfigurator ConfigureConsumer<TMessage, TMessageConsumer>();
         IEndpointConfigurator ConfigureEndpoint(string endpointName);
         IMessageConfigurator ConfigureMessage<TMessage>();
     }

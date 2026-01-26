@@ -3,7 +3,7 @@ using Portic.Consumer;
 
 namespace Portic.Configuration
 {
-    internal sealed class MessageConsumerConfigurator(IPorticConfigurator configurator, Type consumerType, Type messageType) : IMessageConsumerConfigurator
+    internal sealed class MessageConsumerConfigurator(IPorticConfigurator configurator, Type consumerType, Type messageType) : IConsumerConfigurator
     {
         private readonly IPorticConfigurator _configurator = configurator;
 
@@ -12,7 +12,7 @@ namespace Portic.Configuration
 
         public string EndpointName { get; private set; } = messageType.FullName ?? messageType.Name;
 
-        public IMessageConsumerConfigurator WithEndpointName(string endpointName)
+        public IConsumerConfigurator WithEndpointName(string endpointName)
         {
             ArgumentException.ThrowIfNullOrEmpty(endpointName, nameof(endpointName));
 

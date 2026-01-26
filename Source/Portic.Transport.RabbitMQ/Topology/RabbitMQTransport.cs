@@ -1,6 +1,5 @@
 ﻿using Portic.Abstractions;
 using Portic.Serializer;
-using Portic.Transport.RabbitMQ.Abstractions;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Models;
 using RabbitMQ.Client;

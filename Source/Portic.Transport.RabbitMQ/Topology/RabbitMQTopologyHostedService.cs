@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Portic.Abstractions;
-using Portic.Transport.RabbitMQ.Abstractions;
 using Portic.Transport.RabbitMQ.Consumer;
 
 namespace Portic.Transport.RabbitMQ.Topology

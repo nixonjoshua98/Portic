@@ -26,7 +26,7 @@ namespace Portic.Configuration
             return GetEndpointConfigurator(endpointName);
         }
 
-        public IMessageConsumerConfigurator ConfigureConsumer<TMessage, TMessageConsumer>()
+        public IConsumerConfigurator ConfigureConsumer<TMessage, TMessageConsumer>()
         {
             var message = ConfigureMessage<TMessage>();
 

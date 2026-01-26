@@ -2,7 +2,7 @@
 
 namespace Portic.Consumer
 {
-    public interface IMessageConsumerContextFactory
+    public interface IConsumerContextFactory
     {
         IConsumerContext<TMessage> CreateContext<TMessage>(ITransportPayload<TMessage> message, CancellationToken cancellationToken);
     }
