@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 namespace Portic.Transport.RabbitMQ.Channel
 {
     internal sealed class RabbitMQChannelPool(
-        IConnection connection, 
+        IConnection connection,
         int maxPoolSize = 256
     ) : IAsyncDisposable
     {

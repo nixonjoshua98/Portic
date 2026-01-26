@@ -1,13 +1,13 @@
-﻿using Portic.Transport;
-
-namespace Portic.Consumer
+﻿namespace Portic.Consumer
 {
     internal sealed class ConsumerContextFactory : IConsumerContextFactory
     {
-        public IConsumerContext<TMessage> CreateContext<TMessage>(ITransportPayload<TMessage> payload, CancellationToken cancellationToken)
+        public IConsumerContext<TMessage> CreateContext<TMessage>(ConsumerExecutorContext<TMessage> context, CancellationToken cancellationToken)
         {
             return new ConsumerContext<TMessage>(
-                payload,
+                context.Payload,
+                context.Consumer,
+                context.Services,
                 cancellationToken
             );
         }

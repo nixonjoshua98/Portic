@@ -1,6 +1,4 @@
-﻿using Portic.Consumer;
-
-namespace Portic.Middleware
+﻿namespace Portic.Consumer
 {
     public interface IConsumerMiddleware
     {

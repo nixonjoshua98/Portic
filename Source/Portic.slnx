@@ -5,6 +5,7 @@
   </Folder>
   <Folder Name="/Samples/">
     <Project Path="Portic.Samples/Portic.Samples.Alpha/Portic.Samples.Alpha.csproj" />
+    <Project Path="Portic.Samples/Portic.Samples.Bravo/Portic.Samples.Bravo.csproj" Id="23f1e357-3283-40a6-a21d-f593aad478fa" />
   </Folder>
   <Folder Name="/Samples/Props/">
     <File Path="Portic.Samples/Directory.Build.props" />

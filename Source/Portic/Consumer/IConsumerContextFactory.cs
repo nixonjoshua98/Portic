@@ -1,9 +1,7 @@
-﻿using Portic.Transport;
-
-namespace Portic.Consumer
+﻿namespace Portic.Consumer
 {
-    public interface IConsumerContextFactory
+    internal interface IConsumerContextFactory
     {
-        IConsumerContext<TMessage> CreateContext<TMessage>(ITransportPayload<TMessage> message, CancellationToken cancellationToken);
+        IConsumerContext<TMessage> CreateContext<TMessage>(ConsumerExecutorContext<TMessage> context, CancellationToken cancellationToken);
     }
 }

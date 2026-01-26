@@ -6,7 +6,7 @@ using RabbitMQ.Client.Events;
 namespace Portic.Transport.RabbitMQ.Consumer
 {
     internal sealed class RabbitMQEndpointConsumerState : IDisposable
-    {       
+    {
         private bool _isDisposed;
 
         public IChannel? Channel { get; private set; }

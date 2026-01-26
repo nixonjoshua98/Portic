@@ -16,6 +16,8 @@ namespace Portic.Configuration
 
         private readonly ConcurrentDictionary<string, EndpointConfigurator> EndpointConfigurators = [];
 
+        private readonly List<Type> Middleware = [];
+
         public IMessageConfigurator ConfigureMessage<TMessage>()
         {
             return GetMessageConfigurator<TMessage>();
@@ -35,6 +37,13 @@ namespace Portic.Configuration
             ConfigureEndpoint(consumer.EndpointName);
 
             return consumer;
+        }
+
+        public IPorticConfigurator Use<TMiddleware>() where TMiddleware : IConsumerMiddleware
+        {
+            Middleware.Add(typeof(TMiddleware));
+
+            return this;
         }
 
         private MessageConsumerConfigurator GetConsumerConfigurator<TConsumer>(Type messageType)
@@ -65,7 +74,7 @@ namespace Portic.Configuration
             );
         }
 
-        Dictionary<Type, IMessageConfiguration> CreateMessageConfigurations()
+        private Dictionary<Type, IMessageConfiguration> CreateMessageConfigurations()
         {
             var duplicateMessageName = MessageConfigurators.Values
                 .GroupBy(x => x.Name)
@@ -98,7 +107,8 @@ namespace Portic.Configuration
 
             return new PorticConfiguration(
                 messages,
-                endpoints
+                endpoints,
+                Middleware
             );
         }
     }

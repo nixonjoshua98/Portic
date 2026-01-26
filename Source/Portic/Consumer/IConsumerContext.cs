@@ -2,13 +2,16 @@
 {
     public interface IConsumerContext
     {
-        object Message { get; }
-
+        string MessageName { get; }
         CancellationToken CancellationToken { get; }
+
+        IConsumerContext WithServiceProvider(IServiceProvider serviceProvider);
     }
 
     public interface IConsumerContext<TMessage> : IConsumerContext
     {
-        new TMessage Message { get; }
+        TMessage Message { get; }
+        IServiceProvider Services { get; }
+        IConsumerConfiguration Consumer { get; }
     }
 }

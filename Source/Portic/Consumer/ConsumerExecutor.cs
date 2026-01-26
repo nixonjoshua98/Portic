@@ -1,35 +1,65 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Portic.Abstractions;
 using Portic.Exceptions;
-using Portic.Middleware;
+using Portic.Logging;
 
 namespace Portic.Consumer
 {
-    internal sealed class TextMiddleware : IConsumerMiddleware
+    internal sealed class ConsumerExecutor(
+        IConsumerContextFactory _contextFactory,
+        ILogger<ConsumerExecutor> _logger,
+        IPorticConfiguration _configuration
+    ) : IConsumerExecutor
     {
-        public async Task InvokeAsync(IConsumerContext context, ConsumerMiddlewareDelegate next)
+        public async Task ExecuteAsync<TMessage>(ConsumerExecutorContext<TMessage> executorContext, CancellationToken cancellationToken)
         {
-            await next(context);
-        }
-    }
+            var context = _contextFactory.CreateContext(
+                executorContext,
+                cancellationToken
+            );
 
-    internal sealed class ConsumerExecutor(IConsumerContextFactory _contextFactory) : IConsumerExecutor
-    {
-        public async Task ExecuteAsync<TMessage>(ConsumerExecutorContext<TMessage> context, CancellationToken cancellationToken)
+            var pipeline = BuildPipeline(context);
+
+            await pipeline(context);
+        }
+
+        private ConsumerMiddlewareDelegate BuildPipeline<TMessage>(IConsumerContext<TMessage> context)
         {
-            await ConsumeAsync(context, cancellationToken);
+            ConsumerMiddlewareDelegate pipeline = async _ =>
+            {
+                await ExecuteConsumerAsync(context);
+            };
+
+            foreach (var middlewareType in _configuration.Middleware.Reverse())
+            {
+                AddMiddlewareToPipeline(context, ref pipeline, middlewareType);
+            }
+
+            return pipeline;
         }
 
-        private async Task ConsumeAsync<TMessage>(ConsumerExecutorContext<TMessage> context, CancellationToken cancellationToken)
+        private static void AddMiddlewareToPipeline<TMessage>(IConsumerContext<TMessage> context, ref ConsumerMiddlewareDelegate pipeline, Type middlewareType)
+        {
+            var currentPipeline = pipeline;
+
+            pipeline = async (ctx) =>
+            {
+                var middleware = ActivatorUtilities.CreateInstance(context.Services, middlewareType) as IConsumerMiddleware
+                    ?? throw new InvalidOperationException($"Failed to create middleware instance of type '{middlewareType.Name}'");
+
+                await middleware.InvokeAsync(ctx, currentPipeline);
+            };
+        }
+
+        private async Task ExecuteConsumerAsync<TMessage>(IConsumerContext<TMessage> context)
         {
             var consumerInst = ActivatorUtilities.CreateInstance(context.Services, context.Consumer.ConsumerType) as IConsumer<TMessage>
                 ?? throw UnknownMessageException.FromName(context.Consumer.Message.Name);
 
-            var consumerContext = _contextFactory.CreateContext(
-                context.Payload,
-                cancellationToken
-            );
+            await consumerInst.ConsumeAsync(context);
 
-            await consumerInst.ConsumeAsync(consumerContext);
+            _logger.LogMessageConsumed(context.Consumer.Message.Name);
         }
     }
 }

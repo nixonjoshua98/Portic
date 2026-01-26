@@ -76,7 +76,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
             await using var scope = _scopeFactory.CreateAsyncScope();
 
             var context = new ConsumerExecutorContext<TMessage>(
-                payload, 
+                payload,
                 scope.ServiceProvider,
                 consumerConfiguration
             );
