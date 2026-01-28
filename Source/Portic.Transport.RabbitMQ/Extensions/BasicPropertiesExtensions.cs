@@ -54,7 +54,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
             {
                 var str = Encoding.UTF8.GetString(headerBytes);
 
-                return T.TryParse(str, null, out var value) ? 
+                return T.TryParse(str, null, out var value) ?
                     value : defaultValue;
             }
 

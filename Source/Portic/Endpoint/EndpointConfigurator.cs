@@ -1,5 +1,4 @@
-﻿using Portic.Abstractions;
-using Portic.Configuration;
+﻿using Portic.Configuration;
 using Portic.Consumer;
 using Portic.Models;
 

@@ -67,8 +67,8 @@ namespace Portic.Transport.RabbitMQ.Consumer
         }
 
         private async Task RedeliverMessageAsync<TMessage>(
-            RawTransportMessageReceived message, 
-            IConsumerContext<TMessage> context, 
+            RawTransportMessageReceived message,
+            IConsumerContext<TMessage> context,
             CancellationToken cancellationToken)
         {
             // Republish the message for redelivery first, to ensure at-least-once delivery guarantee

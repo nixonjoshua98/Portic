@@ -49,17 +49,17 @@ namespace Portic.Transport.RabbitMQ.Topology
                 .SetMessageName(configuration.Name);
 
             await PublishAsync(
-                configuration, 
-                payloadBytes, 
-                properties, 
+                configuration,
+                payloadBytes,
+                properties,
                 cancellationToken
             );
         }
 
         private async Task PublishAsync(
-            IMessageConfiguration configuration, 
+            IMessageConfiguration configuration,
             byte[] payloadBytes,
-            BasicProperties properties, 
+            BasicProperties properties,
             CancellationToken cancellationToken)
         {
             using var rented = await _connectionContext.RentChannelAsync(cancellationToken);

@@ -18,7 +18,7 @@ namespace Portic.Consumer
             await using var scope = _scopeFactory.CreateAsyncScope();
 
             var context = await _contextFactory.CreateAsync(
-                message, 
+                message,
                 scope.ServiceProvider,
                 cancellationToken
             );
@@ -31,7 +31,7 @@ namespace Portic.Consumer
             }
             catch (Exception ex) when (context.DeliveryCount < context.MaxRedeliveryAttempts)
             {
-                throw PorticConsumerException.ForRedelivery(ex, context);
+                throw PorticConsumerException<TMessage>.ForRedelivery(ex, context);
             }
 
         }
