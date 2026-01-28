@@ -1,15 +1,29 @@
-﻿using Portic.Endpoint;
+﻿using Portic.Abstractions;
+using Portic.Endpoint;
 using Portic.Transport.RabbitMQ.Channel;
 
 namespace Portic.Transport.RabbitMQ.Extensions
 {
-    public static class EndpointConfigurationExtensions
+    public static class CustomPropertyExtensions
     {
         private const string PrefetchCountKey = "rmq-prefetchcount";
         private const string ChannelCountKey = "rmq-channelcount";
         private const string AutoDeleteKey = "rmq-autodelete";
         private const string ExclusiveKey = "rmq-exclusive";
+        private const string MandatoryKey = "rmq-mandatory";
         private const string DurableKey = "rmq-durable";
+
+        extension(IMessageConfiguration configurator)
+        {
+            internal bool Mandatory =>
+                configurator.GetPropertyOrDefault(MandatoryKey, false);
+        }
+
+        extension(IMessageConfigurator configurator)
+        {
+            public IMessageConfigurator WithMandatory(bool value = true) =>
+                configurator.SetProperty(MandatoryKey, value);
+        }
 
         extension(IEndpointConfigurator configurator)
         {

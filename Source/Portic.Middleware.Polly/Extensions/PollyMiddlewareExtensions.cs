@@ -9,29 +9,34 @@ namespace Portic.Middleware.Polly.Extensions
 {
     public static class PollyMiddlewareExtensions
     {
-        private const string PollyMiddlewareAdded = "polly-middleware-added";
+        private const string PollyMiddlewareAdded = "polly-middleware";
 
-        private static IPorticConfigurator UsePolly(IPorticConfigurator configurator, ResiliencePipeline pipeline)
+        /// <summary>
+        /// Configures the retry policy to use the specified maximum number of retry attempts for transient failures.
+        /// </summary>
+        /// <remarks>This method adds a retry policy to the configuration, allowing operations to be
+        /// retried up to the specified number of times in case of transient errors. If a retry policy is already
+        /// configured, it will be replaced.</remarks>
+        /// <param name="configurator">The configurator instance to apply the retry policy to.</param>
+        /// <param name="retryCount">The maximum number of retry attempts to use. Must be greater than zero.</param>
+        /// <param name="delay">An optional delay between retry attempts. If not provided, a default delay of 500 milliseconds will be used.</param>
+        /// <returns>The same configurator instance, enabling method chaining.</returns>
+        public static IPorticConfigurator UseRetryCount(this IPorticConfigurator configurator, byte retryCount, TimeSpan? delay = null)
         {
-            ArgumentNullException.ThrowIfNull(pipeline, nameof(pipeline));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(retryCount, nameof(retryCount));
 
-            configurator.Services.Configure<PollyMiddlewareOptions>(options =>
+            return UsePolly(configurator, config =>
             {
-                options.Pipeline = pipeline;
+                config.Builder.AddRetry(new RetryStrategyOptions
+                {
+                    MaxRetryAttempts = retryCount,
+                    Delay = delay ?? TimeSpan.FromMilliseconds(500),
+                    OnRetry = args => OnPollyPolicyRetryAsync(retryCount, args)
+                });
             });
-
-            // We only ever want a single polly middleware registered
-            if (!configurator.HasProperty(PollyMiddlewareAdded))
-            {
-                configurator.Use<PollyMiddleware>();
-
-                configurator.SetProperty(PollyMiddlewareAdded, string.Empty);
-            }
-
-            return configurator;
         }
 
-        public static IPorticConfigurator UsePolly(this IPorticConfigurator configurator, Action<IPollyMiddlewareConfigurator> callback)
+        private static IPorticConfigurator UsePolly(IPorticConfigurator configurator, Action<IPollyMiddlewareConfigurator> callback)
         {
             ArgumentNullException.ThrowIfNull(callback, nameof(callback));
 
@@ -44,18 +49,27 @@ namespace Portic.Middleware.Polly.Extensions
             return UsePolly(configurator, pipeline);
         }
 
-        public static IPorticConfigurator UsePolly(this IPorticConfigurator configurator, int retryCount)
+        private static void UsePollyMiddleware(IPorticConfigurator configurator)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(retryCount, nameof(retryCount));
-
-            return UsePolly(configurator, config =>
+            if (!configurator.HasProperty(PollyMiddlewareAdded))
             {
-                config.Builder.AddRetry(new RetryStrategyOptions
-                {
-                    MaxRetryAttempts = retryCount,
-                    OnRetry = args => OnPollyPolicyRetryAsync(retryCount, args)
-                });
+                configurator.Use<PollyMiddleware>();
+                configurator.SetProperty(PollyMiddlewareAdded, string.Empty);
+            }
+        }
+
+        private static IPorticConfigurator UsePolly(IPorticConfigurator configurator, ResiliencePipeline pipeline)
+        {
+            ArgumentNullException.ThrowIfNull(pipeline, nameof(pipeline));
+
+            configurator.Services.Configure<PollyMiddlewareOptions>(options =>
+            {
+                options.Pipeline = pipeline;
             });
+
+            UsePollyMiddleware(configurator);
+
+            return configurator;
         }
 
         private static ValueTask OnPollyPolicyRetryAsync(int retryCount, OnRetryArguments<object> args)

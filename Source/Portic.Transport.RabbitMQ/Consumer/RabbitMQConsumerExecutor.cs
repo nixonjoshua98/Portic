@@ -1,20 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Portic.Consumer;
 using Portic.Exceptions;
 using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Logging;
 using Portic.Transport.RabbitMQ.Models;
+using Portic.Transport.RabbitMQ.Topology;
 using System.Collections.Concurrent;
 using System.Reflection;
 
 namespace Portic.Transport.RabbitMQ.Consumer
 {
     internal sealed class RabbitMQConsumerExecutor(
-        IServiceScopeFactory _scopeFactory,
         IPorticSerializer _serializer,
         ILogger<RabbitMQConsumerExecutor> _logger,
-        IConsumerExecutor _consumerExecutor
+        IConsumerExecutor _consumerExecutor,
+        IRabbitMQTransport _transport
     ) : IRabbitMQConsumerExecutor
     {
         private static readonly MethodInfo ConsumeGenericMethodInfo;
@@ -27,61 +27,59 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 throw new Exception("Failed to find ConsumeGenericAsync method.");
         }
 
-        public async Task ExecuteAsync(TransportMessageReceived message, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(RawTransportMessageReceived message, CancellationToken cancellationToken)
         {
-            try
-            {
-                if (!message.TryGetConsumerConfiguration(out var consumerConfig))
-                {
-                    throw UnknownMessageException.FromName(message.MessageName);
-                }
+            var genericConsumeMethod = GetGenericConsumeMethod(message.MessageConfiguration.MessageType);
 
-                await ExecuteConsumerAsync(message, consumerConfig, cancellationToken);
-
-                await message.Channel.BasicAckAsync(message.DeliveryTag, false, cancellationToken);
-
-                LoggingExtensions.LogMessageConsumed(
-                    _logger,
-                    consumerConfig.Message.Name,
-                    message.EndpointConfiguration.Name
-                );
-            }
-            catch (Exception)
-            {
-                await message.Channel.BasicNackAsync(message.DeliveryTag, false, true, cancellationToken);
-
-                throw;
-            }
-        }
-
-        private async Task ExecuteConsumerAsync(TransportMessageReceived message, IConsumerConfiguration consumerConfig, CancellationToken cancellationToken)
-        {
-            var genericConsumeMethod = GetGenericConsumeMethod(consumerConfig.Message.MessageType);
-
-            object[] methodArgs = [message, consumerConfig, cancellationToken];
+            object[] methodArgs = [message, cancellationToken];
 
             var genericConsumeResult = genericConsumeMethod.Invoke(this, methodArgs) as Task;
 
             await genericConsumeResult!;
         }
 
-        private async Task ConsumeGenericAsync<TMessage>(
-            TransportMessageReceived message,
-            IConsumerConfiguration consumerConfiguration,
-            CancellationToken cancellationToken
-        )
+        private async Task ConsumeGenericAsync<TMessage>(RawTransportMessageReceived message, CancellationToken cancellationToken)
         {
-            var payload = _serializer.Deserialize<TransportMessagePayload<TMessage>>(message.Body);
+            var body = _serializer.Deserialize<RabbitMQMessageBody<TMessage>>(message.RawBody.Span);
 
-            await using var scope = _scopeFactory.CreateAsyncScope();
+            var messageReceived = message.ToReceivedMessage(body.MessageId, body.Message);
 
-            var context = new ConsumerExecutorContext<TMessage>(
-                payload,
-                scope.ServiceProvider,
-                consumerConfiguration
-            );
+            try
+            {
+                await _consumerExecutor.ExecuteAsync(messageReceived, cancellationToken);
 
-            await _consumerExecutor.ExecuteAsync(context, cancellationToken);
+                await message.Channel.BasicAckAsync(message.DeliveryTag, false, cancellationToken);
+            }
+
+            catch (PorticConsumerException<TMessage> ex) when (ex.ShouldRedeliver)
+            {
+                await RedeliverMessageAsync(message, ex.Context, cancellationToken);
+            }
+
+            catch (Exception)
+            {
+                // DLQ
+
+                await message.Channel.BasicNackAsync(message.DeliveryTag, false, false, cancellationToken);
+
+                throw;
+            }
+        }
+
+        private async Task RedeliverMessageAsync<TMessage>(
+            RawTransportMessageReceived message,
+            IConsumerContext<TMessage> context,
+            CancellationToken cancellationToken)
+        {
+            // Republish the message for redelivery first, to ensure at-least-once delivery guarantee
+            await _transport.RePublishAsync(context, cancellationToken);
+
+            // Nack the original message without requeueing, since we've already republished it
+            // This prevents potential duplicate deliveries from the original queue
+            // Intentionally ignoring cancellationToken here to ensure Nack is sent regardless of cancellation
+            await message.Channel.BasicNackAsync(message.DeliveryTag, false, false, CancellationToken.None);
+
+            _logger.LogSuccessfulRedelivery(context.MessageId, context.DeliveryCount + 1, context.MaxRedeliveryAttempts);
         }
 
         private static MethodInfo GetGenericConsumeMethod(Type messageType)

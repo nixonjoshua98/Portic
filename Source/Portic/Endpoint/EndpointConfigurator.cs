@@ -1,4 +1,5 @@
-﻿using Portic.Consumer;
+﻿using Portic.Configuration;
+using Portic.Consumer;
 using Portic.Models;
 
 namespace Portic.Endpoint
@@ -16,17 +17,18 @@ namespace Portic.Endpoint
 
         public IEndpointConfigurator SetProperty(string key, object value)
         {
-            Properties.SetProperty(key, value);
+            Properties.Set(key, value);
 
             return this;
         }
 
-        public IEndpointConfiguration Build(IEnumerable<IConsumerConfiguration> consumers)
+        public IEndpointConfiguration Build(PorticConfigurator configurator, IEnumerable<IConsumerConfiguration> consumers)
         {
             return new EndpointConfiguration(
                 Name,
                 consumers,
-                Properties
+                Properties,
+                configurator.MaxRedeliveryAttempts
             );
         }
     }

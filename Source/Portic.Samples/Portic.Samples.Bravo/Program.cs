@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Portic.Extensions;
-using Portic.Middleware.Polly.Extensions;
 using Portic.Samples.Bravo;
 using Portic.Transport.RabbitMQ.Extensions;
 using Serilog;
@@ -23,7 +22,7 @@ builder.Services.AddPortic(configurator =>
 
     configurator.Use<LoggingMiddleware>();
 
-    configurator.UsePolly(3);
+    configurator.SetMaxRedeliveryAttempts(1);
 
     configurator.UsingRabbitMQ();
 });

@@ -19,26 +19,29 @@ namespace Portic.Transport.RabbitMQ.Topology
 
                 _endpointStates.Add(state);
             }
+
+            // Start consumers after all endpoints have been created
+
+            foreach (var state in _endpointStates)
+            {
+                foreach (var consumer in state.Consumers)
+                {
+                    await consumer.BasicConsumeAsync(cancellationToken);
+                }
+            }
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             DisposeEndpointStates();
+
+            return Task.CompletedTask;
         }
 
         private void DisposeEndpointStates()
         {
-            foreach (var state in _endpointStates)
-            {
-                try
-                {
-                    state.Dispose();
-                }
-                catch (Exception)
-                {
-                    // Swallow
-                }
-            }
+            _endpointStates.ForEach(x => x?.Dispose());
+            _endpointStates.Clear();
         }
 
         public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;

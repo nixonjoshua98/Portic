@@ -21,6 +21,15 @@ namespace Portic.Configuration
 
         private readonly List<Type> Middleware = [];
 
+        internal byte MaxRedeliveryAttempts { get; private set; } = 0;
+
+        public IPorticConfigurator SetMaxRedeliveryAttempts(byte attempts)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(attempts, nameof(attempts));
+            MaxRedeliveryAttempts = attempts;
+            return this;
+        }
+
         public IMessageConfigurator ConfigureMessage<TMessage>()
         {
             return GetMessageConfigurator<TMessage>();
@@ -51,7 +60,7 @@ namespace Portic.Configuration
 
         public IPorticConfigurator SetProperty(string key, object value)
         {
-            Properties.SetProperty(key, value);
+            Properties.Set(key, value);
 
             return this;
         }
@@ -116,6 +125,7 @@ namespace Portic.Configuration
 
             var endpoints = EndpointConfigurators.Values
                 .Select(endpoint => endpoint.Build(
+                    this,
                     consumers.Where(consumer => consumer.EndpointName == endpoint.Name)
                 ))
                 .ToList();

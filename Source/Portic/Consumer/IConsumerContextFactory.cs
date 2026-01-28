@@ -1,7 +1,11 @@
-﻿namespace Portic.Consumer
+
+namespace Portic.Consumer
 {
     internal interface IConsumerContextFactory
     {
-        IConsumerContext<TMessage> CreateContext<TMessage>(ConsumerExecutorContext<TMessage> context, CancellationToken cancellationToken);
+        ValueTask<IConsumerContext<TMessage>> CreateAsync<TMessage>(
+            TransportMessageReceived<TMessage> message,
+            IServiceProvider serviceProvider,
+            CancellationToken cancellationToken);
     }
 }

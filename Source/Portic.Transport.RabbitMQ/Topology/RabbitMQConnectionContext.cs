@@ -3,15 +3,18 @@ using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
-    internal sealed class RabbitMQConnectionContext(IRabbitMQTransportConfiguration _configuration) : IRabbitMQConnectionContext, IAsyncDisposable
-    {
+    internal sealed class RabbitMQConnectionContext(IRabbitMQTransportConfiguration _configuration) : IRabbitMQConnectionContext, IDisposable
+    {       
+        private bool _isDisposed;
         private readonly SemaphoreSlim _connectionLock = new(1, 1);
 
         private IConnection? _connection;
         private RabbitMQChannelPool? _channelPool;
 
-        public async ValueTask<IRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
+        public async ValueTask<IRabbitMQRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
         {
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
+
             var channelPool = await GetChannelPoolAsync(cancellationToken);
 
             return await channelPool.RentAsync(cancellationToken);
@@ -19,6 +22,8 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         public async ValueTask<IChannel> CreateChannelAsync(RabbitMQChannelOptions options, CancellationToken cancellationToken = default)
         {
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
+
             var connection = await GetConnectionAsync(cancellationToken);
 
             var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
@@ -63,15 +68,28 @@ namespace Portic.Transport.RabbitMQ.Topology
             }
         }
 
-        public async ValueTask DisposeAsync()
+        private void Dispose(bool disposing)
         {
-            await (_channelPool?.DisposeAsync() ?? ValueTask.CompletedTask);
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _connection?.Dispose();
+                    _channelPool?.Dispose();
+                    _connectionLock?.Dispose();
+                }
 
-            _channelPool = null;
+                _connection = null;
+                _channelPool = null;
 
-            await (_connection?.DisposeAsync() ?? ValueTask.CompletedTask);
+                _isDisposed = true;
+            }
+        }
 
-            _connection = null;
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

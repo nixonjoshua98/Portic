@@ -8,10 +8,7 @@ using Portic.Middleware.Polly.Extensions;
 
 namespace Portic.Middleware.Polly.Middleware
 {
-    internal sealed class PollyMiddleware(
-        IOptions<PollyMiddlewareOptions> _middlewareOptions,
-        ILogger<PollyMiddleware> _logger
-    ) : IConsumerMiddleware
+    internal sealed class PollyMiddleware(IOptions<PollyMiddlewareOptions> _middlewareOptions, ILogger<PollyMiddleware> _logger) : IConsumerMiddleware
     {
         private readonly ResiliencePipeline _pipeline = _middlewareOptions.Value.Pipeline;
 

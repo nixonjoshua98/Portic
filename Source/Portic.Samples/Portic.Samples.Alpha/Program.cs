@@ -6,7 +6,7 @@ using Portic.Transport.RabbitMQ.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
+    .MinimumLevel.Information()
     .WriteTo.Console()
     .CreateLogger();
 
@@ -18,7 +18,11 @@ builder.Services.AddHostedService<PingPublisher>();
 
 builder.Services.AddPortic(configurator =>
 {
-    configurator.ConfigureConsumer<PingMessage, PingConsumer>();
+    configurator.ConfigureConsumer<PingMessage, PingConsumer>()
+        .WithEndpointName("PingEndpoint");
+
+    configurator.ConfigureEndpoint("PingEndpoint")
+        .WithPrefetchCount(16);
 
     configurator.UsingRabbitMQ();
 });

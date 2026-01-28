@@ -4,7 +4,7 @@
     {
         private readonly Dictionary<string, object> _properties = [];
 
-        public void SetProperty(string key, object value)
+        public void Set(string key, object value)
         {
             _properties[key] = value;
         }

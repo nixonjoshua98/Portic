@@ -34,8 +34,6 @@ namespace Portic.Transport.RabbitMQ.Topology
                 );
 
                 var consumerState = state.AddConsumer(channel);
-
-                await consumerState.BasicConsumeAsync(cancellationToken);
             }
 
             return state;
@@ -51,11 +49,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             await rented.Channel.QueueBindAsync(queue.QueueName, consumer.Message.Name, string.Empty, cancellationToken: cancellationToken);
 
-            LoggingExtensions.LogExchangeBoundToQueue(
-                _logger,
-                queue.QueueName,
-                consumer.Message.Name
-            );
+            _logger.LogExchangeBoundToQueue(queue.QueueName, consumer.Message.Name);
         }
     }
 }

@@ -1,15 +1,23 @@
-﻿namespace Portic.Consumer
+namespace Portic.Consumer
 {
     internal sealed class ConsumerContextFactory : IConsumerContextFactory
     {
-        public IConsumerContext<TMessage> CreateContext<TMessage>(ConsumerExecutorContext<TMessage> context, CancellationToken cancellationToken)
+        public ValueTask<IConsumerContext<TMessage>> CreateAsync<TMessage>(
+            TransportMessageReceived<TMessage> message,
+            IServiceProvider serviceProvider,
+            CancellationToken cancellationToken)
         {
-            return new ConsumerContext<TMessage>(
-                context.Payload,
-                context.Consumer,
-                context.Services,
+            var context = new ConsumerContext<TMessage>(
+                message.MessageId,
+                message.Message,
+                message.DeliveryCount,
+                serviceProvider,
+                message.ConsumerConfiguration,
+                message.EndpointConfiguration,
                 cancellationToken
             );
+
+            return ValueTask.FromResult<IConsumerContext<TMessage>>(context);
         }
     }
 }
