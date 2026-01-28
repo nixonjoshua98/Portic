@@ -3,7 +3,7 @@ using Portic.Consumer;
 
 namespace Portic.Samples.Bravo
 {
-    internal sealed class PingConsumer(ILogger<PingConsumer> _logger) : IConsumer<PingMessage>
+    internal sealed class PingConsumer : IConsumer<PingMessage>
     {
         private static readonly HashSet<string> _messageIdsToFail = [];
 
@@ -13,10 +13,8 @@ namespace Portic.Samples.Bravo
             {
                 _messageIdsToFail.Add(context.MessageId);
 
-                throw new Exception($"Consumer for message '{context.MessageId}' has failed");
+                throw new Exception($"ConsumerConfiguration for message '{context.MessageId}' has failed");
             }
-
-            _logger.LogInformation("Pong! {Value}", context.Message.Value);
 
             return ValueTask.CompletedTask;
         }

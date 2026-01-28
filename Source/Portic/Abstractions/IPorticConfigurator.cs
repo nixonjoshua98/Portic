@@ -34,6 +34,14 @@ namespace Portic.Abstractions
 
         bool HasProperty(string key);
 
+        /// <summary>
+        /// Sets the maximum number of redelivery attempts for failed messages.
+        /// </summary>
+        /// <param name="attempts">The maximum number of times a message will be redelivered before it is considered undeliverable. Must be
+        /// greater than zero.</param>
+        /// <returns>The current configurator instance for method chaining.</returns>
+        IPorticConfigurator SetMaxRedeliveryAttempts(byte attempts);
+
         IPorticConfigurator SetProperty(string key, object value);
 
         /// <summary>

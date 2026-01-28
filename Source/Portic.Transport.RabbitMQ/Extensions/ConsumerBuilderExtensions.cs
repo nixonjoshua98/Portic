@@ -34,9 +34,13 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
         private static void AddCoreServices(IServiceCollection services)
         {
-            services.AddHostedService<RabbitMQTopologyHostedService>();
+            services.TryAddSingleton<IRabbitMQTransport, RabbitMQTransport>();
 
-            services.TryAddSingleton<IMessageTransport, RabbitMQTransport>();
+            services.TryAddSingleton<IMessageTransport>(
+                provider => provider.GetRequiredService<IRabbitMQTransport>()
+            );
+
+            services.AddHostedService<RabbitMQTopologyHostedService>();
 
             services.TryAddSingleton<IRabbitMQConsumerExecutor, RabbitMQConsumerExecutor>();
 

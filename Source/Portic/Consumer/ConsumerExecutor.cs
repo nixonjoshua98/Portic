@@ -21,12 +21,12 @@ namespace Portic.Consumer
             }
 
             // Redelivery
-            catch (Exception ex) when (context.DeliveryCount < _configuration.MaxDeliveryAttempts)
+            catch (Exception ex) when (context.DeliveryCount < context.MaxRedeliveryAttempts)
             {
                 throw PorticConsumerException.ForRedelivery(
                     context.MessageId,
-                    context.DeliveryCount,
-                    _configuration.MaxDeliveryAttempts,
+                    Convert.ToByte(context.DeliveryCount + 1),
+                    context.MaxRedeliveryAttempts,
                     ex
                 );
             }
@@ -62,12 +62,12 @@ namespace Portic.Consumer
 
         private async Task ExecuteConsumerAsync<TMessage>(IConsumerContext<TMessage> context)
         {
-            var consumerInst = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, context.Consumer.ConsumerType) as IConsumer<TMessage>
-                ?? throw UnknownMessageException.FromName(context.Consumer.Message.Name);
+            var consumerInst = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, context.ConsumerConfiguration.ConsumerType) as IConsumer<TMessage>
+                ?? throw MessageTypeNotFoundException.FromName(context.ConsumerConfiguration.Message.Name);
 
             await consumerInst.ConsumeAsync(context);
 
-            _logger.LogMessageConsumed(context.Consumer.Message.Name);
+            _logger.LogMessageConsumed(context.ConsumerConfiguration.Message.Name);
         }
     }
 }

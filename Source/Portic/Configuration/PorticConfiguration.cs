@@ -1,5 +1,6 @@
 ﻿using Portic.Abstractions;
 using Portic.Endpoint;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Portic.Configuration
 {
@@ -11,12 +12,15 @@ namespace Portic.Configuration
     {
         private readonly IReadOnlyDictionary<Type, IMessageConfiguration> Messages = messages;
 
-        public IReadOnlyList<IEndpointConfiguration> Endpoints =>
-            [.. endpoints.Where(e => e.Consumers.Any())];
+        public IReadOnlyList<IEndpointConfiguration> Endpoints { get; } = [.. endpoints.Where(e => e.Consumers.Any())];
 
         public IReadOnlyList<Type> Middleware { get; } = globalMiddlewareTypes;
 
-        public byte MaxDeliveryAttempts => 3;
+        public bool TryGetEndpointByName(string name, [NotNullWhen(true)] out IEndpointConfiguration? endpoint)
+        {
+            endpoint = Endpoints.FirstOrDefault(e => e.Name == name);
+            return endpoint is not null;
+        }
 
         public IMessageConfiguration GetMessageConfiguration<TMessage>()
         {

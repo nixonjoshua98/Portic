@@ -19,9 +19,9 @@ namespace Portic.Samples.Bravo
 
                 await _messageBus.PublishAsync(message, stoppingToken);
 
-                _logger.LogInformation("Ping {Value}", message.Value);
+                _logger.LogInformation("Ping");
 
-                await Task.Delay(1000, stoppingToken);
+                await Task.Delay(10000000, stoppingToken);
             }
         }
     }

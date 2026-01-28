@@ -1,4 +1,6 @@
-﻿namespace Portic.Consumer
+﻿using Portic.Abstractions;
+
+namespace Portic.Consumer
 {
     public interface IConsumerContext
     {
@@ -6,9 +8,10 @@
         string MessageName { get; }
         byte DeliveryCount { get; }
         IServiceProvider Services { get; }
+        byte MaxRedeliveryAttempts { get; }
         CancellationToken CancellationToken { get; }
-
-        internal IConsumerConfiguration Consumer { get; }
+        IMessageConfiguration MessageConfiguration { get; }
+        IConsumerConfiguration ConsumerConfiguration { get; }
 
         IConsumerContext WithServiceProvider(IServiceProvider serviceProvider);
     }

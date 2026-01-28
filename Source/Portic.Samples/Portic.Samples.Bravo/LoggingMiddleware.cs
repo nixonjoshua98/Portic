@@ -7,19 +7,15 @@ namespace Portic.Samples.Bravo
     {
         public async Task InvokeAsync(IConsumerContext context, ConsumerMiddlewareDelegate next)
         {
-            var messageName = context.MessageName;
-
             try
             {
-                _logger.LogInformation("Processing message of type {MessageType}", messageName);
-
                 await next(context);
 
-                _logger.LogInformation("Successfully processed message of type {MessageType}", messageName);
+                _logger.LogInformation("Successfully processed message '{MessageId}'", context.MessageId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing message of type {MessageType}", messageName);
+                _logger.LogError(ex, "Error processing message '{MessageId}'", context.MessageId);
 
                 throw;
             }

@@ -8,31 +8,57 @@ namespace Portic.Transport.RabbitMQ.Extensions
         private const string MessageNameKey = "x-portic-message";
         private const string DeliveryCountKey = "x-portic-delivery-count";
 
-        public static BasicProperties SetMessageName(this BasicProperties properties, string name)
+        extension(BasicProperties properties)
+        {
+            public BasicProperties SetMessageName(string name) =>
+                SetHeaderValue(properties, MessageNameKey, name);
+
+            public BasicProperties SetDeliveryCount(byte count) =>
+                SetHeaderValue(properties, DeliveryCountKey, count);
+        }
+
+        extension(IReadOnlyBasicProperties properties)
+        {
+            public string? MessageName =>
+                GetHeaderValue(properties, MessageNameKey);
+
+            public byte DeliveryCount =>
+                GetHeaderValueOrDefault<byte>(properties, DeliveryCountKey, 0);
+        }
+
+        private static BasicProperties SetHeaderValue(BasicProperties properties, string name, object? value)
         {
             properties.Headers ??= new Dictionary<string, object?>();
-
-            properties.Headers[MessageNameKey] = name;
-
+            properties.Headers[name] = value;
             return properties;
         }
 
-        public static string? GetMessageName(this IReadOnlyBasicProperties properties) =>
-            GetHeaderValue(properties, MessageNameKey);
-
-        public static byte GetDeliveryCount(this IReadOnlyBasicProperties properties) =>
-            GetHeaderValueOrDefault<byte>(properties, DeliveryCountKey, 0);
-
         private static T GetHeaderValueOrDefault<T>(IReadOnlyBasicProperties properties, string name, T defaultValue) where T : IParsable<T>
         {
-            var str = GetHeaderValue(properties, name);
-
-            if (string.IsNullOrEmpty(str) || !T.TryParse(str, null, out var value))
+            if (!properties.IsHeadersPresent() || properties.Headers is null)
             {
                 return defaultValue;
             }
 
-            return value;
+            else if (!properties.Headers.TryGetValue(name, out var headerValue))
+            {
+                return defaultValue;
+            }
+
+            else if (headerValue is T parsed)
+            {
+                return parsed;
+            }
+
+            else if (headerValue is byte[] headerBytes)
+            {
+                var str = Encoding.UTF8.GetString(headerBytes);
+
+                return T.TryParse(str, null, out var value) ? 
+                    value : defaultValue;
+            }
+
+            return defaultValue;
         }
 
         private static string? GetHeaderValue(IReadOnlyBasicProperties properties, string name)

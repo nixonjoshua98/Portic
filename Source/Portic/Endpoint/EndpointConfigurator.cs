@@ -1,4 +1,6 @@
-﻿using Portic.Consumer;
+﻿using Portic.Abstractions;
+using Portic.Configuration;
+using Portic.Consumer;
 using Portic.Models;
 
 namespace Portic.Endpoint
@@ -21,12 +23,13 @@ namespace Portic.Endpoint
             return this;
         }
 
-        public IEndpointConfiguration Build(IEnumerable<IConsumerConfiguration> consumers)
+        public IEndpointConfiguration Build(PorticConfigurator configurator, IEnumerable<IConsumerConfiguration> consumers)
         {
             return new EndpointConfiguration(
                 Name,
                 consumers,
-                Properties
+                Properties,
+                configurator.MaxRedeliveryAttempts
             );
         }
     }
