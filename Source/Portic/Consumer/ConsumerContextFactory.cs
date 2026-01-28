@@ -21,4 +21,3 @@ namespace Portic.Consumer
         }
     }
 }
-

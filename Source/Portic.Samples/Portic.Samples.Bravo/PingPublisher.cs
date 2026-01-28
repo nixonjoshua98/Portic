@@ -21,7 +21,7 @@ namespace Portic.Samples.Bravo
 
                 _logger.LogInformation("Ping");
 
-                await Task.Delay(10000000, stoppingToken);
+                await Task.Delay(1000, stoppingToken);
             }
         }
     }

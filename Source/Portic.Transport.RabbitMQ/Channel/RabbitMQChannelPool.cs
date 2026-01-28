@@ -3,17 +3,18 @@ using System.Collections.Concurrent;
 
 namespace Portic.Transport.RabbitMQ.Channel
 {
-    internal sealed class RabbitMQChannelPool(
-        IConnection connection,
-        int maxPoolSize = 256
-    ) : IAsyncDisposable
+    internal sealed class RabbitMQChannelPool(IConnection connection, int maxPoolSize = 256) : IDisposable
     {
         private readonly IConnection _connection = connection;
         private readonly ConcurrentQueue<IChannel> _idleChannels = new();
         private readonly SemaphoreSlim _creationLock = new(maxPoolSize, maxPoolSize);
 
+        private bool _isDisposed;
+
         public async Task<IRabbitMQRentedChannel> RentAsync(CancellationToken cancellationToken)
         {
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
+
             if (_idleChannels.TryDequeue(out var channel))
             {
                 return new RabbitMQRentedChannel(this, channel);
@@ -38,19 +39,26 @@ namespace Portic.Transport.RabbitMQ.Channel
             _idleChannels.Enqueue(channel);
         }
 
-        public async ValueTask DisposeAsync()
+        private void Dispose(bool disposing)
         {
-            foreach (var channel in _idleChannels)
+            if (!_isDisposed)
             {
-                try
+                if (disposing)
                 {
-                    await (channel?.DisposeAsync() ?? ValueTask.CompletedTask);
+                    while (_idleChannels.TryDequeue(out var channel))
+                    {
+                        channel?.Dispose();
+                    }
                 }
-                catch (Exception)
-                {
-                    // Swallow
-                }
+
+                _isDisposed = true;
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

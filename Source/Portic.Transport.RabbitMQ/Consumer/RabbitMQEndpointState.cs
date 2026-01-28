@@ -13,6 +13,8 @@ namespace Portic.Transport.RabbitMQ.Consumer
         private readonly List<RabbitMQEndpointConsumerState> ConsumerStates = [];
         private readonly Func<RawTransportMessageReceived, CancellationToken, Task> ConsumeFunc = consumeFunc;
 
+        public IEnumerable<RabbitMQEndpointConsumerState> Consumers => ConsumerStates;
+
         public RabbitMQEndpointConsumerState AddConsumer(IChannel channel)
         {
             var consumer = new RabbitMQEndpointConsumerState(
