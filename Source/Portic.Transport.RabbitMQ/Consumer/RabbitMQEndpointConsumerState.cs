@@ -14,12 +14,12 @@ namespace Portic.Transport.RabbitMQ.Consumer
         public readonly IEndpointConfiguration Endpoint;
 
         private readonly AsyncEventingBasicConsumer EventConsumer;
-        private readonly Func<RabbitMQTransportMessageReceived, CancellationToken, Task> ConsumeFunc;
+        private readonly Func<RawTransportMessageReceived, CancellationToken, Task> ConsumeFunc;
 
         public RabbitMQEndpointConsumerState(
             IChannel channel,
             IEndpointConfiguration endpoint,
-            Func<RabbitMQTransportMessageReceived, CancellationToken, Task> consumeFunc)
+            Func<RawTransportMessageReceived, CancellationToken, Task> consumeFunc)
         {
             Channel = channel;
             Endpoint = endpoint;
@@ -51,7 +51,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
             ObjectDisposedException.ThrowIf(_isDisposed, this);
 
             await ConsumeFunc(
-                new RabbitMQTransportMessageReceived(
+                new RawTransportMessageReceived(
                     this,
                     args
                 ),

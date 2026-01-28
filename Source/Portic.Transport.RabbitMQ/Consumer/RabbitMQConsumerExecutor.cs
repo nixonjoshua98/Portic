@@ -27,7 +27,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 throw new Exception("Failed to find ConsumeGenericAsync method.");
         }
 
-        public async Task ExecuteAsync(RabbitMQTransportMessageReceived message, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(RawTransportMessageReceived message, CancellationToken cancellationToken)
         {
             var genericConsumeMethod = GetGenericConsumeMethod(message.MessageConfiguration.MessageType);
 
@@ -38,7 +38,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
             await genericConsumeResult!;
         }
 
-        private async Task ConsumeGenericAsync<TMessage>(RabbitMQTransportMessageReceived message, CancellationToken cancellationToken)
+        private async Task ConsumeGenericAsync<TMessage>(RawTransportMessageReceived message, CancellationToken cancellationToken)
         {
             var body = _serializer.Deserialize<RabbitMQMessageBody<TMessage>>(message.RawBody.Span);
 
@@ -67,7 +67,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
         }
 
         private async Task RedeliverMessageAsync<TMessage>(
-            RabbitMQTransportMessageReceived message, 
+            RawTransportMessageReceived message, 
             IConsumerContext<TMessage> context, 
             CancellationToken cancellationToken)
         {

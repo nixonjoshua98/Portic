@@ -8,7 +8,7 @@ using RabbitMQ.Client.Events;
 
 namespace Portic.Transport.RabbitMQ.Models
 {
-    internal sealed class RabbitMQTransportMessageReceived
+    internal sealed class RawTransportMessageReceived
     {
         public IChannel Channel { get; }
         public byte DeliveryCount { get; }
@@ -20,7 +20,7 @@ namespace Portic.Transport.RabbitMQ.Models
 
         public ReadOnlyMemory<byte> RawBody { get; }
 
-        public RabbitMQTransportMessageReceived(RabbitMQEndpointConsumerState state, BasicDeliverEventArgs deliverArgs)
+        public RawTransportMessageReceived(RabbitMQEndpointConsumerState state, BasicDeliverEventArgs deliverArgs)
         {
             Channel = state.GetChannelOrThrow();
 
