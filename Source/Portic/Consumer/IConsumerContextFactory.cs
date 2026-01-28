@@ -1,7 +1,7 @@
 
 namespace Portic.Consumer
 {
-    public interface IConsumerContextFactory
+    internal interface IConsumerContextFactory
     {
         ValueTask<IConsumerContext<TMessage>> CreateAsync<TMessage>(
             TransportMessageReceived<TMessage> message,

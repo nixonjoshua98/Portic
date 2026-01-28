@@ -13,6 +13,8 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         public async ValueTask<IRabbitMQRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
         {
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
+
             var channelPool = await GetChannelPoolAsync(cancellationToken);
 
             return await channelPool.RentAsync(cancellationToken);
@@ -20,6 +22,8 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         public async ValueTask<IChannel> CreateChannelAsync(RabbitMQChannelOptions options, CancellationToken cancellationToken = default)
         {
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
+
             var connection = await GetConnectionAsync(cancellationToken);
 
             var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
@@ -70,11 +74,13 @@ namespace Portic.Transport.RabbitMQ.Topology
             {
                 if (disposing)
                 {
-                    _channelPool?.Dispose();
                     _connection?.Dispose();
+                    _channelPool?.Dispose();
+                    _connectionLock?.Dispose();
                 }
 
-                _channelPool = null; _connection = null;
+                _connection = null;
+                _channelPool = null;
 
                 _isDisposed = true;
             }

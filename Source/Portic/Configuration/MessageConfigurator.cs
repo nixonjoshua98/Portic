@@ -9,7 +9,6 @@ namespace Portic.Configuration
 
         public Type MessageType { get; } = messageType;
         public string Name { get; private set; } = messageType.FullName ?? messageType.Name;
-        public bool Mandatory { get; private set; } = false;
 
         public IMessageConfigurator WithName(string name)
         {

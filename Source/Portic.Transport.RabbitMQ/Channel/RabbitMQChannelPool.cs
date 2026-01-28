@@ -45,6 +45,8 @@ namespace Portic.Transport.RabbitMQ.Channel
             {
                 if (disposing)
                 {
+                    _creationLock.Dispose();
+
                     while (_idleChannels.TryDequeue(out var channel))
                     {
                         channel?.Dispose();

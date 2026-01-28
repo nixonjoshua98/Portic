@@ -8,13 +8,13 @@ namespace Portic.Endpoint
         string name,
         IEnumerable<IConsumerConfiguration> consumers,
         IReadOnlyCustomPropertyBag properties,
-        byte maxDeliveryAttempts
+        byte maxRedeliveryAttempts
     ) : IEndpointConfiguration
     {
         private readonly IReadOnlyCustomPropertyBag Properties = properties;
 
         public string Name { get; } = name;
-        public byte MaxRedeliveryAttempts { get; } = maxDeliveryAttempts;
+        public byte MaxRedeliveryAttempts { get; } = maxRedeliveryAttempts;
         public IReadOnlyDictionary<string, IConsumerConfiguration> Consumers { get; } = consumers.ToDictionary(x => x.Message.Name);
 
         public T GetPropertyOrDefault<T>(string key, T defaultValue) => Properties.GetOrDefault(key, defaultValue);
