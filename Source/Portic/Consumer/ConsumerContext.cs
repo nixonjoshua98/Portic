@@ -3,7 +3,7 @@ using Portic.Endpoint;
 
 namespace Portic.Consumer
 {
-    public sealed class ConsumerContext<TMessage>(
+    internal sealed class ConsumerContext<TMessage>(
         string messageId,
         TMessage message,
         byte deliveryCount,

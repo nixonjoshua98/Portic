@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Portic.Consumer;
-using Portic.Endpoint;
 using Portic.Exceptions;
 using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Logging;
@@ -13,7 +11,6 @@ using System.Reflection;
 namespace Portic.Transport.RabbitMQ.Consumer
 {
     internal sealed class RabbitMQConsumerExecutor(
-        IServiceScopeFactory _scopeFactory,
         IPorticSerializer _serializer,
         ILogger<RabbitMQConsumerExecutor> _logger,
         IConsumerExecutor _consumerExecutor,
@@ -30,55 +27,33 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 throw new Exception("Failed to find ConsumeGenericAsync method.");
         }
 
-        public async Task ExecuteAsync(TransportMessageReceived message, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(RabbitMQTransportMessageReceived message, CancellationToken cancellationToken)
         {
-            if (!message.TryGetConsumerConfiguration(out var consumerConfig))
-            {
-                throw MessageTypeNotFoundException.FromName(message.MessageName);
-            }
+            var genericConsumeMethod = GetGenericConsumeMethod(message.MessageConfiguration.MessageType);
 
-            var genericConsumeMethod = GetGenericConsumeMethod(consumerConfig.Message.MessageType);
-
-            object[] methodArgs = [message, message.EndpointConfiguration, consumerConfig, cancellationToken];
+            object[] methodArgs = [message, cancellationToken];
 
             var genericConsumeResult = genericConsumeMethod.Invoke(this, methodArgs) as Task;
 
             await genericConsumeResult!;
         }
 
-        private async Task ConsumeGenericAsync<TMessage>(
-            TransportMessageReceived message,
-            IEndpointConfiguration endpointConfiguration,
-            IConsumerConfiguration consumerConfiguration,
-            CancellationToken cancellationToken
-        )
+        private async Task ConsumeGenericAsync<TMessage>(RabbitMQTransportMessageReceived message, CancellationToken cancellationToken)
         {
-            var body = _serializer.Deserialize<RabbitMQMessageBody<TMessage>>(message.Body);
+            var body = _serializer.Deserialize<RabbitMQMessageBody<TMessage>>(message.RawBody.Span);
 
-            await using var scope = _scopeFactory.CreateAsyncScope();
-
-            var context = new ConsumerContext<TMessage>(
-                body.MessageId,
-                body.Message,
-                message.DeliveryCount,
-                scope.ServiceProvider,
-                consumerConfiguration,
-                endpointConfiguration,
-                cancellationToken
-            );
+            var messageReceived = message.ToReceivedMessage(body.MessageId, body.Message);
 
             try
             {
-                await _consumerExecutor.ExecuteAsync(context, cancellationToken);
+                await _consumerExecutor.ExecuteAsync(messageReceived, cancellationToken);
 
                 await message.Channel.BasicAckAsync(message.DeliveryTag, false, cancellationToken);
-
-                _logger.LogMessageConsumed(context.MessageName, message.EndpointConfiguration.Name);
             }
 
-            catch (PorticConsumerException ex) when (ex.ShouldRedeliver)
+            catch (PorticConsumerException<TMessage> ex) when (ex.ShouldRedeliver)
             {
-                await RedeliverMessageAsync(message, context, cancellationToken);
+                await RedeliverMessageAsync(message, ex.Context, cancellationToken);
             }
 
             catch (Exception)
@@ -91,7 +66,10 @@ namespace Portic.Transport.RabbitMQ.Consumer
             }
         }
 
-        private async Task RedeliverMessageAsync<T>(TransportMessageReceived message, ConsumerContext<T> context, CancellationToken cancellationToken)
+        private async Task RedeliverMessageAsync<TMessage>(
+            RabbitMQTransportMessageReceived message, 
+            IConsumerContext<TMessage> context, 
+            CancellationToken cancellationToken)
         {
             // Republish the message for redelivery first, to ensure at-least-once delivery guarantee
             await _transport.RePublishAsync(context, cancellationToken);

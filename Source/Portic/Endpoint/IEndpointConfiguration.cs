@@ -1,5 +1,4 @@
 ﻿using Portic.Consumer;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Portic.Endpoint
 {
@@ -9,7 +8,7 @@ namespace Portic.Endpoint
         IReadOnlyDictionary<string, IConsumerConfiguration> Consumers { get; }
         byte MaxRedeliveryAttempts { get; }
 
+        IConsumerConfiguration GetConsumerConfiguration(string? messageName);
         T GetPropertyOrDefault<T>(string key, T defaultValue);
-        bool TryGetConsumerForMessage(string? messageName, [NotNullWhen(true)] out IConsumerConfiguration? consumer);
     }
 }

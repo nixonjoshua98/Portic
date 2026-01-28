@@ -8,28 +8,32 @@ namespace Portic.Consumer
 {
     internal sealed class ConsumerExecutor(
         ILogger<ConsumerExecutor> _logger,
-        IPorticConfiguration _configuration
+        IPorticConfiguration _configuration,
+        IServiceScopeFactory _scopeFactory,
+        IConsumerContextFactory _contextFactory
     ) : IConsumerExecutor
     {
-        public async Task ExecuteAsync<TMessage>(IConsumerContext<TMessage> context, CancellationToken cancellationToken)
+        public async Task ExecuteAsync<TMessage>(TransportMessageReceived<TMessage> message, CancellationToken cancellationToken)
         {
+            await using var scope = _scopeFactory.CreateAsyncScope();
+
+            var context = await _contextFactory.CreateAsync(
+                message, 
+                scope.ServiceProvider,
+                cancellationToken
+            );
+
             var pipeline = BuildPipeline(context);
 
             try
             {
                 await pipeline(context);
             }
-
-            // Redelivery
             catch (Exception ex) when (context.DeliveryCount < context.MaxRedeliveryAttempts)
             {
-                throw PorticConsumerException.ForRedelivery(
-                    context.MessageId,
-                    Convert.ToByte(context.DeliveryCount + 1),
-                    context.MaxRedeliveryAttempts,
-                    ex
-                );
+                throw PorticConsumerException.ForRedelivery(ex, context);
             }
+
         }
 
         private ConsumerMiddlewareDelegate BuildPipeline<TMessage>(IConsumerContext<TMessage> context)

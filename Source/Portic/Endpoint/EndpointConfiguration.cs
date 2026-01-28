@@ -1,6 +1,6 @@
 ﻿using Portic.Consumer;
+using Portic.Exceptions;
 using Portic.Models;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Portic.Endpoint
 {
@@ -19,16 +19,14 @@ namespace Portic.Endpoint
 
         public T GetPropertyOrDefault<T>(string key, T defaultValue) => Properties.GetOrDefault(key, defaultValue);
 
-        public bool TryGetConsumerForMessage(string? messageName, [NotNullWhen(true)] out IConsumerConfiguration? consumer)
+        public IConsumerConfiguration GetConsumerConfiguration(string? messageName)
         {
-            if (string.IsNullOrEmpty(messageName))
+            if (string.IsNullOrEmpty(messageName) || !Consumers.TryGetValue(messageName, out var consumer))
             {
-                consumer = null;
-
-                return false;
+                throw MessageTypeNotFoundException.FromName(messageName);
             }
 
-            return Consumers.TryGetValue(messageName, out consumer);
+            return consumer;
         }
     }
 }

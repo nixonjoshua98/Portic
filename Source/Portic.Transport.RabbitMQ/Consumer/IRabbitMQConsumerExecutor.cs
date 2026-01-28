@@ -4,6 +4,6 @@ namespace Portic.Transport.RabbitMQ.Consumer
 {
     internal interface IRabbitMQConsumerExecutor
     {
-        Task ExecuteAsync(TransportMessageReceived message, CancellationToken cancellationToken);
+        Task ExecuteAsync(RabbitMQTransportMessageReceived message, CancellationToken cancellationToken);
     }
 }
