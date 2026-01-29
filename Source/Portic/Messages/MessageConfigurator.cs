@@ -1,5 +1,4 @@
-﻿using Portic.Configuration;
-using Portic.Models;
+﻿using Portic.Models;
 
 namespace Portic.Messages
 {

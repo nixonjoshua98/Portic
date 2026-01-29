@@ -14,8 +14,8 @@ namespace Portic.Consumers
                 message.Message,
                 message.DeliveryCount,
                 serviceProvider,
-                message.ConsumerConfiguration,
-                message.EndpointConfiguration,
+                message.ConsumerDefinition,
+                message.EndpointDefinition,
                 cancellationToken
             );
 

@@ -11,7 +11,7 @@ namespace Portic.Consumers
         byte MaxRedeliveryAttempts { get; }
         CancellationToken CancellationToken { get; }
         IMessageDefinition MessageConfiguration { get; }
-        IConsumerDefinition ConsumerConfiguration { get; }
+        IConsumerDefinition ConsumerDefinition { get; }
 
         IConsumerContext WithServiceProvider(IServiceProvider serviceProvider);
     }
