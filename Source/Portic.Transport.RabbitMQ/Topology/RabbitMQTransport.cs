@@ -37,7 +37,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
         {
-            var configuration = _configuration.GetMessageConfiguration<TMessage>();
+            var configuration = _configuration.GetMessageDefinition<TMessage>();
 
             var body = new RabbitMQMessageBody<TMessage>(
                 Guid.CreateVersion7().ToString(),
