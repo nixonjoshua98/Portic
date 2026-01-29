@@ -26,7 +26,7 @@ namespace Portic.Configuration
             return endpoint is not null;
         }
 
-        public IMessageDefinition GetMessageConfiguration<TMessage>()
+        public IMessageDefinition GetMessageDefinition<TMessage>()
         {
             var messageType = typeof(TMessage);
 

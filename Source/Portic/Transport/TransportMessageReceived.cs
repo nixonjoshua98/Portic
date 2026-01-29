@@ -7,7 +7,7 @@ namespace Portic.Transport
         string MessageId,
         TMessage Message,
         byte DeliveryCount,
-        IConsumerDefinition ConsumerConfiguration,
-        IEndpointDefinition EndpointConfiguration
+        IConsumerDefinition ConsumerDefinition,
+        IEndpointDefinition EndpointDefinition
     );
 }

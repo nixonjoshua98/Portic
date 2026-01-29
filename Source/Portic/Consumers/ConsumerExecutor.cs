@@ -67,12 +67,12 @@ namespace Portic.Consumers
 
         private async Task ExecuteConsumerAsync<TMessage>(IConsumerContext<TMessage> context)
         {
-            var consumerInst = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, context.ConsumerConfiguration.ConsumerType) as IConsumer<TMessage>
-                ?? throw MessageTypeNotFoundException.FromName(context.ConsumerConfiguration.Message.Name);
+            var consumerInst = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, context.ConsumerDefinition.ConsumerType) as IConsumer<TMessage>
+                ?? throw MessageTypeNotFoundException.FromName(context.ConsumerDefinition.Message.Name);
 
             await consumerInst.ConsumeAsync(context);
 
-            _logger.LogMessageConsumed(context.ConsumerConfiguration.Message.Name);
+            _logger.LogMessageConsumed(context.ConsumerDefinition.Message.Name);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Portic.Consumers
         public IMessageDefinition MessageConfiguration { get; } = consumer.Message;
         public CancellationToken CancellationToken { get; } = cancellationToken;
         public IServiceProvider Services { get; private set; } = serviceProvider;
-        public IConsumerDefinition ConsumerConfiguration { get; } = consumer;
+        public IConsumerDefinition ConsumerDefinition { get; } = consumer;
         public byte DeliveryCount { get; } = deliveryCount;
         public byte MaxRedeliveryAttempts { get; } = endpoint.MaxRedeliveryAttempts;
 

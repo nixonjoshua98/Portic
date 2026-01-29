@@ -45,6 +45,7 @@ namespace Portic.Configuration
         IPorticConfigurator SetMaxRedeliveryAttempts(byte attempts);
 
         IPorticConfigurator SetProperty(string key, object value);
+
         IPorticConfigurator SetTransportDefinition(ITransportDefinition transportDefinition);
 
         /// <summary>

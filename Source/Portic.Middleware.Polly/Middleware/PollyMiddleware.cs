@@ -10,7 +10,7 @@ namespace Portic.Middleware.Polly.Middleware
 {
     internal sealed class PollyMiddleware(IOptions<PollyMiddlewareOptions> _middlewareOptions, ILogger<PollyMiddleware> _logger) : IConsumerMiddleware
     {
-        private readonly ResiliencePipeline _pipeline = _middlewareOptions.Value.Pipeline;
+        private readonly PollyMiddlewareOptions _options = _middlewareOptions.Value;
 
         public async Task InvokeAsync(IConsumerContext context, ConsumerMiddlewareDelegate next)
         {
@@ -20,7 +20,7 @@ namespace Portic.Middleware.Polly.Middleware
             {
                 resilienceContext.SetLoggingProperties(context, _logger);
 
-                await _pipeline.ExecuteAsync(async _ => await ExecuteAsync(context, next), resilienceContext);
+                await _options.Pipeline.ExecuteAsync(async _ => await ExecuteAsync(context, next), resilienceContext);
             }
             catch (Exception ex)
             {
@@ -34,20 +34,18 @@ namespace Portic.Middleware.Polly.Middleware
             }
         }
 
-        private static async Task ExecuteAsync(IConsumerContext context, ConsumerMiddlewareDelegate next)
+        private async Task ExecuteAsync(IConsumerContext context, ConsumerMiddlewareDelegate next)
         {
-            /*
-             * When executing a consumer in a retry policy, each consumer execution should run in
-             * its own scope. This ensures any state changes from the previous attempt do not leak,
-             * such as DbContext tracking changes. 
-             * We could maybe consider making this configurable in the future.
-             */
-
             var originalServiceProvider = context.Services;
 
-            await using var scope = context.Services.CreateAsyncScope();
+            AsyncServiceScope? createdScope = null;
 
-            context.WithServiceProvider(scope.ServiceProvider);
+            if (_options.UseScopePerExecution)
+            {
+                createdScope = context.Services.CreateAsyncScope();
+
+                context.WithServiceProvider(createdScope.Value.ServiceProvider);
+            }
 
             try
             {
@@ -55,7 +53,12 @@ namespace Portic.Middleware.Polly.Middleware
             }
             finally
             {
-                context.WithServiceProvider(originalServiceProvider);
+                if (createdScope.HasValue)
+                {
+                    await createdScope.Value.DisposeAsync();
+
+                    context.WithServiceProvider(originalServiceProvider);
+                }
             }
         }
     }

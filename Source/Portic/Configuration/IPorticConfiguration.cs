@@ -11,7 +11,7 @@ namespace Portic.Configuration
         ITransportDefinition TransportDefinition { get; }
         internal IReadOnlyList<Type> Middleware { get; }
 
-        IMessageDefinition GetMessageConfiguration<TMessage>();
+        IMessageDefinition GetMessageDefinition<TMessage>();
 
         internal bool TryGetEndpointByName(string name, [NotNullWhen(true)] out IEndpointDefinition? endpoint);
     }
