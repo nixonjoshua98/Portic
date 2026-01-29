@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Portic.Abstractions;
+using Portic.Configuration;
 using Portic.Transport.RabbitMQ.Consumer;
 using Portic.Transport.RabbitMQ.Topology;
 
@@ -26,7 +26,11 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
                 callback?.Invoke(busBuilder);
 
-                builder.Services.TryAddSingleton(busBuilder.Build());
+                var transportDefinition = busBuilder.Build();
+
+                builder.SetTransportDefinition(transportDefinition);
+
+                builder.Services.TryAddSingleton(transportDefinition);
 
                 AddCoreServices(builder.Services);
 

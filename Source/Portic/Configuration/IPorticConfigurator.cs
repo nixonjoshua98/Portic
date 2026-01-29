@@ -2,6 +2,7 @@
 using Portic.Consumers;
 using Portic.Endpoints;
 using Portic.Messages;
+using Portic.Transport;
 
 namespace Portic.Configuration
 {
@@ -44,6 +45,7 @@ namespace Portic.Configuration
         IPorticConfigurator SetMaxRedeliveryAttempts(byte attempts);
 
         IPorticConfigurator SetProperty(string key, object value);
+        IPorticConfigurator SetTransportDefinition(ITransportDefinition transportDefinition);
 
         /// <summary>
         /// Adds the specified consumer middleware type to the processing pipeline.

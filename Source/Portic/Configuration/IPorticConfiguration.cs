@@ -1,5 +1,6 @@
 ﻿using Portic.Endpoints;
 using Portic.Messages;
+using Portic.Transport;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Portic.Configuration
@@ -7,7 +8,7 @@ namespace Portic.Configuration
     public interface IPorticConfiguration
     {
         IReadOnlyList<IEndpointDefinition> Endpoints { get; }
-
+        ITransportDefinition TransportDefinition { get; }
         internal IReadOnlyList<Type> Middleware { get; }
 
         IMessageDefinition GetMessageConfiguration<TMessage>();

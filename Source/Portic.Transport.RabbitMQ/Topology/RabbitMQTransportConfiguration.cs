@@ -8,6 +8,8 @@ namespace Portic.Transport.RabbitMQ.Topology
         private readonly IPorticConfigurator Configurator;
         private readonly ConnectionFactory ConnectionFactory = new();
 
+        public string DisplayName => "RabbitMQ";
+
         public RabbitMQTransportConfiguration(IPorticConfigurator builder)
         {
             Configurator = builder;
