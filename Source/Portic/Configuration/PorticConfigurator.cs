@@ -152,7 +152,7 @@ namespace Portic.Configuration
                 messages,
                 endpoints,
                 Middleware,
-                TransportDefinition ?? throw TransportNotDefinedException.Create()
+                TransportDefinition ?? throw TransportNotDefinedException.CreateNew()
             );
         }
     }
