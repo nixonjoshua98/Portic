@@ -1,6 +1,6 @@
 ﻿using RabbitMQ.Client;
 
-namespace Portic.Transport.RabbitMQ.Channel
+namespace Portic.Transport.RabbitMQ.Channels
 {
     internal sealed class RabbitMQRentedChannel(RabbitMQChannelPool Pool, IChannel channel) : IRabbitMQRentedChannel
     {

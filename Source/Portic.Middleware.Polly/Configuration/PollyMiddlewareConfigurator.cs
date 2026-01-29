@@ -36,7 +36,7 @@ namespace Portic.Middleware.Polly.Configuration
             {
                 var delay = args.RetryDelay.TotalMilliseconds;
 
-                logger.LogRetryAttempt(context.MessageId, context.MessageName, args.AttemptNumber + 1, retryCount, delay);
+                logger.LogRetryAttempt(context.MessageId, args.AttemptNumber + 1, retryCount, delay);
             }
 
             return ValueTask.CompletedTask;

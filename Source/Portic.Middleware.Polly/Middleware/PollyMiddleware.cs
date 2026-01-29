@@ -24,7 +24,7 @@ namespace Portic.Middleware.Polly.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogFailedResiliencePipeline(ex, context.MessageName);
+                _logger.LogFailedResiliencePipeline(ex, context.MessageId);
 
                 throw;
             }

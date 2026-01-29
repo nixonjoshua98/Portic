@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Portic.Consumers;
 using Portic.Endpoints;
-using Portic.Transport.RabbitMQ.Consumer;
+using Portic.Transport.RabbitMQ.Consumers;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Logging;
 using RabbitMQ.Client;

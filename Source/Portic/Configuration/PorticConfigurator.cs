@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Portic.Consumers;
 using Portic.Endpoints;
+using Portic.Exceptions;
 using Portic.Messages;
 using Portic.Models;
+using Portic.Transport;
 using System.Collections.Concurrent;
 
 namespace Portic.Configuration
@@ -12,6 +14,8 @@ namespace Portic.Configuration
         private readonly CustomPropertyBag Properties = new();
 
         public IServiceCollection Services { get; } = services;
+        private ITransportDefinition? TransportDefinition { get; set; }
+
 
         private readonly ConcurrentDictionary<Type, MessageConfigurator> MessageConfigurators = [];
 
@@ -26,7 +30,21 @@ namespace Portic.Configuration
         public IPorticConfigurator SetMaxRedeliveryAttempts(byte attempts)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(attempts, nameof(attempts));
+
             MaxRedeliveryAttempts = attempts;
+
+            return this;
+        }
+
+        public IPorticConfigurator SetTransportDefinition(ITransportDefinition transportDefinition)
+        {
+            if (TransportDefinition is not null)
+            {
+                throw TransportAlreadyDefinedException.FromTransport(TransportDefinition, transportDefinition);
+            }
+
+            TransportDefinition = transportDefinition;
+
             return this;
         }
 
@@ -133,7 +151,8 @@ namespace Portic.Configuration
             return new PorticConfiguration(
                 messages,
                 endpoints,
-                Middleware
+                Middleware,
+                TransportDefinition ?? throw TransportNotDefinedException.CreateNew()
             );
         }
     }

@@ -1,6 +1,6 @@
 ﻿using Portic.Endpoints;
 using Portic.Messages;
-using System.Diagnostics.CodeAnalysis;
+using Portic.Transport;
 
 namespace Portic.Configuration
 {
@@ -8,10 +8,9 @@ namespace Portic.Configuration
     {
         IReadOnlyList<IEndpointDefinition> Endpoints { get; }
 
+        internal ITransportDefinition TransportDefinition { get; }
         internal IReadOnlyList<Type> Middleware { get; }
 
         IMessageDefinition GetMessageDefinition<TMessage>();
-
-        internal bool TryGetEndpointByName(string name, [NotNullWhen(true)] out IEndpointDefinition? endpoint);
     }
 }

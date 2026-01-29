@@ -1,6 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
-using Polly.Retry;
 using Portic.Configuration;
 using Portic.Middleware.Polly.Configuration;
 using Portic.Middleware.Polly.Middleware;

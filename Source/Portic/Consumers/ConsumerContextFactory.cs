@@ -5,7 +5,7 @@ namespace Portic.Consumers
     internal sealed class ConsumerContextFactory : IConsumerContextFactory
     {
         public ValueTask<IConsumerContext<TMessage>> CreateAsync<TMessage>(
-            TransportMessageReceived<TMessage> message,
+            ITransportMessageReceived<TMessage> message,
             IServiceProvider serviceProvider,
             CancellationToken cancellationToken)
         {
@@ -16,6 +16,7 @@ namespace Portic.Consumers
                 serviceProvider,
                 message.ConsumerDefinition,
                 message.EndpointDefinition,
+                message.Settlement,
                 cancellationToken
             );
 

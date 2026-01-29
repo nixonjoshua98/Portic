@@ -1,5 +1,4 @@
 ﻿using Polly;
-using Portic.Abstractions;
 
 namespace Portic.Middleware.Polly.Configuration
 {

@@ -1,5 +1,5 @@
 ﻿using Portic.Endpoints;
-using Portic.Transport.RabbitMQ.Consumer;
+using Portic.Transport.RabbitMQ.Consumers;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {

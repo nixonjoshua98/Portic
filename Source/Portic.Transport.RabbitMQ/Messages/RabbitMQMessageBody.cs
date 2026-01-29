@@ -1,7 +1,6 @@
-﻿namespace Portic.Transport.RabbitMQ.Models
+﻿namespace Portic.Transport.RabbitMQ.Messages
 {
     internal sealed record RabbitMQMessageBody<TMessage>(
-        string MessageId,
         TMessage Message
     );
 }

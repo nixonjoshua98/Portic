@@ -4,6 +4,6 @@ namespace Portic.Consumers
 {
     public interface IConsumerExecutor
     {
-        Task ExecuteAsync<TMessage>(TransportMessageReceived<TMessage> message, CancellationToken cancellationToken);
+        Task ExecuteAsync<TMessage>(ITransportMessageReceived<TMessage> message, CancellationToken cancellationToken);
     }
 }

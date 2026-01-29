@@ -15,7 +15,7 @@ namespace Portic.Serializer
                 ?? throw new Exception("Failed to deserialize value");
         }
 
-        public byte[] SerializeToBytes<T>(T value)
+        public ReadOnlyMemory<byte> Serialize<T>(T value)
         {
             return JsonSerializer.SerializeToUtf8Bytes(value, _serializerOptions);
         }

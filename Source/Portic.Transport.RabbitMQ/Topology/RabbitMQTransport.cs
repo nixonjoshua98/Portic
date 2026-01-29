@@ -1,9 +1,8 @@
 ﻿using Portic.Configuration;
-using Portic.Consumers;
 using Portic.Messages;
 using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Extensions;
-using Portic.Transport.RabbitMQ.Models;
+using Portic.Transport.RabbitMQ.Messages;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
@@ -14,22 +13,15 @@ namespace Portic.Transport.RabbitMQ.Topology
         IPorticSerializer _serializer
     ) : IRabbitMQTransport
     {
-        public async Task RePublishAsync<TMessage>(IConsumerContext<TMessage> context, CancellationToken cancellationToken)
+        public async Task PublishFaultedAsync(RabbitMQRawMessageReceived message, CancellationToken cancellationToken)
         {
-            var body = new RabbitMQMessageBody<TMessage>(
-                context.MessageId,
-                context.Message
-            );
-
-            var payloadBytes = _serializer.SerializeToBytes(body);
-
             var properties = new BasicProperties()
-                .SetMessageName(context.MessageName)
-                .SetDeliveryCount(Convert.ToByte(context.DeliveryCount + 1));
+                .SetHeadersFrom(message.BasicProperties)
+                .SetDeliveryCount(Convert.ToByte(message.DeliveryCount + 1));
 
             await PublishAsync(
-                context.MessageConfiguration,
-                payloadBytes,
+                message.MessageConfiguration,
+                message.RawBody,
                 properties,
                 cancellationToken
             );
@@ -40,13 +32,13 @@ namespace Portic.Transport.RabbitMQ.Topology
             var definition = _configuration.GetMessageDefinition<TMessage>();
 
             var body = new RabbitMQMessageBody<TMessage>(
-                Guid.CreateVersion7().ToString(),
                 message
             );
 
-            var payloadBytes = _serializer.SerializeToBytes(body);
+            var payloadBytes = _serializer.Serialize(body);
 
             var properties = new BasicProperties()
+                .SetMessageId(Guid.CreateVersion7().ToString())
                 .SetMessageName(definition.Name);
 
             await PublishAsync(
@@ -59,7 +51,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         private async Task PublishAsync(
             IMessageDefinition configuration,
-            byte[] payloadBytes,
+            ReadOnlyMemory<byte> payloadBytes,
             BasicProperties properties,
             CancellationToken cancellationToken)
         {
