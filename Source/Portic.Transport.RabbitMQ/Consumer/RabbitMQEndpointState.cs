@@ -1,15 +1,15 @@
-﻿using Portic.Endpoint;
+﻿using Portic.Endpoints;
 using Portic.Transport.RabbitMQ.Models;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Consumer
 {
     internal sealed class RabbitMQEndpointState(
-        IEndpointConfiguration endpoint,
+        IEndpointDefinition endpoint,
         Func<RawTransportMessageReceived, CancellationToken, Task> consumeFunc
     ) : IDisposable
     {
-        private readonly IEndpointConfiguration Endpoint = endpoint;
+        private readonly IEndpointDefinition Endpoint = endpoint;
         private readonly List<RabbitMQEndpointConsumerState> ConsumerStates = [];
         private readonly Func<RawTransportMessageReceived, CancellationToken, Task> ConsumeFunc = consumeFunc;
 

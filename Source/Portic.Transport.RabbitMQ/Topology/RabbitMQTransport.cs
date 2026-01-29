@@ -1,5 +1,6 @@
-﻿using Portic.Abstractions;
-using Portic.Consumer;
+﻿using Portic.Configuration;
+using Portic.Consumers;
+using Portic.Messages;
 using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Models;
@@ -36,7 +37,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
         {
-            var configuration = _configuration.GetMessageConfiguration<TMessage>();
+            var definition = _configuration.GetMessageDefinition<TMessage>();
 
             var body = new RabbitMQMessageBody<TMessage>(
                 Guid.CreateVersion7().ToString(),
@@ -46,10 +47,10 @@ namespace Portic.Transport.RabbitMQ.Topology
             var payloadBytes = _serializer.SerializeToBytes(body);
 
             var properties = new BasicProperties()
-                .SetMessageName(configuration.Name);
+                .SetMessageName(definition.Name);
 
             await PublishAsync(
-                configuration,
+                definition,
                 payloadBytes,
                 properties,
                 cancellationToken
@@ -57,7 +58,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         }
 
         private async Task PublishAsync(
-            IMessageConfiguration configuration,
+            IMessageDefinition configuration,
             byte[] payloadBytes,
             BasicProperties properties,
             CancellationToken cancellationToken)

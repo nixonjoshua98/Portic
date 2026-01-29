@@ -1,8 +1,8 @@
 ﻿using Portic.Configuration;
-using Portic.Consumer;
+using Portic.Consumers;
 using Portic.Models;
 
-namespace Portic.Endpoint
+namespace Portic.Endpoints
 {
     internal sealed class EndpointConfigurator : IEndpointConfigurator
     {
@@ -22,9 +22,9 @@ namespace Portic.Endpoint
             return this;
         }
 
-        public IEndpointConfiguration Build(PorticConfigurator configurator, IEnumerable<IConsumerConfiguration> consumers)
+        public IEndpointDefinition Build(PorticConfigurator configurator, IEnumerable<IConsumerDefinition> consumers)
         {
-            return new EndpointConfiguration(
+            return new EndpointDefinition(
                 Name,
                 consumers,
                 Properties,

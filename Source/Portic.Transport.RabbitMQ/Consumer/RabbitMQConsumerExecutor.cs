@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Portic.Consumer;
+using Portic.Consumers;
 using Portic.Exceptions;
 using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Logging;

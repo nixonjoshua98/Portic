@@ -1,6 +1,6 @@
-﻿using Portic.Abstractions;
-using Portic.Consumer;
-using Portic.Endpoint;
+﻿using Portic.Consumers;
+using Portic.Endpoints;
+using Portic.Messages;
 using Portic.Transport.RabbitMQ.Consumer;
 using Portic.Transport.RabbitMQ.Extensions;
 using RabbitMQ.Client;
@@ -14,9 +14,9 @@ namespace Portic.Transport.RabbitMQ.Models
         public byte DeliveryCount { get; }
         public ulong DeliveryTag { get; }
 
-        public IEndpointConfiguration EndpointConfiguration { get; }
-        public IConsumerConfiguration ConsumerConfiguration { get; }
-        public IMessageConfiguration MessageConfiguration { get; }
+        public IEndpointDefinition EndpointDefinition { get; }
+        public IConsumerDefinition ConsumerDefinition { get; }
+        public IMessageDefinition MessageConfiguration { get; }
 
         public ReadOnlyMemory<byte> RawBody { get; }
 
@@ -24,13 +24,13 @@ namespace Portic.Transport.RabbitMQ.Models
         {
             Channel = state.GetChannelOrThrow();
 
-            ConsumerConfiguration = state.Endpoint.GetConsumerConfiguration(deliverArgs.BasicProperties.MessageName);
+            ConsumerDefinition = state.Endpoint.GetConsumerDefinition(deliverArgs.BasicProperties.MessageName);
 
             RawBody = deliverArgs.Body;
-            EndpointConfiguration = state.Endpoint;
+            EndpointDefinition = state.Endpoint;
             DeliveryCount = deliverArgs.BasicProperties.DeliveryCount;
             DeliveryTag = deliverArgs.DeliveryTag;
-            MessageConfiguration = ConsumerConfiguration.Message;
+            MessageConfiguration = ConsumerDefinition.Message;
         }
 
         public TransportMessageReceived<TMessage> ToReceivedMessage<TMessage>(string messageId, TMessage message)
@@ -39,8 +39,8 @@ namespace Portic.Transport.RabbitMQ.Models
                 messageId,
                 message,
                 DeliveryCount,
-                ConsumerConfiguration,
-                EndpointConfiguration
+                ConsumerDefinition,
+                EndpointDefinition
             );
         }
     }

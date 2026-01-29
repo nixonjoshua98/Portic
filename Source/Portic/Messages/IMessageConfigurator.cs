@@ -1,4 +1,4 @@
-﻿namespace Portic.Abstractions
+﻿namespace Portic.Messages
 {
     public interface IMessageConfigurator
     {

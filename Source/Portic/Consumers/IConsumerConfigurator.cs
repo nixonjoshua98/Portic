@@ -1,4 +1,4 @@
-﻿namespace Portic.Consumer
+﻿namespace Portic.Consumers
 {
     public interface IConsumerConfigurator
     {

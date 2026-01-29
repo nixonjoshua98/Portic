@@ -1,4 +1,4 @@
-﻿namespace Portic.Endpoint
+﻿namespace Portic.Endpoints
 {
     public interface IEndpointConfigurator
     {

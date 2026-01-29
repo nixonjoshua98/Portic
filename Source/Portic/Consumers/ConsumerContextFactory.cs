@@ -1,4 +1,6 @@
-namespace Portic.Consumer
+using Portic.Transport;
+
+namespace Portic.Consumers
 {
     internal sealed class ConsumerContextFactory : IConsumerContextFactory
     {
@@ -12,8 +14,8 @@ namespace Portic.Consumer
                 message.Message,
                 message.DeliveryCount,
                 serviceProvider,
-                message.ConsumerConfiguration,
-                message.EndpointConfiguration,
+                message.ConsumerDefinition,
+                message.EndpointDefinition,
                 cancellationToken
             );
 

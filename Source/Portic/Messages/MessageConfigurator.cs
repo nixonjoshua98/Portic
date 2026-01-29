@@ -1,7 +1,6 @@
-﻿using Portic.Abstractions;
-using Portic.Models;
+﻿using Portic.Models;
 
-namespace Portic.Configuration
+namespace Portic.Messages
 {
     internal sealed class MessageConfigurator(Type messageType) : IMessageConfigurator
     {
@@ -23,9 +22,9 @@ namespace Portic.Configuration
             return this;
         }
 
-        public IMessageConfiguration Build()
+        public IMessageDefinition Build()
         {
-            return new MessageConfiguration(Name, MessageType, _properties);
+            return new MessageDefinition(Name, MessageType, _properties);
         }
     }
 }

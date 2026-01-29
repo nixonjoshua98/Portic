@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Portic.Abstractions;
+using Portic.Configuration;
 using Portic.Exceptions;
 using Portic.Logging;
+using Portic.Transport;
 
-namespace Portic.Consumer
+namespace Portic.Consumers
 {
     internal sealed class ConsumerExecutor(
         ILogger<ConsumerExecutor> _logger,
@@ -66,12 +67,12 @@ namespace Portic.Consumer
 
         private async Task ExecuteConsumerAsync<TMessage>(IConsumerContext<TMessage> context)
         {
-            var consumerInst = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, context.ConsumerConfiguration.ConsumerType) as IConsumer<TMessage>
-                ?? throw MessageTypeNotFoundException.FromName(context.ConsumerConfiguration.Message.Name);
+            var consumerInst = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, context.ConsumerDefinition.ConsumerType) as IConsumer<TMessage>
+                ?? throw MessageTypeNotFoundException.FromName(context.ConsumerDefinition.Message.Name);
 
             await consumerInst.ConsumeAsync(context);
 
-            _logger.LogMessageConsumed(context.ConsumerConfiguration.Message.Name);
+            _logger.LogMessageConsumed(context.ConsumerDefinition.Message.Name);
         }
     }
 }
