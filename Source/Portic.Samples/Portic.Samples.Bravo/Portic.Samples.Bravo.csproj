@@ -14,6 +14,7 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Portic.Middleware.Polly\Portic.Middleware.Polly.csproj" />
     <ProjectReference Include="..\..\Portic.Transport.RabbitMQ\Portic.Transport.RabbitMQ.csproj" />
   </ItemGroup>
 

@@ -12,31 +12,14 @@ namespace Portic.Middleware.Polly.Extensions
         private const string PollyMiddlewareAdded = "polly-middleware";
 
         /// <summary>
-        /// Configures the retry policy to use the specified maximum number of retry attempts for transient failures.
+        /// Configures Polly-based resilience policies for the Portic pipeline using the specified configuration
+        /// callback.
         /// </summary>
-        /// <remarks>This method adds a retry policy to the configuration, allowing operations to be
-        /// retried up to the specified number of times in case of transient errors. If a retry policy is already
-        /// configured, it will be replaced.</remarks>
-        /// <param name="configurator">The configurator instance to apply the retry policy to.</param>
-        /// <param name="retryCount">The maximum number of retry attempts to use. Must be greater than zero.</param>
-        /// <param name="delay">An optional delay between retry attempts. If not provided, a default delay of 500 milliseconds will be used.</param>
-        /// <returns>The same configurator instance, enabling method chaining.</returns>
-        public static IPorticConfigurator UseRetryCount(this IPorticConfigurator configurator, byte retryCount, TimeSpan? delay = null)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(retryCount, nameof(retryCount));
-
-            return UsePolly(configurator, config =>
-            {
-                config.Builder.AddRetry(new RetryStrategyOptions
-                {
-                    MaxRetryAttempts = retryCount,
-                    Delay = delay ?? TimeSpan.FromMilliseconds(500),
-                    OnRetry = args => OnPollyPolicyRetryAsync(retryCount, args)
-                });
-            });
-        }
-
-        private static IPorticConfigurator UsePolly(IPorticConfigurator configurator, Action<IPollyMiddlewareConfigurator> callback)
+        /// <param name="configurator">The Portic configurator to which Polly middleware will be added.</param>
+        /// <param name="callback">A callback that configures the Polly middleware by providing an <see cref="IPollyMiddlewareConfigurator"/>
+        /// instance. Cannot be null.</param>
+        /// <returns>The same <see cref="IPorticConfigurator"/> instance for method chaining.</returns>
+        public static IPorticConfigurator UsePolly(this IPorticConfigurator configurator, Action<IPollyMiddlewareConfigurator> callback)
         {
             ArgumentNullException.ThrowIfNull(callback, nameof(callback));
 
@@ -46,7 +29,15 @@ namespace Portic.Middleware.Polly.Extensions
 
             var pipeline = pollyConfigurator.Builder.Build();
 
-            return UsePolly(configurator, pipeline);
+            configurator.Services.Configure<PollyMiddlewareOptions>(options =>
+            {
+                options.Pipeline = pipeline;
+                options.UseScopePerExecution = pollyConfigurator.UseScopePerExecution;
+            });
+
+            UsePollyMiddleware(configurator);
+
+            return configurator;
         }
 
         private static void UsePollyMiddleware(IPorticConfigurator configurator)
@@ -56,32 +47,6 @@ namespace Portic.Middleware.Polly.Extensions
                 configurator.Use<PollyMiddleware>();
                 configurator.SetProperty(PollyMiddlewareAdded, string.Empty);
             }
-        }
-
-        private static IPorticConfigurator UsePolly(IPorticConfigurator configurator, ResiliencePipeline pipeline)
-        {
-            ArgumentNullException.ThrowIfNull(pipeline, nameof(pipeline));
-
-            configurator.Services.Configure<PollyMiddlewareOptions>(options =>
-            {
-                options.Pipeline = pipeline;
-            });
-
-            UsePollyMiddleware(configurator);
-
-            return configurator;
-        }
-
-        private static ValueTask OnPollyPolicyRetryAsync(int retryCount, OnRetryArguments<object> args)
-        {
-            if (args.Context.TryGetLoggingProperties(out var context, out var logger))
-            {
-                var delay = args.RetryDelay.TotalMilliseconds;
-
-                logger.LogRetryAttempt(context.MessageId, context.MessageName, args.AttemptNumber + 1, retryCount, delay);
-            }
-
-            return ValueTask.CompletedTask;
         }
     }
 }
