@@ -8,7 +8,7 @@ namespace Portic.Endpoints
         IReadOnlyDictionary<string, IConsumerDefinition> Consumers { get; }
         byte MaxRedeliveryAttempts { get; }
 
-        IConsumerDefinition GetConsumerConfiguration(string? messageName);
+        IConsumerDefinition GetConsumerDefinition(string? messageName);
         T GetPropertyOrDefault<T>(string key, T defaultValue);
     }
 }
