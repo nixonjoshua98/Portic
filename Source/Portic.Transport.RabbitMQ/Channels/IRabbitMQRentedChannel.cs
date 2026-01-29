@@ -1,6 +1,6 @@
 ﻿using RabbitMQ.Client;
 
-namespace Portic.Transport.RabbitMQ.Channel
+namespace Portic.Transport.RabbitMQ.Channels
 {
     internal interface IRabbitMQRentedChannel : IDisposable
     {

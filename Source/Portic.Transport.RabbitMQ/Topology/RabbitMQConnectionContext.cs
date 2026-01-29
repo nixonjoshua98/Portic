@@ -1,10 +1,10 @@
-﻿using Portic.Transport.RabbitMQ.Channel;
+﻿using Portic.Transport.RabbitMQ.Channels;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQConnectionContext(IRabbitMQTransportDefinition _configuration) : IRabbitMQConnectionContext, IDisposable
-    {       
+    {
         private bool _isDisposed;
         private readonly SemaphoreSlim _connectionLock = new(1, 1);
 

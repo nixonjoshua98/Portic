@@ -1,4 +1,4 @@
-﻿namespace Portic.Transport.RabbitMQ.Channel
+﻿namespace Portic.Transport.RabbitMQ.Channels
 {
     internal readonly record struct RabbitMQChannelOptions(
         uint PrefetchSize,

@@ -2,6 +2,6 @@
 {
     public interface ITransportDefinition
     {
-        public string DisplayName { get; }
+        string DisplayName { get; }
     }
 }

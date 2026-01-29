@@ -1,14 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Portic.Consumers;
-using Portic.Exceptions;
 using Portic.Serializer;
-using Portic.Transport.RabbitMQ.Logging;
-using Portic.Transport.RabbitMQ.Models;
+using Portic.Transport.RabbitMQ.Messages;
 using Portic.Transport.RabbitMQ.Topology;
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace Portic.Transport.RabbitMQ.Consumer
+namespace Portic.Transport.RabbitMQ.Consumers
 {
     internal sealed class RabbitMQConsumerExecutor(
         IPorticSerializer _serializer,
@@ -27,7 +25,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
                 throw new Exception("Failed to find ConsumeGenericAsync method.");
         }
 
-        public async Task ExecuteAsync(RawTransportMessageReceived message, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(RabbitMQRawMessageReceived message, CancellationToken cancellationToken)
         {
             var genericConsumeMethod = GetGenericConsumeMethod(message.MessageConfiguration.MessageType);
 
@@ -38,48 +36,27 @@ namespace Portic.Transport.RabbitMQ.Consumer
             await genericConsumeResult!;
         }
 
-        private async Task ConsumeGenericAsync<TMessage>(RawTransportMessageReceived message, CancellationToken cancellationToken)
+        private async Task ConsumeGenericAsync<TMessage>(RabbitMQRawMessageReceived message, CancellationToken cancellationToken)
         {
             var body = _serializer.Deserialize<RabbitMQMessageBody<TMessage>>(message.RawBody.Span);
 
-            var messageReceived = message.ToReceivedMessage(body.MessageId, body.Message);
+            var settlement = new RabbitMQMessageSettlement<TMessage>(
+                message,
+                _transport,
+                _logger,
+                message.EndpointDefinition.MaxRedeliveryAttempts
+            );
 
-            try
-            {
-                await _consumerExecutor.ExecuteAsync(messageReceived, cancellationToken);
+            var messageReceived = new RabbitMQMessageReceived<TMessage>(
+                message.MessageId!,
+                body.Message,
+                message.DeliveryCount,
+                message.ConsumerDefinition,
+                message.EndpointDefinition,
+                settlement
+            );
 
-                await message.Channel.BasicAckAsync(message.DeliveryTag, false, cancellationToken);
-            }
-
-            catch (PorticConsumerException<TMessage> ex) when (ex.ShouldRedeliver)
-            {
-                await RedeliverMessageAsync(message, ex.Context, cancellationToken);
-            }
-
-            catch (Exception)
-            {
-                // DLQ
-
-                await message.Channel.BasicNackAsync(message.DeliveryTag, false, false, cancellationToken);
-
-                throw;
-            }
-        }
-
-        private async Task RedeliverMessageAsync<TMessage>(
-            RawTransportMessageReceived message,
-            IConsumerContext<TMessage> context,
-            CancellationToken cancellationToken)
-        {
-            // Republish the message for redelivery first, to ensure at-least-once delivery guarantee
-            await _transport.RePublishAsync(context, cancellationToken);
-
-            // Nack the original message without requeueing, since we've already republished it
-            // This prevents potential duplicate deliveries from the original queue
-            // Intentionally ignoring cancellationToken here to ensure Nack is sent regardless of cancellation
-            await message.Channel.BasicNackAsync(message.DeliveryTag, false, false, CancellationToken.None);
-
-            _logger.LogSuccessfulRedelivery(context.MessageId, context.DeliveryCount + 1, context.MaxRedeliveryAttempts);
+            await _consumerExecutor.ExecuteAsync(messageReceived, cancellationToken);
         }
 
         private static MethodInfo GetGenericConsumeMethod(Type messageType)

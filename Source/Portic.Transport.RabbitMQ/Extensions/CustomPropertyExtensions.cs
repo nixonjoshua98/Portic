@@ -1,6 +1,6 @@
 ﻿using Portic.Endpoints;
 using Portic.Messages;
-using Portic.Transport.RabbitMQ.Channel;
+using Portic.Transport.RabbitMQ.Channels;
 
 namespace Portic.Transport.RabbitMQ.Extensions
 {

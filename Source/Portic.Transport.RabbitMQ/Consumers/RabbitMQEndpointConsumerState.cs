@@ -1,9 +1,9 @@
 ﻿using Portic.Endpoints;
-using Portic.Transport.RabbitMQ.Models;
+using Portic.Transport.RabbitMQ.Messages;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Portic.Transport.RabbitMQ.Consumer
+namespace Portic.Transport.RabbitMQ.Consumers
 {
     internal sealed class RabbitMQEndpointConsumerState : IDisposable
     {
@@ -14,12 +14,12 @@ namespace Portic.Transport.RabbitMQ.Consumer
         public readonly IEndpointDefinition Endpoint;
 
         private readonly AsyncEventingBasicConsumer EventConsumer;
-        private readonly Func<RawTransportMessageReceived, CancellationToken, Task> ConsumeFunc;
+        private readonly Func<RabbitMQRawMessageReceived, CancellationToken, Task> ConsumeFunc;
 
         public RabbitMQEndpointConsumerState(
             IChannel channel,
             IEndpointDefinition endpoint,
-            Func<RawTransportMessageReceived, CancellationToken, Task> consumeFunc)
+            Func<RabbitMQRawMessageReceived, CancellationToken, Task> consumeFunc)
         {
             Channel = channel;
             Endpoint = endpoint;
@@ -51,7 +51,7 @@ namespace Portic.Transport.RabbitMQ.Consumer
             ObjectDisposedException.ThrowIf(_isDisposed, this);
 
             await ConsumeFunc(
-                new RawTransportMessageReceived(
+                new RabbitMQRawMessageReceived(
                     this,
                     args
                 ),

@@ -3,11 +3,13 @@ using Portic.Endpoints;
 
 namespace Portic.Transport
 {
-    public sealed record TransportMessageReceived<TMessage>(
-        string MessageId,
-        TMessage Message,
-        byte DeliveryCount,
-        IConsumerDefinition ConsumerDefinition,
-        IEndpointDefinition EndpointDefinition
-    );
+    public interface ITransportMessageReceived<TMessage>
+    {
+        IConsumerDefinition ConsumerDefinition { get; }
+        byte DeliveryCount { get; }
+        IEndpointDefinition EndpointDefinition { get; }
+        TMessage Message { get; }
+        string MessageId { get; }
+        IMessageSettlement Settlement { get; }
+    }
 }

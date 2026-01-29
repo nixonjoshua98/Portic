@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Configuration;
-using Portic.Transport.RabbitMQ.Consumer;
+using Portic.Transport.RabbitMQ.Consumers;
 using Portic.Transport.RabbitMQ.Topology;
 
 namespace Portic.Transport.RabbitMQ.Extensions

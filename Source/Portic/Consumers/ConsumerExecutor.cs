@@ -14,7 +14,7 @@ namespace Portic.Consumers
         IConsumerContextFactory _contextFactory
     ) : IConsumerExecutor
     {
-        public async Task ExecuteAsync<TMessage>(TransportMessageReceived<TMessage> message, CancellationToken cancellationToken)
+        public async Task ExecuteAsync<TMessage>(ITransportMessageReceived<TMessage> message, CancellationToken cancellationToken)
         {
             await using var scope = _scopeFactory.CreateAsyncScope();
 
@@ -29,10 +29,16 @@ namespace Portic.Consumers
             try
             {
                 await pipeline(context);
+
+                await context.Settlement.CompleteAsync(cancellationToken);
             }
-            catch (Exception ex) when (context.DeliveryCount < context.MaxRedeliveryAttempts)
+            catch (Exception) when (context.DeliveryCount < context.MaxRedeliveryAttempts)
             {
-                throw PorticConsumerException<TMessage>.ForRedelivery(ex, context);
+                await context.Settlement.DeferAsync(cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                await context.Settlement.FaultAsync(exception, cancellationToken);
             }
 
         }

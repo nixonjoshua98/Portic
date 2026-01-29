@@ -1,5 +1,5 @@
 ﻿using Portic.Endpoints;
-using Portic.Messages;
+using Portic.Transport;
 
 namespace Portic.Consumers
 {
@@ -10,14 +10,14 @@ namespace Portic.Consumers
         IServiceProvider serviceProvider,
         IConsumerDefinition consumer,
         IEndpointDefinition endpoint,
+        IMessageSettlement messageSettlement,
         CancellationToken cancellationToken
     ) : IConsumerContext<TMessage>
     {
         public string MessageId { get; } = messageId;
-        public string MessageName { get; } = consumer.Message.Name;
         public TMessage Message { get; } = message;
-        public IMessageDefinition MessageConfiguration { get; } = consumer.Message;
         public CancellationToken CancellationToken { get; } = cancellationToken;
+        public IMessageSettlement Settlement { get; } = messageSettlement;
         public IServiceProvider Services { get; private set; } = serviceProvider;
         public IConsumerDefinition ConsumerDefinition { get; } = consumer;
         public byte DeliveryCount { get; } = deliveryCount;

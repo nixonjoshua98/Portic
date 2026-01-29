@@ -1,4 +1,4 @@
-﻿using Portic.Transport.RabbitMQ.Channel;
+﻿using Portic.Transport.RabbitMQ.Channels;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology

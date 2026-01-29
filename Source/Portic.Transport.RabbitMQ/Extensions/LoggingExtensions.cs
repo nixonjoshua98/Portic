@@ -8,6 +8,6 @@ namespace Portic.Transport.RabbitMQ.Logging
         public static partial void LogExchangeBoundToQueue(this ILogger logger, string queueName, string exchangeName);
 
         [LoggerMessage(Level = LogLevel.Information, Message = "Message '{MessageId}' has been successfully redelivered (Delivery: {DeliveryCount} of {MaxRedeliveryAttempts})")]
-        public static partial void LogSuccessfulRedelivery(this ILogger logger, string messageId, int deliveryCount, int maxRedeliveryAttempts);
+        public static partial void LogSuccessfulRedelivery(this ILogger logger, string? messageId, int deliveryCount, int maxRedeliveryAttempts);
     }
 }

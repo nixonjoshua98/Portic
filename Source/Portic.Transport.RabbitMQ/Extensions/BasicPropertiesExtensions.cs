@@ -6,6 +6,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
     internal static class BasicPropertiesExtensions
     {
         private const string MessageNameKey = "x-portic-message";
+        private const string MessageIdKey = "x-portic-message-id";
         private const string DeliveryCountKey = "x-portic-delivery-count";
 
         extension(BasicProperties properties)
@@ -15,12 +16,33 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
             public BasicProperties SetDeliveryCount(byte count) =>
                 SetHeaderValue(properties, DeliveryCountKey, count);
+
+            public BasicProperties SetMessageId(string id) =>
+                SetHeaderValue(properties, MessageIdKey, id);
+
+            public BasicProperties SetHeadersFrom(IReadOnlyBasicProperties source)
+            {
+                if (!source.IsHeadersPresent() || source.Headers is null)
+                {
+                    return properties;
+                }
+
+                foreach (var header in source.Headers)
+                {
+                    SetHeaderValue(properties, header.Key, header.Value);
+                }
+
+                return properties;
+            }
         }
 
         extension(IReadOnlyBasicProperties properties)
         {
             public string? MessageName =>
                 GetHeaderValue(properties, MessageNameKey);
+
+            public string? PorticMessageId =>
+                GetHeaderValue(properties, MessageIdKey);
 
             public byte DeliveryCount =>
                 GetHeaderValueOrDefault<byte>(properties, DeliveryCountKey, 0);

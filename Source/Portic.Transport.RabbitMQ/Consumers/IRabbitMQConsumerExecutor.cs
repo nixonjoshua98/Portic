@@ -1,9 +1,9 @@
-﻿using Portic.Transport.RabbitMQ.Models;
+﻿using Portic.Transport.RabbitMQ.Messages;
 
-namespace Portic.Transport.RabbitMQ.Consumer
+namespace Portic.Transport.RabbitMQ.Consumers
 {
     internal interface IRabbitMQConsumerExecutor
     {
-        Task ExecuteAsync(RawTransportMessageReceived message, CancellationToken cancellationToken);
+        Task ExecuteAsync(RabbitMQRawMessageReceived message, CancellationToken cancellationToken);
     }
 }

@@ -20,12 +20,6 @@ namespace Portic.Configuration
 
         public IReadOnlyList<Type> Middleware { get; } = globalMiddlewareTypes;
 
-        public bool TryGetEndpointByName(string name, [NotNullWhen(true)] out IEndpointDefinition? endpoint)
-        {
-            endpoint = Endpoints.FirstOrDefault(e => e.Name == name);
-            return endpoint is not null;
-        }
-
         public IMessageDefinition GetMessageDefinition<TMessage>()
         {
             var messageType = typeof(TMessage);
