@@ -30,7 +30,9 @@ namespace Portic.Configuration
         public IPorticConfigurator SetMaxRedeliveryAttempts(byte attempts)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(attempts, nameof(attempts));
+
             MaxRedeliveryAttempts = attempts;
+
             return this;
         }
 
