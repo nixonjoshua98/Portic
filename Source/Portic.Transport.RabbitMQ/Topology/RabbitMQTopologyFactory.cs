@@ -45,7 +45,13 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             var queue = await rented.Channel.QueueDeclareAsync(endpoint, cancellationToken);
 
-            await rented.Channel.ExchangeDeclareAsync(consumer.Message.Name, ExchangeType.Fanout, cancellationToken: cancellationToken);
+            await rented.Channel.ExchangeDeclareAsync(
+                exchange: consumer.Message.Name, 
+                type: ExchangeType.Fanout,
+                durable: true,
+                autoDelete: false,
+                cancellationToken: cancellationToken
+            );
 
             await rented.Channel.QueueBindAsync(queue.QueueName, consumer.Message.Name, string.Empty, cancellationToken: cancellationToken);
 

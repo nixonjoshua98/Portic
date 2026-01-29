@@ -27,29 +27,8 @@ Portic is currently in **early development**. The API is subject to change and m
 | [Portic.Middleware.Polly](https://www.nuget.org/packages/Portic.Middleware.Polly) | [![NuGet](https://img.shields.io/nuget/v/Portic.Middleware.Polly.svg)](https://www.nuget.org/packages/Portic.Middleware.Polly) | Polly middleware for resilience policies |
 
 
-## 📚 Quick Start + Samples
+## 📚 Samples
 For complete working examples, check out the [Samples](https://github.com/nixonjoshua98/Portic/tree/master/Source/Portic.Samples).
-
-```cs
-builder.Services.AddPortic(configurator =>
-{
-    configurator.ConfigureConsumer<PingMessage, PingConsumer>();
-
-    configurator.UsingRabbitMQ();
-});
-
-...
-
-public class MyDependency(IMessageTransport _transport)
-{
-    public async Task PublishPing() 
-    {
-        await _transport.PublishAsync(
-            new PingMessage()
-        );
-    }
-}
-```
 
 **Installation**
 
@@ -59,7 +38,4 @@ dotnet add package Portic
 
 # Transport package
 dotnet add package Portic.Transport.RabbitMQ
-
-# Middleware (optional)
-dotnet add package Portic.Middleware.Polly
 ```

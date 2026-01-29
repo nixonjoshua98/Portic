@@ -5,9 +5,13 @@ namespace Portic.Transport.RabbitMQ.Extensions
 {
     internal static class BasicPropertiesExtensions
     {
-        private const string MessageNameKey = "x-portic-message";
         private const string MessageIdKey = "x-portic-message-id";
+        private const string MessageNameKey = "x-portic-message-name";
+
         private const string DeliveryCountKey = "x-portic-delivery-count";
+
+        private const string ExceptionMessageKey = "x-portic-exception-message";
+        private const string ExceptionStackTraceKey = "x-portic-exception-stacktrace";
 
         extension(BasicProperties properties)
         {
@@ -20,7 +24,15 @@ namespace Portic.Transport.RabbitMQ.Extensions
             public BasicProperties SetMessageId(string id) =>
                 SetHeaderValue(properties, MessageIdKey, id);
 
-            public BasicProperties SetHeadersFrom(IReadOnlyBasicProperties source)
+            public BasicProperties SetException(Exception exception)
+            {
+                SetHeaderValue(properties, ExceptionMessageKey, exception.Message);
+                SetHeaderValue(properties, ExceptionStackTraceKey, exception.StackTrace);
+
+                return properties;
+            }
+
+            public BasicProperties CopyHeadersFrom(IReadOnlyBasicProperties source)
             {
                 if (!source.IsHeadersPresent() || source.Headers is null)
                 {

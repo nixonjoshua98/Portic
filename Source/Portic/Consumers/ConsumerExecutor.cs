@@ -32,9 +32,9 @@ namespace Portic.Consumers
 
                 await context.Settlement.CompleteAsync(cancellationToken);
             }
-            catch (Exception) when (context.DeliveryCount < context.MaxRedeliveryAttempts)
+            catch (Exception exception) when (context.DeliveryCount < context.MaxRedeliveryAttempts)
             {
-                await context.Settlement.DeferAsync(cancellationToken);
+                await context.Settlement.DeferAsync(exception, cancellationToken);
             }
             catch (Exception exception)
             {
