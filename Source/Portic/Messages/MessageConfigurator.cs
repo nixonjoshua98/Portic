@@ -11,7 +11,6 @@ namespace Portic.Messages
 
         public IMessageConfigurator WithName(string name)
         {
-            ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
             Name = name;
             return this;
