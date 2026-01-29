@@ -19,7 +19,7 @@ namespace Portic.Endpoints
 
         public T GetPropertyOrDefault<T>(string key, T defaultValue) => Properties.GetOrDefault(key, defaultValue);
 
-        public IConsumerDefinition GetConsumerConfiguration(string? messageName)
+        public IConsumerDefinition GetConsumerDefinition(string? messageName)
         {
             if (string.IsNullOrEmpty(messageName) || !Consumers.TryGetValue(messageName, out var consumer))
             {

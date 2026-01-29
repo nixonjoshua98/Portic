@@ -37,7 +37,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
         {
-            var configuration = _configuration.GetMessageConfiguration<TMessage>();
+            var definition = _configuration.GetMessageDefinition<TMessage>();
 
             var body = new RabbitMQMessageBody<TMessage>(
                 Guid.CreateVersion7().ToString(),
@@ -47,10 +47,10 @@ namespace Portic.Transport.RabbitMQ.Topology
             var payloadBytes = _serializer.SerializeToBytes(body);
 
             var properties = new BasicProperties()
-                .SetMessageName(configuration.Name);
+                .SetMessageName(definition.Name);
 
             await PublishAsync(
-                configuration,
+                definition,
                 payloadBytes,
                 properties,
                 cancellationToken

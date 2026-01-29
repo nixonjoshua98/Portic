@@ -24,7 +24,7 @@ namespace Portic.Transport.RabbitMQ.Models
         {
             Channel = state.GetChannelOrThrow();
 
-            ConsumerConfiguration = state.Endpoint.GetConsumerConfiguration(deliverArgs.BasicProperties.MessageName);
+            ConsumerConfiguration = state.Endpoint.GetConsumerDefinition(deliverArgs.BasicProperties.MessageName);
 
             RawBody = deliverArgs.Body;
             EndpointConfiguration = state.Endpoint;
