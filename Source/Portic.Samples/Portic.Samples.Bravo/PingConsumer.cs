@@ -1,4 +1,4 @@
-﻿using Portic.Consumer;
+﻿using Portic.Consumers;
 
 namespace Portic.Samples.Bravo
 {
@@ -12,7 +12,7 @@ namespace Portic.Samples.Bravo
             {
                 _messageIdsToFail.Add(context.MessageId);
 
-                throw new Exception($"ConsumerConfiguration for message '{context.MessageId}' has failed");
+                throw new Exception($"ConsumerDefinition for message '{context.MessageId}' has failed");
             }
 
             return ValueTask.CompletedTask;

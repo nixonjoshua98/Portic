@@ -1,13 +1,12 @@
-﻿using Portic.Abstractions;
-using Portic.Models;
+﻿using Portic.Models;
 
-namespace Portic.Configuration
+namespace Portic.Messages
 {
-    internal sealed class MessageConfiguration(
+    internal sealed class MessageDefinition(
         string name,
         Type messageType,
         IReadOnlyCustomPropertyBag properties
-    ) : IMessageConfiguration
+    ) : IMessageDefinition
     {
         private readonly IReadOnlyCustomPropertyBag _properties = properties;
 

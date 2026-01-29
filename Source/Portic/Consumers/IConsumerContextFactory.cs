@@ -1,5 +1,6 @@
+using Portic.Transport;
 
-namespace Portic.Consumer
+namespace Portic.Consumers
 {
     internal interface IConsumerContextFactory
     {

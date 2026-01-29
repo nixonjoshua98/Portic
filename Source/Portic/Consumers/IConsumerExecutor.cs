@@ -1,5 +1,6 @@
-﻿
-namespace Portic.Consumer
+﻿using Portic.Transport;
+
+namespace Portic.Consumers
 {
     public interface IConsumerExecutor
     {

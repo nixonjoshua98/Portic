@@ -1,25 +1,25 @@
-﻿using Portic.Abstractions;
-using Portic.Endpoint;
+﻿using Portic.Endpoints;
+using Portic.Messages;
 
-namespace Portic.Consumer
+namespace Portic.Consumers
 {
     internal sealed class ConsumerContext<TMessage>(
         string messageId,
         TMessage message,
         byte deliveryCount,
         IServiceProvider serviceProvider,
-        IConsumerConfiguration consumer,
-        IEndpointConfiguration endpoint,
+        IConsumerDefinition consumer,
+        IEndpointDefinition endpoint,
         CancellationToken cancellationToken
     ) : IConsumerContext<TMessage>
     {
         public string MessageId { get; } = messageId;
         public string MessageName { get; } = consumer.Message.Name;
         public TMessage Message { get; } = message;
-        public IMessageConfiguration MessageConfiguration { get; } = consumer.Message;
+        public IMessageDefinition MessageConfiguration { get; } = consumer.Message;
         public CancellationToken CancellationToken { get; } = cancellationToken;
         public IServiceProvider Services { get; private set; } = serviceProvider;
-        public IConsumerConfiguration ConsumerConfiguration { get; } = consumer;
+        public IConsumerDefinition ConsumerConfiguration { get; } = consumer;
         public byte DeliveryCount { get; } = deliveryCount;
         public byte MaxRedeliveryAttempts { get; } = endpoint.MaxRedeliveryAttempts;
 

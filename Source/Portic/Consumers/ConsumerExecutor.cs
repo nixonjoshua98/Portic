@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Portic.Abstractions;
+using Portic.Configuration;
 using Portic.Exceptions;
 using Portic.Logging;
+using Portic.Transport;
 
-namespace Portic.Consumer
+namespace Portic.Consumers
 {
     internal sealed class ConsumerExecutor(
         ILogger<ConsumerExecutor> _logger,

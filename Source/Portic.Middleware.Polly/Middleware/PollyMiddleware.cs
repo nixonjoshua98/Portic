@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
-using Portic.Consumer;
+using Portic.Consumers;
 using Portic.Middleware.Polly.Configuration;
 using Portic.Middleware.Polly.Extensions;
 

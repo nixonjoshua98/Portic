@@ -1,6 +1,6 @@
-﻿namespace Portic.Abstractions
+﻿namespace Portic.Messages
 {
-    public interface IMessageConfiguration
+    public interface IMessageDefinition
     {
         Type MessageType { get; }
         string Name { get; }

@@ -1,4 +1,6 @@
-namespace Portic.Consumer
+using Portic.Transport;
+
+namespace Portic.Consumers
 {
     internal sealed class ConsumerContextFactory : IConsumerContextFactory
     {

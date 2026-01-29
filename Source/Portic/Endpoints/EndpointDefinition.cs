@@ -1,25 +1,25 @@
-﻿using Portic.Consumer;
+﻿using Portic.Consumers;
 using Portic.Exceptions;
 using Portic.Models;
 
-namespace Portic.Endpoint
+namespace Portic.Endpoints
 {
-    internal sealed class EndpointConfiguration(
+    internal sealed class EndpointDefinition(
         string name,
-        IEnumerable<IConsumerConfiguration> consumers,
+        IEnumerable<IConsumerDefinition> consumers,
         IReadOnlyCustomPropertyBag properties,
         byte maxRedeliveryAttempts
-    ) : IEndpointConfiguration
+    ) : IEndpointDefinition
     {
         private readonly IReadOnlyCustomPropertyBag Properties = properties;
 
         public string Name { get; } = name;
         public byte MaxRedeliveryAttempts { get; } = maxRedeliveryAttempts;
-        public IReadOnlyDictionary<string, IConsumerConfiguration> Consumers { get; } = consumers.ToDictionary(x => x.Message.Name);
+        public IReadOnlyDictionary<string, IConsumerDefinition> Consumers { get; } = consumers.ToDictionary(x => x.Message.Name);
 
         public T GetPropertyOrDefault<T>(string key, T defaultValue) => Properties.GetOrDefault(key, defaultValue);
 
-        public IConsumerConfiguration GetConsumerConfiguration(string? messageName)
+        public IConsumerDefinition GetConsumerConfiguration(string? messageName)
         {
             if (string.IsNullOrEmpty(messageName) || !Consumers.TryGetValue(messageName, out var consumer))
             {

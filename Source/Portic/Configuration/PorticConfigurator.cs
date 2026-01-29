@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Portic.Abstractions;
-using Portic.Consumer;
-using Portic.Endpoint;
+using Portic.Consumers;
+using Portic.Endpoints;
+using Portic.Messages;
 using Portic.Models;
 using System.Collections.Concurrent;
 
@@ -15,7 +15,7 @@ namespace Portic.Configuration
 
         private readonly ConcurrentDictionary<Type, MessageConfigurator> MessageConfigurators = [];
 
-        private readonly ConcurrentDictionary<Type, MessageConsumerConfigurator> ConsumerBuilders = [];
+        private readonly ConcurrentDictionary<Type, ConsumerConfigurator> ConsumerBuilders = [];
 
         private readonly ConcurrentDictionary<string, EndpointConfigurator> EndpointConfigurators = [];
 
@@ -70,13 +70,13 @@ namespace Portic.Configuration
             return Properties.ContainsKey(key);
         }
 
-        private MessageConsumerConfigurator GetConsumerConfigurator<TConsumer>(Type messageType)
+        private ConsumerConfigurator GetConsumerConfigurator<TConsumer>(Type messageType)
         {
             var consumerType = typeof(TConsumer);
 
             return ConsumerBuilders.GetOrAdd(
                 consumerType,
-                _ => new MessageConsumerConfigurator(this, consumerType, messageType)
+                _ => new ConsumerConfigurator(this, consumerType, messageType)
             );
         }
 
@@ -98,7 +98,7 @@ namespace Portic.Configuration
             );
         }
 
-        private Dictionary<Type, IMessageConfiguration> CreateMessageConfigurations()
+        private Dictionary<Type, IMessageDefinition> CreateMessageConfigurations()
         {
             var duplicateMessageName = MessageConfigurators.Values
                 .GroupBy(x => x.Name)

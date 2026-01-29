@@ -1,5 +1,5 @@
-﻿using Portic.Abstractions;
-using Portic.Endpoint;
+﻿using Portic.Endpoints;
+using Portic.Messages;
 using Portic.Transport.RabbitMQ.Channel;
 
 namespace Portic.Transport.RabbitMQ.Extensions
@@ -13,7 +13,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
         private const string MandatoryKey = "rmq-mandatory";
         private const string DurableKey = "rmq-durable";
 
-        extension(IMessageConfiguration configurator)
+        extension(IMessageDefinition configurator)
         {
             internal bool Mandatory =>
                 configurator.GetPropertyOrDefault(MandatoryKey, false);
@@ -43,7 +43,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
                 configurator.SetProperty(ExclusiveKey, value);
         }
 
-        extension(IEndpointConfiguration configurator)
+        extension(IEndpointDefinition configurator)
         {
             internal ushort PrefetchCount =>
                 configurator.GetPropertyOrDefault<ushort>(PrefetchCountKey, 1);
@@ -61,7 +61,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
                 configurator.GetPropertyOrDefault(ExclusiveKey, false);
         }
 
-        extension(IEndpointConfiguration endpoint)
+        extension(IEndpointDefinition endpoint)
         {
             internal RabbitMQChannelOptions CreateChannelOptions()
             {

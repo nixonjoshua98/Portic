@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Portic.Consumer;
+using Portic.Consumers;
 
 namespace Portic.Samples.Bravo
 {

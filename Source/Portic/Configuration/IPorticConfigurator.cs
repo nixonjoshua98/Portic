@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Portic.Consumer;
-using Portic.Endpoint;
+using Portic.Consumers;
+using Portic.Endpoints;
+using Portic.Messages;
 
-namespace Portic.Abstractions
+namespace Portic.Configuration
 {
     public interface IPorticConfigurator
     {

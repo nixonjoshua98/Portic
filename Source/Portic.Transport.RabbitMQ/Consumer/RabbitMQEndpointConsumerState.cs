@@ -1,4 +1,4 @@
-﻿using Portic.Endpoint;
+﻿using Portic.Endpoints;
 using Portic.Transport.RabbitMQ.Models;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -11,14 +11,14 @@ namespace Portic.Transport.RabbitMQ.Consumer
 
         public IChannel? Channel { get; private set; }
 
-        public readonly IEndpointConfiguration Endpoint;
+        public readonly IEndpointDefinition Endpoint;
 
         private readonly AsyncEventingBasicConsumer EventConsumer;
         private readonly Func<RawTransportMessageReceived, CancellationToken, Task> ConsumeFunc;
 
         public RabbitMQEndpointConsumerState(
             IChannel channel,
-            IEndpointConfiguration endpoint,
+            IEndpointDefinition endpoint,
             Func<RawTransportMessageReceived, CancellationToken, Task> consumeFunc)
         {
             Channel = channel;

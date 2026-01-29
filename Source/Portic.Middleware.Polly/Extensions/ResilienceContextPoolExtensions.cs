@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
-using Portic.Consumer;
+using Portic.Consumers;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Portic.Middleware.Polly.Extensions

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using Portic.Consumer;
-using Portic.Endpoint;
+using Portic.Consumers;
+using Portic.Endpoints;
 using Portic.Transport.RabbitMQ.Consumer;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Logging;
@@ -14,7 +14,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         ILogger<RabbitMQTopologyFactory> _logger
     ) : IRabbitMQTopologyFactory
     {
-        public async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointConfiguration endpoint, CancellationToken cancellationToken)
+        public async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointDefinition endpoint, CancellationToken cancellationToken)
         {
             foreach (var (_, consumer) in endpoint.Consumers)
             {
@@ -39,7 +39,7 @@ namespace Portic.Transport.RabbitMQ.Topology
             return state;
         }
 
-        private async Task BindQueuesToExchangeAsync(IEndpointConfiguration endpoint, IConsumerConfiguration consumer, CancellationToken cancellationToken)
+        private async Task BindQueuesToExchangeAsync(IEndpointDefinition endpoint, IConsumerDefinition consumer, CancellationToken cancellationToken)
         {
             using var rented = await _connectionContext.RentChannelAsync(cancellationToken);
 

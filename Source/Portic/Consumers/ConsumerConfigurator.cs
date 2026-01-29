@@ -1,9 +1,9 @@
-﻿using Portic.Abstractions;
-using Portic.Consumer;
+﻿using Portic.Configuration;
+using Portic.Messages;
 
-namespace Portic.Configuration
+namespace Portic.Consumers
 {
-    internal sealed class MessageConsumerConfigurator(IPorticConfigurator configurator, Type consumerType, Type messageType) : IConsumerConfigurator
+    internal sealed class ConsumerConfigurator(IPorticConfigurator configurator, Type consumerType, Type messageType) : IConsumerConfigurator
     {
         private readonly IPorticConfigurator _configurator = configurator;
 
@@ -23,9 +23,9 @@ namespace Portic.Configuration
             return this;
         }
 
-        public IConsumerConfiguration Build(IMessageConfiguration message)
+        public IConsumerDefinition Build(IMessageDefinition message)
         {
-            return new ConsumerConfiguration(
+            return new ConsumerDefinition(
                 message,
                 ConsumerType,
                 EndpointName

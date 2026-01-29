@@ -1,4 +1,4 @@
-﻿using Portic.Consumer;
+﻿using Portic.Consumers;
 
 namespace Portic.Exceptions
 {

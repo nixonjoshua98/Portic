@@ -1,5 +1,6 @@
-﻿using Portic.Abstractions;
-using Portic.Consumer;
+﻿using Portic.Configuration;
+using Portic.Consumers;
+using Portic.Messages;
 using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Models;
@@ -57,7 +58,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         }
 
         private async Task PublishAsync(
-            IMessageConfiguration configuration,
+            IMessageDefinition configuration,
             byte[] payloadBytes,
             BasicProperties properties,
             CancellationToken cancellationToken)
