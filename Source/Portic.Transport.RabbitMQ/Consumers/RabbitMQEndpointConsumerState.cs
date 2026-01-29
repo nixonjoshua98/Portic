@@ -9,7 +9,7 @@ namespace Portic.Transport.RabbitMQ.Consumers
     {
         private bool _isDisposed;
 
-        public IChannel? Channel { get; private set; }
+        private IChannel? Channel;
 
         public readonly IEndpointDefinition Endpoint;
 

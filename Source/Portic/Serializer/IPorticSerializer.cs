@@ -3,6 +3,6 @@
     public interface IPorticSerializer
     {
         T Deserialize<T>(ReadOnlySpan<byte> json);
-        byte[] SerializeToBytes<T>(T value);
+        ReadOnlyMemory<byte> Serialize<T>(T value);
     }
 }

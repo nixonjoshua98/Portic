@@ -20,7 +20,7 @@ namespace Portic.Transport.RabbitMQ.Messages
         public ReadOnlyMemory<byte> RawBody { get; }
         public IReadOnlyBasicProperties BasicProperties { get; }
 
-        public string? MessageId => BasicProperties.PorticMessageId; // Important: Use BasicProperties.PorticMessageId, not BasicProperties.MessageId
+        public string? MessageId => BasicProperties.PorticMessageId;
         public byte DeliveryCount => BasicProperties.DeliveryCount;
 
         public RabbitMQRawMessageReceived(RabbitMQEndpointConsumerState state, BasicDeliverEventArgs deliverArgs)

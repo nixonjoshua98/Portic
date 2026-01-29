@@ -35,7 +35,7 @@ namespace Portic.Transport.RabbitMQ.Topology
                 message
             );
 
-            var payloadBytes = _serializer.SerializeToBytes(body);
+            var payloadBytes = _serializer.Serialize(body);
 
             var properties = new BasicProperties()
                 .SetMessageId(Guid.CreateVersion7().ToString())
