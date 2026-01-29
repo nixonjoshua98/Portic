@@ -16,10 +16,10 @@ namespace Portic.Transport.RabbitMQ.Messages
             await RawMessage.Channel.BasicAckAsync(RawMessage.DeliveryTag, false, cancellationToken);
         }
 
-        public async Task DeferAsync(CancellationToken cancellationToken)
+        public async Task DeferAsync(Exception exception, CancellationToken cancellationToken)
         {
             // Republish the message for redelivery first, to ensure at-least-once delivery guarantee
-            await Transport.PublishFaultedAsync(RawMessage, cancellationToken);
+            await Transport.PublishFaultedAsync(RawMessage, exception, cancellationToken);
 
             // Ack the original message to remove it from the queue
             // Intentionally ignoring cancellationToken here to ensure Ack is sent regardless of cancellation

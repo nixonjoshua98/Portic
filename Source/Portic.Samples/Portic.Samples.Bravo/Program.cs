@@ -19,7 +19,11 @@ builder.Services.AddHostedService<PingPublisher>();
 
 builder.Services.AddPortic(configurator =>
 {
-    configurator.ConfigureConsumer<PingMessage, PingConsumer>();
+    configurator.ConfigureConsumer<PingMessage, PingConsumer>()
+        .WithEndpointName("ping-queue");
+
+    configurator.ConfigureEndpoint("ping-queue")
+        .WithAutoDelete();
 
     configurator.Use<LoggingMiddleware>();
 

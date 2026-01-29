@@ -4,7 +4,7 @@
     {
         Task CompleteAsync(CancellationToken cancellationToken);
 
-        Task DeferAsync(CancellationToken cancellationToken);
+        Task DeferAsync(Exception exception, CancellationToken cancellationToken);
 
         Task FaultAsync(Exception exception, CancellationToken cancellationToken);
     }
