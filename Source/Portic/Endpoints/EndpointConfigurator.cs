@@ -6,7 +6,7 @@ namespace Portic.Endpoints
 {
     internal sealed class EndpointConfigurator : IEndpointConfigurator
     {
-        private readonly CustomPropertyBag Properties = new();
+        private readonly CustomPropertyBag _properties = new();
 
         public string Name { get; private set; }
 
@@ -17,7 +17,9 @@ namespace Portic.Endpoints
 
         public IEndpointConfigurator SetProperty(string key, object value)
         {
-            Properties.Set(key, value);
+            ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
+
+            _properties.Set(key, value);
 
             return this;
         }
@@ -27,7 +29,7 @@ namespace Portic.Endpoints
             return new EndpointDefinition(
                 Name,
                 consumers,
-                Properties,
+                _properties,
                 configurator.MaxRedeliveryAttempts
             );
         }

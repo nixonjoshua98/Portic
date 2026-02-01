@@ -48,9 +48,11 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
             services.AddHostedService<RabbitMQTopologyHostedService>();
 
-            services.TryAddSingleton<IRabbitMQConsumerExecutor, RabbitMQConsumerExecutor>();
+            services.TryAddSingleton<RabbitMQConsumerExecutor>();
 
-            services.TryAddSingleton<IRabbitMQConnectionContext, RabbitMQConnectionContext>();
+            services.TryAddSingleton<RabbitMQConnectionContext>();
+
+            services.TryAddSingleton<RabbitMQEndpointFactory>();
         }
     }
 }

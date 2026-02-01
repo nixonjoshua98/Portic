@@ -6,7 +6,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQTopologyHostedService(
         IPorticConfiguration _configuration,
-        IRabbitMQTransport _transport
+        RabbitMQEndpointFactory _endpointFactory
     ) : IHostedLifecycleService
     {
         private readonly List<RabbitMQEndpointState> _endpointStates = [];
@@ -15,7 +15,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         {
             foreach (var endpoint in _configuration.Endpoints)
             {
-                var state = await _transport.CreateEndpointStateAsync(endpoint, cancellationToken);
+                var state = await _endpointFactory.CreateEndpointStateAsync(endpoint, cancellationToken);
 
                 _endpointStates.Add(state);
             }

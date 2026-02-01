@@ -18,6 +18,7 @@ namespace Portic.Messages
 
         public IMessageConfigurator SetProperty(string key, object value)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
             _properties.Set(key, value);
             return this;
         }

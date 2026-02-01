@@ -11,20 +11,18 @@ namespace Portic.Configuration
 {
     internal sealed class PorticConfigurator(IServiceCollection services) : IPorticConfigurator
     {
-        private readonly CustomPropertyBag Properties = new();
+        private readonly CustomPropertyBag _properties = new();
+
+        private readonly ConcurrentDictionary<Type, MessageConfigurator> _messageConfigurators = [];
+
+        private readonly ConcurrentDictionary<Type, ConsumerConfigurator> _consumerBuilders = [];
+
+        private readonly ConcurrentDictionary<string, EndpointConfigurator> _endpointConfigurators = [];
+
+        private readonly List<Type> _middleware = [];
 
         public IServiceCollection Services { get; } = services;
         private ITransportDefinition? TransportDefinition { get; set; }
-
-
-        private readonly ConcurrentDictionary<Type, MessageConfigurator> MessageConfigurators = [];
-
-        private readonly ConcurrentDictionary<Type, ConsumerConfigurator> ConsumerBuilders = [];
-
-        private readonly ConcurrentDictionary<string, EndpointConfigurator> EndpointConfigurators = [];
-
-        private readonly List<Type> Middleware = [];
-
         internal byte MaxRedeliveryAttempts { get; private set; } = 0;
 
         public IPorticConfigurator SetMaxRedeliveryAttempts(byte attempts)
@@ -71,28 +69,33 @@ namespace Portic.Configuration
 
         public IPorticConfigurator Use<TMiddleware>() where TMiddleware : IConsumerMiddleware
         {
-            Middleware.Add(typeof(TMiddleware));
+            _middleware.Add(typeof(TMiddleware));
 
             return this;
         }
 
         public IPorticConfigurator SetProperty(string key, object value)
         {
-            Properties.Set(key, value);
+            ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
+            ArgumentNullException.ThrowIfNull(value, nameof(value));
+
+            _properties.Set(key, value);
 
             return this;
         }
 
         public bool HasProperty(string key)
         {
-            return Properties.ContainsKey(key);
+            ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
+
+            return _properties.ContainsKey(key);
         }
 
         private ConsumerConfigurator GetConsumerConfigurator<TConsumer>(Type messageType)
         {
             var consumerType = typeof(TConsumer);
 
-            return ConsumerBuilders.GetOrAdd(
+            return _consumerBuilders.GetOrAdd(
                 consumerType,
                 _ => new ConsumerConfigurator(this, consumerType, messageType)
             );
@@ -100,7 +103,7 @@ namespace Portic.Configuration
 
         private EndpointConfigurator GetEndpointConfigurator(string endpointName)
         {
-            return EndpointConfigurators.GetOrAdd(
+            return _endpointConfigurators.GetOrAdd(
                 endpointName,
                 _ => new EndpointConfigurator(endpointName)
             );
@@ -110,7 +113,7 @@ namespace Portic.Configuration
         {
             var messageType = typeof(TMessage);
 
-            return MessageConfigurators.GetOrAdd(
+            return _messageConfigurators.GetOrAdd(
                 messageType,
                 _ => new MessageConfigurator(messageType)
             );
@@ -118,7 +121,7 @@ namespace Portic.Configuration
 
         private Dictionary<Type, IMessageDefinition> CreateMessageConfigurations()
         {
-            var duplicateMessageName = MessageConfigurators.Values
+            var duplicateMessageName = _messageConfigurators.Values
                 .GroupBy(x => x.Name)
                 .Where(x => x.Count() > 1)
                 .Select(x => x.Key)
@@ -126,10 +129,10 @@ namespace Portic.Configuration
 
             if (!string.IsNullOrEmpty(duplicateMessageName))
             {
-                throw new InvalidOperationException($"Duplicate message name detected: '{duplicateMessageName}'. Message names must be unique.");
+                throw DuplicateMessageNameException.FromName(duplicateMessageName);
             }
 
-            return MessageConfigurators
+            return _messageConfigurators
                 .ToDictionary(x => x.Key, x => x.Value.Build());
         }
 
@@ -137,11 +140,11 @@ namespace Portic.Configuration
         {
             var messages = CreateMessageConfigurations();
 
-            var consumers = ConsumerBuilders.Values
+            var consumers = _consumerBuilders.Values
                 .Select(c => c.Build(messages[c.MessageType]))
                 .ToList();
 
-            var endpoints = EndpointConfigurators.Values
+            var endpoints = _endpointConfigurators.Values
                 .Select(endpoint => endpoint.Build(
                     this,
                     consumers.Where(consumer => consumer.EndpointName == endpoint.Name)
@@ -151,7 +154,7 @@ namespace Portic.Configuration
             return new PorticConfiguration(
                 messages,
                 endpoints,
-                Middleware,
+                _middleware,
                 TransportDefinition ?? throw TransportNotDefinedException.CreateNew()
             );
         }
