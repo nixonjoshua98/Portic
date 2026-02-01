@@ -20,17 +20,13 @@ namespace Portic.Transport.RabbitMQ.Topology
             return await channelPool.RentAsync(cancellationToken);
         }
 
-        public async ValueTask<IChannel> CreateChannelAsync(RabbitMQChannelOptions options, CancellationToken cancellationToken = default)
+        public async ValueTask<IChannel> CreateChannelAsync(CancellationToken cancellationToken = default)
         {
             ObjectDisposedException.ThrowIf(_isDisposed, this);
 
             var connection = await GetConnectionAsync(cancellationToken);
 
-            var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
-
-            await channel.BasicQosAsync(options.PrefetchSize, options.PrefetchCount, global: false, cancellationToken);
-
-            return channel;
+            return await connection.CreateChannelAsync(cancellationToken: cancellationToken);
         }
 
         private async ValueTask<RabbitMQChannelPool> GetChannelPoolAsync(CancellationToken cancellationToken = default)

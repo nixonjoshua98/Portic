@@ -5,7 +5,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 {
     internal interface IRabbitMQConnectionContext
     {
-        ValueTask<IChannel> CreateChannelAsync(RabbitMQChannelOptions options, CancellationToken cancellationToken = default);
+        ValueTask<IChannel> CreateChannelAsync(CancellationToken cancellationToken = default);
         ValueTask<IRabbitMQRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default);
     }
 }
