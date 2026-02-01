@@ -3,7 +3,7 @@ using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
-    internal sealed class RabbitMQConnectionContext(IRabbitMQTransportDefinition _configuration) : IRabbitMQConnectionContext, IDisposable
+    internal sealed class RabbitMQConnectionContext(IRabbitMQTransportDefinition _configuration) : IDisposable
     {
         private bool _isDisposed;
         private readonly SemaphoreSlim _connectionLock = new(1, 1);
@@ -11,7 +11,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         private IConnection? _connection;
         private RabbitMQChannelPool? _channelPool;
 
-        public async ValueTask<IRabbitMQRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
+        public async ValueTask<RabbitMQRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
         {
             ObjectDisposedException.ThrowIf(_isDisposed, this);
 
@@ -20,17 +20,13 @@ namespace Portic.Transport.RabbitMQ.Topology
             return await channelPool.RentAsync(cancellationToken);
         }
 
-        public async ValueTask<IChannel> CreateChannelAsync(RabbitMQChannelOptions options, CancellationToken cancellationToken = default)
+        public async ValueTask<IChannel> CreateChannelAsync(CancellationToken cancellationToken = default)
         {
             ObjectDisposedException.ThrowIf(_isDisposed, this);
 
             var connection = await GetConnectionAsync(cancellationToken);
 
-            var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
-
-            await channel.BasicQosAsync(options.PrefetchSize, options.PrefetchCount, global: false, cancellationToken);
-
-            return channel;
+            return await connection.CreateChannelAsync(cancellationToken: cancellationToken);
         }
 
         private async ValueTask<RabbitMQChannelPool> GetChannelPoolAsync(CancellationToken cancellationToken = default)

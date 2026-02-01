@@ -1,19 +1,12 @@
-﻿using Portic.Configuration;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
-    internal sealed class RabbitMQTransportConfiguration : IRabbitMQTransportConfigurator, IRabbitMQTransportDefinition
+    internal sealed class RabbitMQTransportDefinition : IRabbitMQTransportConfigurator, IRabbitMQTransportDefinition
     {
-        private readonly IPorticConfigurator Configurator;
         private readonly ConnectionFactory ConnectionFactory = new();
 
         public string DisplayName => "RabbitMQ";
-
-        public RabbitMQTransportConfiguration(IPorticConfigurator builder)
-        {
-            Configurator = builder;
-        }
 
         public IRabbitMQTransportConfigurator WithHost(string hostName)
         {

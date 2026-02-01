@@ -13,7 +13,7 @@ namespace Portic.Transport.RabbitMQ.Consumers
         ILogger<RabbitMQConsumerExecutor> _logger,
         IConsumerExecutor _consumerExecutor,
         IRabbitMQTransport _transport
-    ) : IRabbitMQConsumerExecutor
+    )
     {
         private static readonly MethodInfo ConsumeGenericMethodInfo;
 

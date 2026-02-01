@@ -11,7 +11,7 @@ namespace Portic.Transport.RabbitMQ.Channels
 
         private bool _isDisposed;
 
-        public async Task<IRabbitMQRentedChannel> RentAsync(CancellationToken cancellationToken)
+        public async Task<RabbitMQRentedChannel> RentAsync(CancellationToken cancellationToken)
         {
             ObjectDisposedException.ThrowIf(_isDisposed, this);
 

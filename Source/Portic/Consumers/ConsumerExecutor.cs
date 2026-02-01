@@ -65,7 +65,7 @@ namespace Portic.Consumers
             pipeline = async context =>
             {
                 var middleware = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, middlewareType) as IConsumerMiddleware
-                    ?? throw new InvalidOperationException($"Failed to create middleware instance of type '{middlewareType.Name}'");
+                    ?? throw MiddlewareCreationException.FromType(middlewareType);
 
                 await middleware.InvokeAsync(context, currentPipeline);
             };

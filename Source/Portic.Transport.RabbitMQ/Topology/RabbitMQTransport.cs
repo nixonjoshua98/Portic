@@ -8,7 +8,7 @@ using RabbitMQ.Client;
 namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQTransport(
-        IRabbitMQConnectionContext _connectionContext,
+        RabbitMQConnectionContext _connectionContext,
         IPorticConfiguration _configuration,
         IPorticSerializer _serializer
     ) : IRabbitMQTransport

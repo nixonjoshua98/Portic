@@ -22,7 +22,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
             /// <returns>The same configurator instance, enabling further configuration chaining.</returns>
             public IPorticConfigurator UsingRabbitMQ(Action<IRabbitMQTransportConfigurator>? callback = null)
             {
-                var busBuilder = new RabbitMQTransportConfiguration(builder);
+                var busBuilder = new RabbitMQTransportDefinition();
 
                 callback?.Invoke(busBuilder);
 
@@ -48,11 +48,11 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
             services.AddHostedService<RabbitMQTopologyHostedService>();
 
-            services.TryAddSingleton<IRabbitMQConsumerExecutor, RabbitMQConsumerExecutor>();
+            services.TryAddSingleton<RabbitMQConsumerExecutor>();
 
-            services.TryAddSingleton<IRabbitMQTopologyFactory, RabbitMQTopologyFactory>();
+            services.TryAddSingleton<RabbitMQConnectionContext>();
 
-            services.TryAddSingleton<IRabbitMQConnectionContext, RabbitMQConnectionContext>();
+            services.TryAddSingleton<RabbitMQEndpointFactory>();
         }
     }
 }

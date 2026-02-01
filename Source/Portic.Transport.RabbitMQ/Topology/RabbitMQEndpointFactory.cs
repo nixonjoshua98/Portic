@@ -8,11 +8,11 @@ using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
-    internal sealed class RabbitMQTopologyFactory(
-        IRabbitMQConnectionContext _connectionContext,
-        IRabbitMQConsumerExecutor _messageConsumer,
-        ILogger<RabbitMQTopologyFactory> _logger
-    ) : IRabbitMQTopologyFactory
+    internal sealed class RabbitMQEndpointFactory(
+        RabbitMQConnectionContext _connectionContext,
+        RabbitMQConsumerExecutor _consumerExecutor,
+        ILogger<RabbitMQEndpointFactory> _logger
+    )
     {
         public async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointDefinition endpoint, CancellationToken cancellationToken)
         {
@@ -23,15 +23,14 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             var state = new RabbitMQEndpointState(
                 endpoint,
-                _messageConsumer.ExecuteAsync
+                _consumerExecutor.ExecuteAsync
             );
 
             for (int i = 0; i < endpoint.ChannelCount; i++)
             {
-                var channel = await _connectionContext.CreateChannelAsync(
-                    endpoint.CreateChannelOptions(),
-                    cancellationToken
-                );
+                var channel = await _connectionContext.CreateChannelAsync(cancellationToken);
+
+                await channel.BasicQosAsync(0, endpoint.PrefetchCount, global: false, cancellationToken);
 
                 var consumerState = state.AddConsumer(channel);
             }
@@ -46,7 +45,7 @@ namespace Portic.Transport.RabbitMQ.Topology
             var queue = await rented.Channel.QueueDeclareAsync(endpoint, cancellationToken);
 
             await rented.Channel.ExchangeDeclareAsync(
-                exchange: consumer.Message.Name, 
+                exchange: consumer.Message.Name,
                 type: ExchangeType.Fanout,
                 durable: true,
                 autoDelete: false,

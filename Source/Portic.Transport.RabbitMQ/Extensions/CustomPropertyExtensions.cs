@@ -1,6 +1,5 @@
 ﻿using Portic.Endpoints;
 using Portic.Messages;
-using Portic.Transport.RabbitMQ.Channels;
 
 namespace Portic.Transport.RabbitMQ.Extensions
 {
@@ -59,17 +58,6 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
             internal bool Exclusive =>
                 configurator.GetPropertyOrDefault(ExclusiveKey, false);
-        }
-
-        extension(IEndpointDefinition endpoint)
-        {
-            internal RabbitMQChannelOptions CreateChannelOptions()
-            {
-                return new RabbitMQChannelOptions(
-                    0,
-                    endpoint.PrefetchCount
-                );
-            }
         }
     }
 }

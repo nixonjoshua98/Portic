@@ -7,7 +7,7 @@
 
         }
 
-        protected PorticException(string message, Exception innerException) : base(message, innerException)
+        protected PorticException(string message, Exception? innerException) : base(message, innerException)
         {
 
         }
