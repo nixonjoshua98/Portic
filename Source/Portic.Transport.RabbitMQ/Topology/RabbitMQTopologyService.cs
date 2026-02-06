@@ -57,9 +57,9 @@ namespace Portic.Transport.RabbitMQ.Topology
             );
 
             await rented.Channel.QueueBindAsync(
-                queue: queue.QueueName, 
-                exchange: messageDefinition.FaultedExchangeName, 
-                routingKey: string.Empty, 
+                queue: queue.QueueName,
+                exchange: messageDefinition.FaultedExchangeName,
+                routingKey: string.Empty,
                 cancellationToken: cancellationToken
             );
         }
