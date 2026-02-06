@@ -50,7 +50,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
             var queue = await rented.Channel.QueueDeclareAsync(
                 queue: endpointDefinition.FaultedQueueName,
-                durable: false,
+                durable: true,
                 exclusive: false,
                 autoDelete: false,
                 cancellationToken: cancellationToken
