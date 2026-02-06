@@ -13,7 +13,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         IPorticSerializer _serializer
     ) : IRabbitMQTransport
     {
-        public async Task PublishDeferedAsync(RabbitMQRawMessageReceived message, Exception exception, CancellationToken cancellationToken)
+        public async Task PublishDeferredAsync(RabbitMQRawMessageReceived message, Exception exception, CancellationToken cancellationToken)
         {
             var properties = new BasicProperties()
                 .CopyHeadersFrom(message.BasicProperties)
