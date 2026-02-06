@@ -39,8 +39,8 @@ namespace Portic.Transport.RabbitMQ.Topology
             // otherwise we might lose messages if the exchange or queue are not yet created.
 
             await _topologyService.BindFaultedQueueAsync(
-                message.MessageDefinition.FaultedExchangeName,
-                message.EndpointDefinition.FaultedQueueName,
+                message.MessageDefinition,
+                message.EndpointDefinition,
                 cancellationToken
             );
 

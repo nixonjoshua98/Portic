@@ -1,32 +1,64 @@
-﻿using RabbitMQ.Client;
+﻿using Portic.Consumers;
+using Portic.Endpoints;
+using Portic.Messages;
+using Portic.Transport.RabbitMQ.Extensions;
+using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQTopologyService(RabbitMQConnectionContext _connectionContext)
     {
-        public async Task BindFaultedQueueAsync(string exchange, string queue, CancellationToken cancellationToken)
+        public async Task BindQueueAsync(IEndpointDefinition endpoint, IConsumerDefinition consumer, CancellationToken cancellationToken)
         {
             using var rented = await _connectionContext.RentChannelAsync(cancellationToken);
 
             await rented.Channel.ExchangeDeclareAsync(
-                exchange: exchange,
+                exchange: consumer.Message.Name,
                 type: ExchangeType.Fanout,
                 durable: true,
                 autoDelete: false,
                 cancellationToken: cancellationToken
             );
 
-            await rented.Channel.QueueDeclareAsync(
-                queue: queue,
+            var queue = await rented.Channel.QueueDeclareAsync(
+                queue: endpoint.Name,
+                durable: endpoint.Durable,
+                exclusive: endpoint.Exclusive,
+                autoDelete: endpoint.AutoDelete,
+                cancellationToken: cancellationToken
+            );
+
+            await rented.Channel.QueueBindAsync(
+                queue: queue.QueueName,
+                exchange: consumer.Message.Name,
+                routingKey: string.Empty,
+                cancellationToken: cancellationToken
+            );
+        }
+
+        public async Task BindFaultedQueueAsync(IMessageDefinition messageDefinition, IEndpointDefinition endpointDefinition, CancellationToken cancellationToken)
+        {
+            using var rented = await _connectionContext.RentChannelAsync(cancellationToken);
+
+            await rented.Channel.ExchangeDeclareAsync(
+                exchange: messageDefinition.FaultedExchangeName,
+                type: ExchangeType.Fanout,
                 durable: true,
+                autoDelete: false,
+                cancellationToken: cancellationToken
+            );
+
+            var queue = await rented.Channel.QueueDeclareAsync(
+                queue: endpointDefinition.FaultedQueueName,
+                durable: false,
                 exclusive: false,
                 autoDelete: false,
                 cancellationToken: cancellationToken
             );
 
             await rented.Channel.QueueBindAsync(
-                queue: queue, 
-                exchange: exchange, 
+                queue: queue.QueueName, 
+                exchange: messageDefinition.FaultedExchangeName, 
                 routingKey: string.Empty, 
                 cancellationToken: cancellationToken
             );

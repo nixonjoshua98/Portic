@@ -53,8 +53,6 @@ namespace Portic.Transport.RabbitMQ.Extensions
             services.TryAddSingleton<RabbitMQConsumerExecutor>();
 
             services.TryAddSingleton<RabbitMQConnectionContext>();
-
-            services.TryAddSingleton<RabbitMQEndpointFactory>();
         }
     }
 }
