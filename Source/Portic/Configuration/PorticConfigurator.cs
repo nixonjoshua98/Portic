@@ -5,6 +5,7 @@ using Portic.Exceptions;
 using Portic.Messages;
 using Portic.Models;
 using Portic.Transport;
+using Portic.Validation;
 using System.Collections.Concurrent;
 
 namespace Portic.Configuration
@@ -25,7 +26,7 @@ namespace Portic.Configuration
         private ITransportDefinition? TransportDefinition { get; set; }
         internal byte MaxRedeliveryAttempts { get; private set; } = 0;
 
-        public IPorticConfigurator SetMaxRedeliveryAttempts(byte attempts)
+        public IPorticConfigurator WithMaxRedeliveryAttempts(byte attempts)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(attempts, nameof(attempts));
 
@@ -77,7 +78,6 @@ namespace Portic.Configuration
         public IPorticConfigurator SetProperty(string key, object value)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
-            ArgumentNullException.ThrowIfNull(value, nameof(value));
 
             _properties.Set(key, value);
 
@@ -119,29 +119,18 @@ namespace Portic.Configuration
             );
         }
 
-        private Dictionary<Type, IMessageDefinition> CreateMessageConfigurations()
-        {
-            var duplicateMessageName = _messageConfigurators.Values
-                .GroupBy(x => x.Name)
-                .Where(x => x.Count() > 1)
-                .Select(x => x.Key)
-                .FirstOrDefault();
-
-            if (!string.IsNullOrEmpty(duplicateMessageName))
-            {
-                throw DuplicateMessageNameException.FromName(duplicateMessageName);
-            }
-
-            return _messageConfigurators
-                .ToDictionary(x => x.Key, x => x.Value.Build());
-        }
-
         public IPorticConfiguration Build()
         {
-            var messages = CreateMessageConfigurations();
+            var transport = TransportDefinition ?? throw new TransportNotDefinedException();
+
+            var messageDefinitions = _messageConfigurators.Values
+                .Select(x => x.Build())
+                .ToDictionary(x => x.MessageType);
+
+            DefinitionValidator.ValidateMessageDefinitions(messageDefinitions.Values);
 
             var consumers = _consumerBuilders.Values
-                .Select(c => c.Build(messages[c.MessageType]))
+                .Select(c => c.Build(messageDefinitions[c.MessageType]))
                 .ToList();
 
             var endpoints = _endpointConfigurators.Values
@@ -152,10 +141,10 @@ namespace Portic.Configuration
                 .ToList();
 
             return new PorticConfiguration(
-                messages,
+                messageDefinitions,
                 endpoints,
                 _middleware,
-                TransportDefinition ?? throw TransportNotDefinedException.CreateNew()
+                transport
             );
         }
     }

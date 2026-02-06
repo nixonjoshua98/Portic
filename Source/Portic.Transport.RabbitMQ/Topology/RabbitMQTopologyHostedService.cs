@@ -1,12 +1,16 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Portic.Configuration;
+using Portic.Endpoints;
 using Portic.Transport.RabbitMQ.Consumers;
+using Portic.Transport.RabbitMQ.Extensions;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQTopologyHostedService(
         IPorticConfiguration _configuration,
-        RabbitMQEndpointFactory _endpointFactory
+        RabbitMQConnectionContext _connectionContext,
+        RabbitMQConsumerExecutor _consumerExecutor,
+        RabbitMQTopologyService _topologyService
     ) : IHostedLifecycleService
     {
         private readonly List<RabbitMQEndpointState> _endpointStates = [];
@@ -15,7 +19,7 @@ namespace Portic.Transport.RabbitMQ.Topology
         {
             foreach (var endpoint in _configuration.Endpoints)
             {
-                var state = await _endpointFactory.CreateEndpointStateAsync(endpoint, cancellationToken);
+                var state = await CreateEndpointStateAsync(endpoint, cancellationToken);
 
                 _endpointStates.Add(state);
             }
@@ -36,6 +40,30 @@ namespace Portic.Transport.RabbitMQ.Topology
             DisposeEndpointStates();
 
             return Task.CompletedTask;
+        }
+
+        private async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointDefinition endpoint, CancellationToken cancellationToken)
+        {
+            foreach (var (_, consumer) in endpoint.Consumers)
+            {
+                await _topologyService.BindQueueAsync(endpoint, consumer, cancellationToken);
+            }
+
+            var state = new RabbitMQEndpointState(
+                endpoint,
+                _consumerExecutor.ExecuteAsync
+            );
+
+            for (int i = 0; i < endpoint.ChannelCount; i++)
+            {
+                var channel = await _connectionContext.CreateChannelAsync(cancellationToken);
+
+                await channel.BasicQosAsync(0, endpoint.PrefetchCount, global: false, cancellationToken);
+
+                var consumerState = state.AddConsumer(channel);
+            }
+
+            return state;
         }
 
         private void DisposeEndpointStates()

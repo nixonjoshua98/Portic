@@ -1,5 +1,4 @@
 ﻿using Portic.Configuration;
-using Portic.Messages;
 using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Messages;
@@ -9,11 +8,12 @@ namespace Portic.Transport.RabbitMQ.Topology
 {
     internal sealed class RabbitMQTransport(
         RabbitMQConnectionContext _connectionContext,
+        RabbitMQTopologyService _topologyService,
         IPorticConfiguration _configuration,
         IPorticSerializer _serializer
     ) : IRabbitMQTransport
     {
-        public async Task PublishFaultedAsync(RabbitMQRawMessageReceived message, Exception exception, CancellationToken cancellationToken)
+        public async Task PublishDeferredAsync(RabbitMQRawMessageReceived message, Exception exception, CancellationToken cancellationToken)
         {
             var properties = new BasicProperties()
                 .CopyHeadersFrom(message.BasicProperties)
@@ -21,7 +21,32 @@ namespace Portic.Transport.RabbitMQ.Topology
                 .SetDeliveryCount(Convert.ToByte(message.DeliveryCount + 1));
 
             await PublishAsync(
-                message.MessageConfiguration,
+                message.MessageDefinition.Name,
+                message.MessageDefinition.Mandatory,
+                message.RawBody,
+                properties,
+                cancellationToken
+            );
+        }
+
+        public async Task PublishFaultedAsync(RabbitMQRawMessageReceived message, Exception exception, CancellationToken cancellationToken)
+        {
+            var properties = new BasicProperties()
+                .CopyHeadersFrom(message.BasicProperties)
+                .SetException(exception);
+
+            // We want to ensure the exchange and queue are declared and bound before we publish the faulted message,
+            // otherwise we might lose messages if the exchange or queue are not yet created.
+
+            await _topologyService.BindFaultedQueueAsync(
+                message.MessageDefinition,
+                message.EndpointDefinition,
+                cancellationToken
+            );
+
+            await PublishAsync(
+                message.MessageDefinition.FaultedExchangeName,
+                message.MessageDefinition.Mandatory,
                 message.RawBody,
                 properties,
                 cancellationToken
@@ -43,7 +68,8 @@ namespace Portic.Transport.RabbitMQ.Topology
                 .SetMessageName(definition.Name);
 
             await PublishAsync(
-                definition,
+                definition.Name,
+                definition.Mandatory,
                 payloadBytes,
                 properties,
                 cancellationToken
@@ -51,7 +77,8 @@ namespace Portic.Transport.RabbitMQ.Topology
         }
 
         private async Task PublishAsync(
-            IMessageDefinition configuration,
+            string exchange,
+            bool mandatory,
             ReadOnlyMemory<byte> payloadBytes,
             BasicProperties properties,
             CancellationToken cancellationToken)
@@ -59,9 +86,9 @@ namespace Portic.Transport.RabbitMQ.Topology
             using var rented = await _connectionContext.RentChannelAsync(cancellationToken);
 
             await rented.Channel.BasicPublishAsync(
-                exchange: configuration.Name,
+                exchange: exchange,
                 routingKey: string.Empty,
-                mandatory: configuration.Mandatory,
+                mandatory: mandatory,
                 basicProperties: properties,
                 body: payloadBytes,
                 cancellationToken: cancellationToken

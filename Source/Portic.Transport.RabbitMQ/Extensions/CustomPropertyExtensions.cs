@@ -16,6 +16,9 @@ namespace Portic.Transport.RabbitMQ.Extensions
         {
             internal bool Mandatory =>
                 configurator.GetPropertyOrDefault(MandatoryKey, false);
+
+            internal string FaultedExchangeName =>
+                $"{configurator.Name}-faulted";
         }
 
         extension(IMessageConfigurator configurator)
@@ -58,6 +61,9 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
             internal bool Exclusive =>
                 configurator.GetPropertyOrDefault(ExclusiveKey, false);
+
+            internal string FaultedQueueName =>
+                $"{configurator.Name}-faulted";
         }
     }
 }

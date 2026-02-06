@@ -27,8 +27,6 @@ builder.Services.AddPortic(configurator =>
 
     configurator.Use<LoggingMiddleware>();
 
-    configurator.SetMaxRedeliveryAttempts(1);
-
     configurator.UsePolly(polly => polly
         .WithRetryCount(1, TimeSpan.FromMilliseconds(100))
         .WithScopePerExecution()

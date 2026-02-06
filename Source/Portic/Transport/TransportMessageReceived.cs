@@ -1,14 +1,14 @@
-﻿using Portic.Consumers;
+using Portic.Consumers;
 using Portic.Endpoints;
 
-namespace Portic.Transport.RabbitMQ.Messages
+namespace Portic.Transport
 {
-    internal sealed record RabbitMQMessageReceived<TMessage>(
+    public sealed record TransportMessageReceived<TMessage>(
         string MessageId,
         TMessage Message,
         byte DeliveryCount,
         IConsumerDefinition ConsumerDefinition,
         IEndpointDefinition EndpointDefinition,
         IMessageSettlement Settlement
-    ) : ITransportMessageReceived<TMessage>;
+    );
 }
