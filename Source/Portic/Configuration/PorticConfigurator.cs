@@ -26,7 +26,7 @@ namespace Portic.Configuration
         private ITransportDefinition? TransportDefinition { get; set; }
         internal byte MaxRedeliveryAttempts { get; private set; } = 0;
 
-        public IPorticConfigurator WithMessageRedeliveryCount(byte attempts)
+        public IPorticConfigurator WithMaxRedeliveryAttempts(byte attempts)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(attempts, nameof(attempts));
 

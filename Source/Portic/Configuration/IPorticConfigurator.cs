@@ -42,7 +42,7 @@ namespace Portic.Configuration
         /// <param name="attempts">The maximum number of times a message will be redelivered before it is considered undeliverable. Must be
         /// greater than zero.</param>
         /// <returns>The current configurator instance for method chaining.</returns>
-        IPorticConfigurator WithMessageRedeliveryCount(byte attempts);
+        IPorticConfigurator WithMaxRedeliveryAttempts(byte attempts);
 
         IPorticConfigurator SetProperty(string key, object value);
 
