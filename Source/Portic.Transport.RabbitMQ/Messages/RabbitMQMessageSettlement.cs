@@ -15,7 +15,7 @@ namespace Portic.Transport.RabbitMQ.Messages
         public async Task DeferAsync(Exception exception, CancellationToken cancellationToken)
         {
             // Republish the message for redelivery first, to ensure at-least-once delivery guarantee
-            await Transport.PublishDeferedAsync(RawMessage, exception, cancellationToken);
+            await Transport.PublishDeferredAsync(RawMessage, exception, cancellationToken);
 
             // Ack the original message to remove it from the queue
             // Intentionally ignoring cancellationToken here to ensure Ack is sent regardless of cancellation

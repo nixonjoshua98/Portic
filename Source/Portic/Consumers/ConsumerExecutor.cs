@@ -36,7 +36,7 @@ namespace Portic.Consumers
             {
                 await context.Settlement.DeferAsync(exception, cancellationToken);
 
-                _logger.LogDeferedMessage(context.MessageId, exception, context.DeliveryCount, context.MaxRedeliveryAttempts);
+                _logger.LogDeferredMessage(context.MessageId, exception, context.DeliveryCount, context.MaxRedeliveryAttempts);
             }
             catch (Exception exception)
             {
