@@ -17,6 +17,7 @@ Portic is currently in **early development**. The API is subject to change and m
 - **Middleware Pipeline** - Extensible middleware support for cross-cutting concerns like retry policies, logging, validation, and more
 - **Transport Agnostic** - Swap message transports with minimal application code changes
 - **Lightweight** - Minimal dependencies and overhead, focused on doing one thing well
+- **Redelivery & DLQ** - Configurable redelivery and dead-letter support for handling faulted messages
 
 ## 📦 Packages
 
