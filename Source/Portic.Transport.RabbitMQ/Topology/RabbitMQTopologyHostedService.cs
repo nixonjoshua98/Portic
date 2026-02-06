@@ -42,7 +42,7 @@ namespace Portic.Transport.RabbitMQ.Topology
             return Task.CompletedTask;
         }
 
-        public async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointDefinition endpoint, CancellationToken cancellationToken)
+        private async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointDefinition endpoint, CancellationToken cancellationToken)
         {
             foreach (var (_, consumer) in endpoint.Consumers)
             {
