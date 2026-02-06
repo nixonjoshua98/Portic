@@ -15,7 +15,7 @@ namespace Portic.Transport.RabbitMQ.Messages
 
         public IEndpointDefinition EndpointDefinition { get; }
         public IConsumerDefinition ConsumerDefinition { get; }
-        public IMessageDefinition MessageConfiguration { get; }
+        public IMessageDefinition MessageDefinition { get; }
 
         public ReadOnlyMemory<byte> RawBody { get; }
         public IReadOnlyBasicProperties BasicProperties { get; }
@@ -33,7 +33,7 @@ namespace Portic.Transport.RabbitMQ.Messages
             RawBody = deliverArgs.Body;
             EndpointDefinition = state.Endpoint;
             DeliveryTag = deliverArgs.DeliveryTag;
-            MessageConfiguration = ConsumerDefinition.Message;
+            MessageDefinition = ConsumerDefinition.Message;
         }
     }
 }

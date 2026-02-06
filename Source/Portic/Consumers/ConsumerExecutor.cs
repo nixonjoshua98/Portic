@@ -35,10 +35,14 @@ namespace Portic.Consumers
             catch (Exception exception) when (context.DeliveryCount < context.MaxRedeliveryAttempts)
             {
                 await context.Settlement.DeferAsync(exception, cancellationToken);
+
+                _logger.LogDeferedMessage(context.MessageId, exception, context.DeliveryCount, context.MaxRedeliveryAttempts);
             }
             catch (Exception exception)
             {
                 await context.Settlement.FaultAsync(exception, cancellationToken);
+
+                _logger.LogFaultedMessage(context.MessageId, exception);
             }
 
         }

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Portic.Consumers;
+﻿using Portic.Consumers;
 using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Messages;
 using Portic.Transport.RabbitMQ.Topology;
@@ -10,7 +9,6 @@ namespace Portic.Transport.RabbitMQ.Consumers
 {
     internal sealed class RabbitMQConsumerExecutor(
         IPorticSerializer _serializer,
-        ILogger<RabbitMQConsumerExecutor> _logger,
         IConsumerExecutor _consumerExecutor,
         IRabbitMQTransport _transport
     )
@@ -27,7 +25,7 @@ namespace Portic.Transport.RabbitMQ.Consumers
 
         public async Task ExecuteAsync(RabbitMQRawMessageReceived message, CancellationToken cancellationToken)
         {
-            var genericConsumeMethod = GetGenericConsumeMethod(message.MessageConfiguration.MessageType);
+            var genericConsumeMethod = GetGenericConsumeMethod(message.MessageDefinition.MessageType);
 
             object[] methodArgs = [message, cancellationToken];
 
@@ -40,12 +38,7 @@ namespace Portic.Transport.RabbitMQ.Consumers
         {
             var body = _serializer.Deserialize<RabbitMQMessageBody<TMessage>>(message.RawBody.Span);
 
-            var settlement = new RabbitMQMessageSettlement<TMessage>(
-                message,
-                _transport,
-                _logger,
-                message.EndpointDefinition.MaxRedeliveryAttempts
-            );
+            var settlement = new RabbitMQMessageSettlement<TMessage>(message, _transport);
 
             var messageReceived = new RabbitMQMessageReceived<TMessage>(
                 message.MessageId!,

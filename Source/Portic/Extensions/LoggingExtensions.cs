@@ -6,5 +6,11 @@ namespace Portic.Logging
     {
         [LoggerMessage(Level = LogLevel.Debug, Message = "Message '{MessageName}' has been consumed")]
         public static partial void LogMessageConsumed(this ILogger logger, string messageName);
+
+        [LoggerMessage(Level = LogLevel.Error, Message = "Message '{MessageId}' has faulted.")]
+        public static partial void LogFaultedMessage(this ILogger logger, string messageId, Exception exception);
+
+        [LoggerMessage(Level = LogLevel.Warning, Message = "Message '{MessageId}' has been defered (Delivery: {DeliveryCount} of {MaxRedeliveryAttempts})")]
+        public static partial void LogDeferedMessage(this ILogger logger, string messageId, Exception exception, int deliveryCount, int maxRedeliveryAttempts);
     }
 }
