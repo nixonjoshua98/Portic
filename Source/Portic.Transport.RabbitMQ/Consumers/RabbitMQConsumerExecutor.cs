@@ -13,28 +13,26 @@ namespace Portic.Transport.RabbitMQ.Consumers
         IRabbitMQTransport _transport
     )
     {
-        private static readonly MethodInfo ConsumeGenericMethodInfo;
+        private delegate Task ConsumeDelegate(RabbitMQConsumerExecutor instance, RabbitMQRawMessageReceived message, CancellationToken cancellationToken);
 
-        private static readonly ConcurrentDictionary<Type, MethodInfo> MessageTypeConsumeMethods = [];
+        private static readonly MethodInfo ConsumeMethodInfo;
+
+        private static readonly ConcurrentDictionary<Type, ConsumeDelegate> MessageTypeDelegates = [];
 
         static RabbitMQConsumerExecutor()
         {
-            ConsumeGenericMethodInfo = typeof(RabbitMQConsumerExecutor).GetMethod(nameof(ConsumeGenericAsync), BindingFlags.NonPublic | BindingFlags.Instance) ??
-                throw new Exception("Failed to find ConsumeGenericAsync method.");
+            ConsumeMethodInfo = typeof(RabbitMQConsumerExecutor).GetMethod(nameof(ConsumeAsync), BindingFlags.NonPublic | BindingFlags.Instance) ??
+                throw new Exception("Failed to find ConsumeAsync method.");
         }
 
         public async Task ExecuteAsync(RabbitMQRawMessageReceived message, CancellationToken cancellationToken)
         {
-            var genericConsumeMethod = GetGenericConsumeMethod(message.MessageDefinition.MessageType);
+            var consumeDelegate = GetOrCreateConsumeDelegate(message.MessageDefinition.MessageType);
 
-            object[] methodArgs = [message, cancellationToken];
-
-            var genericConsumeResult = genericConsumeMethod.Invoke(this, methodArgs) as Task;
-
-            await genericConsumeResult!;
+            await consumeDelegate(this, message, cancellationToken);
         }
 
-        private async Task ConsumeGenericAsync<TMessage>(RabbitMQRawMessageReceived message, CancellationToken cancellationToken)
+        private async Task ConsumeAsync<TMessage>(RabbitMQRawMessageReceived message, CancellationToken cancellationToken)
         {
             var body = _serializer.Deserialize<RabbitMQMessageBody<TMessage>>(message.RawBody.Span);
 
@@ -52,11 +50,11 @@ namespace Portic.Transport.RabbitMQ.Consumers
             await _consumerExecutor.ExecuteAsync(messageReceived, cancellationToken);
         }
 
-        private static MethodInfo GetGenericConsumeMethod(Type messageType)
+        private static ConsumeDelegate GetOrCreateConsumeDelegate(Type messageType)
         {
-            return MessageTypeConsumeMethods.GetOrAdd(
+            return MessageTypeDelegates.GetOrAdd(
                 messageType,
-                _ => ConsumeGenericMethodInfo.MakeGenericMethod(messageType)
+                static type => ConsumeMethodInfo.MakeGenericMethod(type).CreateDelegate<ConsumeDelegate>()
             );
         }
     }
