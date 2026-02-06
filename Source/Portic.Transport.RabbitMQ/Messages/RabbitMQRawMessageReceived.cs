@@ -29,10 +29,10 @@ namespace Portic.Transport.RabbitMQ.Messages
 
             ConsumerDefinition = state.Endpoint.GetConsumerDefinition(deliverArgs.BasicProperties.MessageName);
 
-            BasicProperties = deliverArgs.BasicProperties;
             RawBody = deliverArgs.Body;
             EndpointDefinition = state.Endpoint;
             DeliveryTag = deliverArgs.DeliveryTag;
+            BasicProperties = deliverArgs.BasicProperties;
             MessageDefinition = ConsumerDefinition.Message;
         }
     }

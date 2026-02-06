@@ -12,7 +12,7 @@ namespace Portic.Samples.Bravo
             {
                 _messageIdsToFail.Add(context.MessageId);
 
-                throw new Exception($"ConsumerDefinition for message '{context.MessageId}' has failed");
+                throw new Exception();
             }
 
             return ValueTask.CompletedTask;

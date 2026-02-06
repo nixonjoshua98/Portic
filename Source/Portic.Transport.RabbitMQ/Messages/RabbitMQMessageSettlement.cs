@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Portic.Transport.RabbitMQ.Logging;
-using Portic.Transport.RabbitMQ.Topology;
+﻿using Portic.Transport.RabbitMQ.Topology;
 
 namespace Portic.Transport.RabbitMQ.Messages
 {

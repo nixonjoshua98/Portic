@@ -24,7 +24,12 @@ namespace Portic.Transport.RabbitMQ.Topology
                 cancellationToken: cancellationToken
             );
 
-            await rented.Channel.QueueBindAsync(queue, exchange, string.Empty, cancellationToken: cancellationToken);
+            await rented.Channel.QueueBindAsync(
+                queue: queue, 
+                exchange: exchange, 
+                routingKey: string.Empty, 
+                cancellationToken: cancellationToken
+            );
         }
     }
 }

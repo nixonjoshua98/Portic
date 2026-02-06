@@ -40,7 +40,7 @@ namespace Portic.Transport.RabbitMQ.Consumers
 
             var settlement = new RabbitMQMessageSettlement<TMessage>(message, _transport);
 
-            var messageReceived = new RabbitMQMessageReceived<TMessage>(
+            var messageReceived = new TransportMessageReceived<TMessage>(
                 message.MessageId!,
                 body.Message,
                 message.DeliveryCount,

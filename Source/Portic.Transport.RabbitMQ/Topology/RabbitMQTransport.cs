@@ -33,16 +33,19 @@ namespace Portic.Transport.RabbitMQ.Topology
         {
             var properties = new BasicProperties()
                 .CopyHeadersFrom(message.BasicProperties)
-                .SetException(exception)
-                .SetDeliveryCount(Convert.ToByte(message.DeliveryCount + 1));
+                .SetException(exception);
 
-            var exchaneName = message.MessageDefinition.Name + "-faulted";
-            var queueName = message.EndpointDefinition.Name + "-faulted";
+            // We want to ensure the exchange and queue are declared and bound before we publish the faulted message,
+            // otherwise we might lose messages if the exchange or queue are not yet created.
 
-            await _topologyService.BindFaultedQueueAsync(exchaneName, queueName, cancellationToken);
+            await _topologyService.BindFaultedQueueAsync(
+                message.MessageDefinition.FaultedExchangeName,
+                message.EndpointDefinition.FaultedQueueName,
+                cancellationToken
+            );
 
             await PublishAsync(
-                exchaneName,
+                message.MessageDefinition.FaultedExchangeName,
                 message.MessageDefinition.Mandatory,
                 message.RawBody,
                 properties,

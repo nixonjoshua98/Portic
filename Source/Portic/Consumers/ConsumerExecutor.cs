@@ -14,7 +14,7 @@ namespace Portic.Consumers
         IConsumerContextFactory _contextFactory
     ) : IConsumerExecutor
     {
-        public async Task ExecuteAsync<TMessage>(ITransportMessageReceived<TMessage> message, CancellationToken cancellationToken)
+        public async Task ExecuteAsync<TMessage>(TransportMessageReceived<TMessage> message, CancellationToken cancellationToken)
         {
             await using var scope = _scopeFactory.CreateAsyncScope();
 
