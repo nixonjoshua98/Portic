@@ -25,8 +25,6 @@ namespace Portic.Extensions
         {
             services.TryAddSingleton<IConsumerExecutor, ConsumerExecutor>();
 
-            services.TryAddSingleton<IConsumerContextFactory, ConsumerContextFactory>();
-
             services.TryAddSingleton<IPorticSerializer, SystemTextJsonSerializer>();
         }
     }

@@ -4,8 +4,8 @@ namespace Portic.Logging
 {
     internal static partial class LoggingExtensions
     {
-        [LoggerMessage(Level = LogLevel.Debug, Message = "Message '{MessageName}' has been consumed")]
-        public static partial void LogMessageConsumed(this ILogger logger, string messageName);
+        [LoggerMessage(Level = LogLevel.Debug, Message = "Message '{MessageId}' has been consumed.")]
+        public static partial void LogMessageConsumed(this ILogger logger, string messageId);
 
         [LoggerMessage(Level = LogLevel.Error, Message = "Message '{MessageId}' has faulted.")]
         public static partial void LogFaultedMessage(this ILogger logger, string messageId, Exception exception);
