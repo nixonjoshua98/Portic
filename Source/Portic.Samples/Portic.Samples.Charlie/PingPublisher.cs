@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Portic.Transport;
 
-namespace Portic.Samples.Alpha
+namespace Portic.Samples.Charlie
 {
     internal sealed class PingPublisher(
         IMessageTransport _messageBus
