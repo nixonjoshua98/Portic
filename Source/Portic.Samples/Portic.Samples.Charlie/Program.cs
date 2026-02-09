@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Portic.Extensions;
-using Portic.Samples.Alpha;
 using Serilog;
 using Portic.Transport.InMemory.Extensions;
+using Portic.Samples.Charlie;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()

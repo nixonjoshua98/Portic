@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Portic.Consumers;
 
-namespace Portic.Samples.Alpha
+namespace Portic.Samples.Charlie
 {
     internal sealed class PingConsumerV2(ILogger<PingConsumer> _logger) : IConsumer<PingMessage>
     {
