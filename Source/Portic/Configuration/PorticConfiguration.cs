@@ -13,7 +13,7 @@ namespace Portic.Configuration
     {
         private readonly IReadOnlyDictionary<Type, IMessageDefinition> Messages = messages;
 
-        public IReadOnlyList<IEndpointDefinition> Endpoints { get; } = [.. endpoints.Where(e => e.Consumers.Any())];
+        public IReadOnlyList<IEndpointDefinition> Endpoints { get; } = [.. endpoints.Where(e => e.ConsumerDefinitions.Count > 0)];
 
         public ITransportDefinition TransportDefinition { get; } = transportDefinition;
 

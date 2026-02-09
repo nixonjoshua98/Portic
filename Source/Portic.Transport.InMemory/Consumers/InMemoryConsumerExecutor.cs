@@ -1,46 +1,42 @@
 ﻿using Portic.Consumers;
-using Portic.Serializer;
-using Portic.Transport.RabbitMQ.Messages;
-using Portic.Transport.RabbitMQ.Topology;
+using Portic.Transport.InMemory.Messages;
+using Portic.Transport.InMemory.Topology;
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace Portic.Transport.RabbitMQ.Consumers
+namespace Portic.Transport.InMemory.Consumers
 {
-    internal sealed class RabbitMQConsumerExecutor(
-        IPorticSerializer _serializer,
-        IConsumerExecutor _consumerExecutor,
-        IRabbitMQTransport _transport
+    internal sealed class InMemoryConsumerExecutor(
+        IInMemoryTransport _transport,
+        IConsumerExecutor _consumerExecutor
     )
     {
-        private delegate Task ConsumeDelegate(RabbitMQConsumerExecutor instance, RabbitMQRawMessageReceived message, CancellationToken cancellationToken);
+        private delegate Task ConsumeDelegate(InMemoryConsumerExecutor instance, InMemoryQueuedMessage message, CancellationToken cancellationToken);
 
         private static readonly MethodInfo ConsumeMethodInfo;
 
         private static readonly ConcurrentDictionary<Type, ConsumeDelegate> MessageTypeDelegates = [];
 
-        static RabbitMQConsumerExecutor()
+        static InMemoryConsumerExecutor()
         {
-            ConsumeMethodInfo = typeof(RabbitMQConsumerExecutor).GetMethod(nameof(ConsumeAsync), BindingFlags.NonPublic | BindingFlags.Instance) ??
+            ConsumeMethodInfo = typeof(InMemoryConsumerExecutor).GetMethod(nameof(ConsumeAsync), BindingFlags.NonPublic | BindingFlags.Instance) ??
                 throw new Exception("Failed to find ConsumeAsync method.");
         }
 
-        public async Task ExecuteAsync(RabbitMQRawMessageReceived message, CancellationToken cancellationToken)
+        public async ValueTask ExecuteAsync(InMemoryQueuedMessage message, CancellationToken cancellationToken = default)
         {
             var consumeDelegate = GetOrCreateConsumeDelegate(message.MessageDefinition.MessageType);
 
             await consumeDelegate(this, message, cancellationToken);
         }
 
-        private async Task ConsumeAsync<TMessage>(RabbitMQRawMessageReceived message, CancellationToken cancellationToken)
-        {
-            var body = _serializer.Deserialize<RabbitMQMessageBody<TMessage>>(message.RawBody.Span);
-
-            var settlement = new RabbitMQMessageSettlement<TMessage>(message, _transport);
+        private async Task ConsumeAsync<TMessage>(InMemoryQueuedMessage message, CancellationToken cancellationToken)
+        {           
+            var settlement = new InMemoryMessageSettlement(message, _transport);
 
             var messageReceived = new TransportMessageReceived<TMessage>(
-                message.MessageId!,
-                body.Message,
+                message.MessageId,
+                (TMessage)message.Message,
                 message.DeliveryCount,
                 message.ConsumerDefinition,
                 message.EndpointDefinition,
