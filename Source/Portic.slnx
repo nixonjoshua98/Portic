@@ -6,6 +6,7 @@
   <Folder Name="/Samples/">
     <Project Path="Portic.Samples/Portic.Samples.Alpha/Portic.Samples.Alpha.csproj" />
     <Project Path="Portic.Samples/Portic.Samples.Bravo/Portic.Samples.Bravo.csproj" Id="23f1e357-3283-40a6-a21d-f593aad478fa" />
+    <Project Path="Portic.Samples/Portic.Samples.Charlie/Portic.Samples.Charlie.csproj" Id="ead296df-6ab6-45aa-b7f8-0374881aab8e" />
   </Folder>
   <Folder Name="/Samples/Props/">
     <File Path="Portic.Samples/Directory.Build.props" />
@@ -18,6 +19,7 @@
     <File Path="../.github/workflows/PublishNuget.yaml" />
   </Folder>
   <Project Path="Portic.Middleware.Polly/Portic.Middleware.Polly.csproj" Id="6a23ba8e-cb4a-4785-969a-7f25463c6087" />
+  <Project Path="Portic.Transport.InMemory/Portic.Transport.InMemory.csproj" Id="7c485c68-069b-455a-bd37-0e76989cdc7b" />
   <Project Path="Portic.Transport.RabbitMQ/Portic.Transport.RabbitMQ.csproj" />
   <Project Path="Portic/Portic.csproj" />
 </Solution>

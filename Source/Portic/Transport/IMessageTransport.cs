@@ -9,6 +9,6 @@
         /// <param name="message">The message to publish.</param>
         /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous publish operation.</returns>
-        Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default);
+        Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) where TMessage : class;
     }
 }
