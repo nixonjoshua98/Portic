@@ -8,7 +8,7 @@ namespace Portic.Transport.InMemory.Topology
     {
         private readonly Channel<InMemoryQueuedMessage> _messageChannel = Channel.CreateUnbounded<InMemoryQueuedMessage>(new UnboundedChannelOptions
         {
-            SingleReader = false,
+            SingleReader = true,
             SingleWriter = false
         });
 
