@@ -6,7 +6,7 @@ namespace Portic.Configuration
 {
     internal sealed class PorticConfiguration(
         IReadOnlyDictionary<Type, IMessageDefinition> messages,
-        IReadOnlyList<IEndpointDefinition> endpoints,
+        IEnumerable<IEndpointDefinition> endpoints,
         IReadOnlyList<Type> globalMiddlewareTypes,
         ITransportDefinition transportDefinition
     ) : IPorticConfiguration
@@ -19,11 +19,6 @@ namespace Portic.Configuration
 
         public IReadOnlyList<Type> Middleware { get; } = globalMiddlewareTypes;
 
-        public IMessageDefinition GetMessageDefinition<TMessage>()
-        {
-            var messageType = typeof(TMessage);
-
-            return Messages[messageType];
-        }
+        public IMessageDefinition GetMessageDefinition<TMessage>() => Messages[typeof(TMessage)];
     }
 }

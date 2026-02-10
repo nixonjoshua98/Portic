@@ -1,5 +1,4 @@
 ﻿using Portic.Consumers;
-using Portic.Exceptions;
 using Portic.Models;
 
 namespace Portic.Endpoints
@@ -18,17 +17,5 @@ namespace Portic.Endpoints
         public IReadOnlyList<IConsumerDefinition> ConsumerDefinitions { get; } = [.. consumers];
 
         public T GetPropertyOrDefault<T>(string key, T defaultValue) => Properties.GetOrDefault(key, defaultValue);
-
-        public IConsumerDefinition GetConsumerDefinition(string? messageName)
-        {
-            var consumerDefinition = ConsumerDefinitions.SingleOrDefault(c => c.Message.Name == messageName);
-
-            if (string.IsNullOrEmpty(messageName) || consumerDefinition is null)
-            {
-                throw MessageTypeNotFoundException.FromName(messageName);
-            }
-
-            return consumerDefinition;
-        }
     }
 }

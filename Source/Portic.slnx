@@ -15,6 +15,14 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Portic.Tests/Portic.Tests.Common/Portic.Tests.Common.csproj" Id="c4f6425d-4876-42a4-aeb7-5cb6cfb022ba" />
+    <Project Path="Portic.Tests/Portic.Transport.RabbitMQ.UnitTests/Portic.Transport.RabbitMQ.UnitTests.csproj" Id="643c1c52-31cd-4644-b244-e4c939188b8d" />
+  </Folder>
+  <Folder Name="/Tests/Props/">
+    <File Path="Portic.Tests/Directory.Build.props" />
+    <File Path="Portic.Tests/Directory.Packages.props" />
+  </Folder>
   <Folder Name="/Workflows/">
     <File Path="../.github/workflows/PublishNuget.yaml" />
   </Folder>

@@ -1,8 +1,6 @@
 ﻿using Portic.Configuration;
 using Portic.Transport.InMemory.Extensions;
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Portic.Transport.InMemory.Topology
 {

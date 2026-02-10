@@ -12,11 +12,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="Portic.Transport.RabbitMQ.UnitTests" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="RabbitMQ.Client" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Portic\Portic.csproj" />
 	</ItemGroup>
+
 
 </Project>

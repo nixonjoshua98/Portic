@@ -20,7 +20,7 @@ builder.Services.AddPortic(configurator =>
 {
     configurator.ConfigureConsumer<PingMessage, PingConsumer>();
 
-    configurator.ConfigureConsumer<PingMessage, PingConsumerV2>();
+    configurator.ConfigureConsumer<PingMessage, PingConsumer2>();
 
     configurator.UsingInMemory();
 });

@@ -6,7 +6,7 @@ using Portic.Transport.RabbitMQ.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
+    .MinimumLevel.Debug()
     .WriteTo.Console()
     .CreateLogger();
 
