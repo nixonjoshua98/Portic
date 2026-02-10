@@ -1,4 +1,5 @@
-﻿using Portic.Consumers;
+﻿using Microsoft.Extensions.Logging;
+using Portic.Consumers;
 using Portic.Transport.InMemory.Messages;
 using Portic.Transport.InMemory.Topology;
 using System.Collections.Concurrent;
@@ -8,10 +9,13 @@ namespace Portic.Transport.InMemory.Consumers
 {
     internal sealed class InMemoryConsumerExecutor(
         IInMemoryTransport _transport,
-        IConsumerExecutor _consumerExecutor
+        IConsumerExecutor _consumerExecutor,
+        ILoggerFactory _loggerFactory
     )
     {
         private delegate Task ConsumeDelegate(InMemoryConsumerExecutor instance, InMemoryQueuedMessage message, CancellationToken cancellationToken);
+
+        private readonly ILogger<InMemoryMessageSettlement> MessageSettlementLogger = _loggerFactory.CreateLogger<InMemoryMessageSettlement>();
 
         private static readonly MethodInfo ConsumeMethodInfo;
 
@@ -32,7 +36,11 @@ namespace Portic.Transport.InMemory.Consumers
 
         private async Task ConsumeAsync<TMessage>(InMemoryQueuedMessage message, CancellationToken cancellationToken)
         {
-            var settlement = new InMemoryMessageSettlement(message, _transport);
+            var settlement = new InMemoryMessageSettlement(
+                message, 
+                _transport, 
+                MessageSettlementLogger
+            );
 
             var messageReceived = new TransportMessageReceived<TMessage>(
                 message.MessageId,
