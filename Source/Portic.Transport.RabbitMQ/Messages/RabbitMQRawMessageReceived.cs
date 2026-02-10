@@ -1,5 +1,6 @@
 ﻿using Portic.Consumers;
 using Portic.Endpoints;
+using Portic.Exceptions;
 using Portic.Messages;
 using Portic.Transport.RabbitMQ.Consumers;
 using Portic.Transport.RabbitMQ.Extensions;
@@ -27,13 +28,26 @@ namespace Portic.Transport.RabbitMQ.Messages
         {
             Channel = state.GetChannelOrThrow();
 
-            ConsumerDefinition = state.Endpoint.GetConsumerDefinition(deliverArgs.BasicProperties.MessageName);
+            ConsumerDefinition = GetConsumerDefinition(state.Endpoint, deliverArgs.BasicProperties.MessageName);
 
             RawBody = deliverArgs.Body;
             EndpointDefinition = state.Endpoint;
             DeliveryTag = deliverArgs.DeliveryTag;
             BasicProperties = deliverArgs.BasicProperties;
             MessageDefinition = ConsumerDefinition.Message;
+        }
+
+        private static IConsumerDefinition GetConsumerDefinition(IEndpointDefinition endpointDefinition, string? messageName)
+        {
+            var consumerDefinition = endpointDefinition.ConsumerDefinitions
+                .SingleOrDefault(c => c.Message.Name == messageName);
+
+            if (string.IsNullOrEmpty(messageName) || consumerDefinition is null)
+            {
+                throw new MessageConsumerNotConfiguredException(messageName, endpointDefinition.Name);
+            }
+
+            return consumerDefinition;
         }
     }
 }

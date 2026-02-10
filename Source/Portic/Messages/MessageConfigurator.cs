@@ -23,7 +23,7 @@ namespace Portic.Messages
             return this;
         }
 
-        public IMessageDefinition Build()
+        public IMessageDefinition ToDefinition()
         {
             return new MessageDefinition(Name, MessageType, _properties);
         }

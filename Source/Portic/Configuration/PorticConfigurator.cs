@@ -123,9 +123,8 @@ namespace Portic.Configuration
         {
             var transport = TransportDefinition ?? throw new TransportNotDefinedException();
 
-            var messageDefinitions = _messageConfigurators.Values
-                .Select(x => x.Build())
-                .ToDictionary(x => x.MessageType);
+            var messageDefinitions = _messageConfigurators
+                .ToDictionary(x => x.Key, x => x.Value.ToDefinition());
 
             DefinitionValidator.ValidateMessageDefinitions(messageDefinitions.Values);
 
@@ -133,19 +132,27 @@ namespace Portic.Configuration
                 .Select(c => c.Build(messageDefinitions[c.MessageType]))
                 .ToList();
 
-            var endpoints = _endpointConfigurators.Values
-                .Select(endpoint => endpoint.Build(
-                    this,
-                    consumers.Where(consumer => consumer.EndpointName == endpoint.Name)
-                ))
-                .ToList();
-
             return new PorticConfiguration(
                 messageDefinitions,
-                endpoints,
+                BuildEndpointDefinitions(transport, consumers),
                 _middleware,
                 transport
             );
+        }
+
+        IEnumerable<IEndpointDefinition> BuildEndpointDefinitions(ITransportDefinition transportDefinition, IEnumerable<IConsumerDefinition> allConsumerDefinitions)
+        {
+            foreach (var (_, configurator) in _endpointConfigurators)
+            {
+                var endpointConsumers = allConsumerDefinitions
+                    .Where(consumer => consumer.EndpointName == configurator.Name);
+
+                var endpointDefinition = configurator.Build(this, endpointConsumers);
+
+                transportDefinition.ValidateEndpoint(endpointDefinition);
+
+                yield return endpointDefinition;
+            }
         }
     }
 }

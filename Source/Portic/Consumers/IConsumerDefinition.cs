@@ -4,8 +4,8 @@ namespace Portic.Consumers
 {
     public interface IConsumerDefinition
     {
+        Type ConsumerType { get; }
+        string EndpointName { get; }
         IMessageDefinition Message { get; }
-        internal Type ConsumerType { get; }
-        internal string EndpointName { get; }
     }
 }

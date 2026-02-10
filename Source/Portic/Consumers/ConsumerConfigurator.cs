@@ -10,7 +10,7 @@ namespace Portic.Consumers
         public Type ConsumerType { get; } = consumerType;
         public Type MessageType { get; } = messageType;
 
-        public string EndpointName { get; private set; } = messageType.FullName ?? messageType.Name;
+        public string EndpointName { get; private set; } = consumerType.FullName ?? consumerType.Name;
 
         public IConsumerConfigurator WithEndpointName(string endpointName)
         {

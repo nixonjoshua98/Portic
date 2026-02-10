@@ -1,4 +1,6 @@
-﻿using RabbitMQ.Client;
+﻿using Portic.Endpoints;
+using Portic.Transport.RabbitMQ.Exceptions;
+using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
@@ -23,6 +25,22 @@ namespace Portic.Transport.RabbitMQ.Topology
         public async Task<IConnection> CreateConnectionAsync(CancellationToken cancellationToken)
         {
             return await ConnectionFactory.CreateConnectionAsync(cancellationToken);
+        }
+
+        void ITransportDefinition.ValidateEndpoint(IEndpointDefinition endpointDefinition)
+        {
+            // Ensure that only one consumer is registered per message type for this endpoint, 
+            // as we shouldn't have multiple consumers consuming the same message type from the same queue in RabbitMQ (the user should use multiple queues)
+
+            HashSet<Type> seenMessageTypes = [];
+
+            foreach (var consumer in endpointDefinition.ConsumerDefinitions)
+            {
+                if (!seenMessageTypes.Add(consumer.Message.MessageType))
+                {
+                    throw new RabbitMQMultipleMessageConsumerException(endpointDefinition.Name, consumer.Message.MessageType);
+                }
+            }
         }
 
         public IRabbitMQTransportDefinition Build()
