@@ -10,17 +10,21 @@ namespace Portic.Consumers
     internal sealed class ConsumerExecutor(
         ILogger<ConsumerExecutor> _logger,
         IPorticConfiguration _configuration,
-        IServiceScopeFactory _scopeFactory,
-        IConsumerContextFactory _contextFactory
+        IServiceScopeFactory _scopeFactory
     ) : IConsumerExecutor
     {
         public async Task ExecuteAsync<TMessage>(TransportMessageReceived<TMessage> message, CancellationToken cancellationToken)
         {
             await using var scope = _scopeFactory.CreateAsyncScope();
 
-            var context = await _contextFactory.CreateAsync(
-                message,
+            var context = new ConsumerContext<TMessage>(
+                message.MessageId,
+                message.Message,
+                message.DeliveryCount,
                 scope.ServiceProvider,
+                message.ConsumerDefinition,
+                message.EndpointDefinition,
+                message.Settlement,
                 cancellationToken
             );
 
@@ -31,6 +35,8 @@ namespace Portic.Consumers
                 await pipeline(context);
 
                 await context.Settlement.CompleteAsync(cancellationToken);
+
+                _logger.LogMessageConsumed(context.MessageId);
             }
             catch (Exception exception) when (context.DeliveryCount < context.MaxRedeliveryAttempts)
             {
@@ -44,7 +50,6 @@ namespace Portic.Consumers
 
                 _logger.LogFaultedMessage(context.MessageId, exception);
             }
-
         }
 
         private ConsumerMiddlewareDelegate BuildPipeline<TMessage>(IConsumerContext<TMessage> context)
@@ -75,14 +80,12 @@ namespace Portic.Consumers
             };
         }
 
-        private async Task ExecuteConsumerAsync<TMessage>(IConsumerContext<TMessage> context)
+        private static async Task ExecuteConsumerAsync<TMessage>(IConsumerContext<TMessage> context)
         {
             var consumerInst = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, context.ConsumerDefinition.ConsumerType) as IConsumer<TMessage>
                 ?? throw new MessageDefinitionNotFound(context.ConsumerDefinition.Message.Name);
 
             await consumerInst.ConsumeAsync(context);
-
-            _logger.LogMessageConsumed(context.ConsumerDefinition.Message.Name);
         }
     }
 }
