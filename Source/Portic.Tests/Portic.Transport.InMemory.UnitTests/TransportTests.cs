@@ -17,8 +17,8 @@ namespace Portic.Transport.InMemory.UnitTests
             var endpointDefinition = new MockEndpointDefinition("TestEndpoint", 0, [consumerDefinition]);
 
             var mockConfiguration = new PorticConfiguration(
-                new Dictionary<Type, IMessageDefinition>() 
-                { 
+                new Dictionary<Type, IMessageDefinition>()
+                {
                     [messageDefinition.MessageType] = messageDefinition
                 },
                 [endpointDefinition],
