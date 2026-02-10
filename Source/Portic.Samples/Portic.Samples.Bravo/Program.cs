@@ -7,7 +7,7 @@ using Portic.Transport.RabbitMQ.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
+    .MinimumLevel.Debug()
     .WriteTo.Console()
     .CreateLogger();
 
@@ -19,16 +19,15 @@ builder.Services.AddHostedService<PingPublisher>();
 
 builder.Services.AddPortic(configurator =>
 {
-    configurator.ConfigureConsumer<PingMessage, PingConsumer>()
-        .WithEndpointName("ping-queue");
+    configurator.ConfigureConsumer<PingMessage, PingConsumer>();
 
-    configurator.ConfigureEndpoint("ping-queue")
-        .WithAutoDelete();
+    configurator.ConfigureConsumer<PingMessage, PingConsumer2>()
+        .WithEndpointName("ping-consumer-two");
 
     configurator.Use<LoggingMiddleware>();
 
     configurator.UsePolly(polly => polly
-        .WithRetryCount(1, TimeSpan.FromMilliseconds(100))
+        .WithRetryCount(3, TimeSpan.FromMilliseconds(100))
         .WithScopePerExecution()
     );
 

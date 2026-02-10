@@ -2,7 +2,8 @@ namespace Portic.Exceptions
 {
     public sealed class DuplicateMessageNameException : PorticException
     {
-        internal DuplicateMessageNameException() : base($"Duplicate message name detected. Message names must be unique")
+        internal DuplicateMessageNameException(string messageName) : 
+            base($"Message name '{messageName}' is used multiple times. Message names must be unique")
         {
 
         }

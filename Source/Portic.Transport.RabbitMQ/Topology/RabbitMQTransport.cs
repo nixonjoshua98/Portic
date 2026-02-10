@@ -53,7 +53,7 @@ namespace Portic.Transport.RabbitMQ.Topology
             );
         }
 
-        public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
+        public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) where TMessage : class
         {
             var definition = _configuration.GetMessageDefinition<TMessage>();
 

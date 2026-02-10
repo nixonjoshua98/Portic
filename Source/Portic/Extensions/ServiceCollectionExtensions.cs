@@ -14,7 +14,9 @@ namespace Portic.Extensions
 
             callback(builder);
 
-            services.TryAddSingleton(builder.Build());
+            var definition = builder.Build();
+
+            services.TryAddSingleton(definition);
 
             AddCoreServices(services);
 

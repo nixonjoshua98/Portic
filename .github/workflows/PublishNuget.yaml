@@ -43,6 +43,7 @@ jobs:
 
           dotnet pack Source/Portic.Middleware.Polly/Portic.Middleware.Polly.csproj --configuration Release --no-build -o ${{ env.DIST_PATH }}
 
+          dotnet pack Source/Portic.Transport.InMemory/Portic.Transport.InMemory.csproj --configuration Release --no-build -o ${{ env.DIST_PATH }}
           dotnet pack Source/Portic.Transport.RabbitMQ/Portic.Transport.RabbitMQ.csproj --configuration Release --no-build -o ${{ env.DIST_PATH }}
 
       - name: Push to NuGet.org

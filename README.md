@@ -24,6 +24,7 @@ Portic is currently in **early development**. The API is subject to change and m
 | Package | Version | Description |
 |---------|---------|-------------|
 | [Portic](https://www.nuget.org/packages/Portic) | [![NuGet](https://img.shields.io/nuget/v/Portic.svg)](https://www.nuget.org/packages/Portic) | Core messaging framework and abstractions |
+| [Portic.Transport.InMemory](https://www.nuget.org/packages/Portic.Transport.InMemory) | [![NuGet](https://img.shields.io/nuget/v/Portic.Transport.InMemory.svg)](https://www.nuget.org/packages/Portic.Transport.InMemory) | In-memory transport implementation |
 | [Portic.Transport.RabbitMQ](https://www.nuget.org/packages/Portic.Transport.RabbitMQ) | [![NuGet](https://img.shields.io/nuget/v/Portic.Transport.RabbitMQ.svg)](https://www.nuget.org/packages/Portic.Transport.RabbitMQ) | RabbitMQ transport implementation |
 | [Portic.Middleware.Polly](https://www.nuget.org/packages/Portic.Middleware.Polly) | [![NuGet](https://img.shields.io/nuget/v/Portic.Middleware.Polly.svg)](https://www.nuget.org/packages/Portic.Middleware.Polly) | Polly middleware for resilience policies |
 

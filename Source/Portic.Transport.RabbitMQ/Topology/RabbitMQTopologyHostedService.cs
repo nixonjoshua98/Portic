@@ -44,7 +44,7 @@ namespace Portic.Transport.RabbitMQ.Topology
 
         private async Task<RabbitMQEndpointState> CreateEndpointStateAsync(IEndpointDefinition endpoint, CancellationToken cancellationToken)
         {
-            foreach (var (_, consumer) in endpoint.Consumers)
+            foreach (var consumer in endpoint.ConsumerDefinitions)
             {
                 await _topologyService.BindQueueAsync(endpoint, consumer, cancellationToken);
             }

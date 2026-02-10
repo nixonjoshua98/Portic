@@ -1,4 +1,5 @@
-﻿using Portic.Consumers;
+﻿using Microsoft.Extensions.Logging;
+using Portic.Consumers;
 using Portic.Endpoints;
 using Portic.Messages;
 using Portic.Transport.RabbitMQ.Extensions;
@@ -6,7 +7,10 @@ using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Topology
 {
-    internal sealed class RabbitMQTopologyService(RabbitMQConnectionContext _connectionContext)
+    internal sealed class RabbitMQTopologyService(
+        RabbitMQConnectionContext _connectionContext,
+        ILogger<RabbitMQTopologyService> _logger
+    )
     {
         public async Task BindQueueAsync(IEndpointDefinition endpoint, IConsumerDefinition consumer, CancellationToken cancellationToken)
         {
@@ -34,6 +38,8 @@ namespace Portic.Transport.RabbitMQ.Topology
                 routingKey: string.Empty,
                 cancellationToken: cancellationToken
             );
+
+            _logger.LogQueueBinding(consumer.Message.Name, queue.QueueName);
         }
 
         public async Task BindFaultedQueueAsync(IMessageDefinition messageDefinition, IEndpointDefinition endpointDefinition, CancellationToken cancellationToken)
