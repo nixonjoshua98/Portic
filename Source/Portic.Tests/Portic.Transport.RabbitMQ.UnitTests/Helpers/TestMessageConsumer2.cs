@@ -1,7 +1,4 @@
 ﻿using Portic.Consumers;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Portic.Transport.RabbitMQ.UnitTests.Helpers
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Portic.Transport.RabbitMQ.UnitTests.Helpers
+﻿namespace Portic.Transport.RabbitMQ.UnitTests.Helpers
 {
     internal sealed class TestMessage;
 

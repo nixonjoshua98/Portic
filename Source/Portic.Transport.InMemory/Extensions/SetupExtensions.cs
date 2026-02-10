@@ -35,7 +35,7 @@ namespace Portic.Transport.InMemory.Extensions
 
             services.TryAddSingleton<InMemoryConsumerExecutor>();
 
-            services.AddHostedService<InMemoryBackgroundDequeuer>();    
+            services.AddHostedService<InMemoryBackgroundDequeuer>();
         }
     }
 }

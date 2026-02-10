@@ -126,7 +126,7 @@ namespace Portic.Configuration
             var messageDefinitions = _messageConfigurators
                 .ToDictionary(x => x.Key, x => x.Value.ToDefinition());
 
-            DefinitionValidator.ValidateMessageDefinitions(messageDefinitions.Values);
+            CommonDefinitionValidator.ValidateMessageDefinitions(messageDefinitions.Values);
 
             var consumers = _consumerBuilders.Values
                 .Select(c => c.Build(messageDefinitions[c.MessageType]))
@@ -140,7 +140,7 @@ namespace Portic.Configuration
             );
         }
 
-        IEnumerable<IEndpointDefinition> BuildEndpointDefinitions(ITransportDefinition transportDefinition, IEnumerable<IConsumerDefinition> allConsumerDefinitions)
+        private IEnumerable<IEndpointDefinition> BuildEndpointDefinitions(ITransportDefinition transportDefinition, List<IConsumerDefinition> allConsumerDefinitions)
         {
             foreach (var (_, configurator) in _endpointConfigurators)
             {
@@ -149,6 +149,8 @@ namespace Portic.Configuration
 
                 var endpointDefinition = configurator.Build(this, endpointConsumers);
 
+                // Each transport may have specific requirements for the endpoint definition,
+                // so we validate it against the transport definition before returning it.
                 transportDefinition.ValidateEndpoint(endpointDefinition);
 
                 yield return endpointDefinition;
