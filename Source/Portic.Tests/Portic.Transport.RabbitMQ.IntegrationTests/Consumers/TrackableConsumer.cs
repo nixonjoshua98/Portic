@@ -1,7 +1,7 @@
 ﻿using Portic.Consumers;
 using Portic.Tests.Common.Helpers;
 
-namespace Portic.Transport.RabbitMQ.UnitTests.Consumers
+namespace Portic.Transport.RabbitMQ.IntegrationTests.Consumers
 {
     internal sealed class TrackableConsumer(TaskCompletionSource<TestMessage> _taskCompletionSource) : IConsumer<TestMessage>
     {

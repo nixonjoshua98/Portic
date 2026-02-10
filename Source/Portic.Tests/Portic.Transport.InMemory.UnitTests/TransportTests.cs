@@ -31,7 +31,7 @@ namespace Portic.Transport.InMemory.UnitTests
 
             var originalMessage = new InMemoryQueuedMessage(
                 string.Empty,
-                new TestMessage(),
+                new TestMessage(Guid.NewGuid()),
                 0,
                 messageDefinition,
                 consumerDefinition,
