@@ -1,6 +1,5 @@
 ﻿using Portic.Endpoints;
 using Portic.Messages;
-using Portic.Transport;
 
 namespace Portic.Configuration
 {
