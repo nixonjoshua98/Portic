@@ -12,6 +12,8 @@ namespace Portic.Transport.InMemory.UnitTests
         [Fact]
         public async Task PublishDeferredAsync_ShouldIncrementDeliveryCount()
         {
+            // Arrange
+
             var messageDefinition = new MockMessageDefinition(typeof(TestMessage), "TestMessage");
             var consumerDefinition = new MockConsumerDefinition(typeof(TestMessageConsumer), "TestMessageConsumer", messageDefinition);
             var endpointDefinition = new MockEndpointDefinition("TestEndpoint", 0, [consumerDefinition]);
@@ -36,7 +38,11 @@ namespace Portic.Transport.InMemory.UnitTests
                 endpointDefinition
             );
 
+            // Act
+
             await transport.PublishDeferredAsync(originalMessage, new Exception(), CancellationToken.None);
+
+            // Assert
 
             await foreach (var queuedMessage in transport.GetMessagesAsync(CancellationToken.None))
             {
