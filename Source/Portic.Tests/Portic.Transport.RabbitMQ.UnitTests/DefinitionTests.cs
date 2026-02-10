@@ -1,26 +1,27 @@
-﻿using Portic.Messages;
+﻿using Portic.Tests.Common.Helpers;
 using Portic.Tests.Common.Mocks;
 using Portic.Transport.RabbitMQ.Exceptions;
 using Portic.Transport.RabbitMQ.Topology;
-using Portic.Transport.RabbitMQ.UnitTests.Helpers;
 using Xunit;
 
 namespace Portic.Transport.RabbitMQ.UnitTests
 {
     public class DefinitionTests
     {
-        private readonly IMessageDefinition TestMessageDefinition = new MockMessageDefinition(typeof(TestMessage), "TestMessage");
-
         [Fact]
-        public void AllowOnlyOneMessageConsumerPerEndpoint()
+        public void ValidateEndpoint_ShouldThrow_WhenMultipleMessageConsumersRegistered()
         {
-            var consumer1 = new MockConsumerDefinition(typeof(TestMessageConsumer), "TestMessageConsumer", TestMessageDefinition);
-            var consumer2 = new MockConsumerDefinition(typeof(TestMessageConsumer), "TestMessageConsumer2", TestMessageDefinition);
+            // Arrange
+            var messageDefinition = new MockMessageDefinition(typeof(TestMessage), "TestMessage");
+
+            var consumer1 = new MockConsumerDefinition(typeof(TestMessageConsumer), "TestMessageConsumer", messageDefinition);
+            var consumer2 = new MockConsumerDefinition(typeof(TestMessageConsumer), "TestMessageConsumer2", messageDefinition);
 
             var endpoint = new MockEndpointDefinition("TestMessage", 0, [consumer1, consumer2]);
 
             ITransportDefinition transportDefinition = new RabbitMQTransportDefinition();
 
+            // Assert
             Assert.Throws<RabbitMQMultipleMessageConsumerException>(() => transportDefinition.ValidateEndpoint(endpoint));
         }
     }

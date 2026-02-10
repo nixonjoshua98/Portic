@@ -11,7 +11,7 @@ env:
   SLNX_PATH: 'Source/Portic.slnx'
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 3
 

@@ -135,8 +135,7 @@ namespace Portic.Configuration
             return new PorticConfiguration(
                 messageDefinitions,
                 BuildEndpointDefinitions(transport, consumers),
-                _middleware,
-                transport
+                _middleware
             );
         }
 

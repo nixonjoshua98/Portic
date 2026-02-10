@@ -1,8 +1,8 @@
-﻿using Portic.Consumers;
+using Portic.Consumers;
 
-namespace Portic.Transport.RabbitMQ.UnitTests.Helpers
+namespace Portic.Tests.Common.Helpers
 {
-    internal sealed class TestMessageConsumer : IConsumer<TestMessage>
+    public sealed class TestMessageConsumer : IConsumer<TestMessage>
     {
         public ValueTask ConsumeAsync(IConsumerContext<TestMessage> context)
         {

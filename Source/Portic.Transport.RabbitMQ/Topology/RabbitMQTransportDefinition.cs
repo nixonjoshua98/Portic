@@ -16,6 +16,24 @@ namespace Portic.Transport.RabbitMQ.Topology
             return this;
         }
 
+        public IRabbitMQTransportConfigurator WithConnectionString(string connectionString)
+        {
+            ConnectionFactory.Uri = new Uri(connectionString);
+            return this;
+        }
+
+        public IRabbitMQTransportConfigurator WithUserName(string username)
+        {
+            ConnectionFactory.UserName = username;
+            return this;
+        }
+
+        public IRabbitMQTransportConfigurator WithPassword(string password)
+        {
+            ConnectionFactory.Password = password;
+            return this;
+        }
+
         public IRabbitMQTransportConfigurator WithPort(int port)
         {
             ConnectionFactory.Port = port;

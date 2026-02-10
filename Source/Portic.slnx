@@ -12,11 +12,10 @@
     <File Path="Portic.Samples/Directory.Build.props" />
     <File Path="Portic.Samples/Directory.Packages.props" />
   </Folder>
-  <Folder Name="/Solution Items/">
-    <File Path=".editorconfig" />
-  </Folder>
   <Folder Name="/Tests/">
     <Project Path="Portic.Tests/Portic.Tests.Common/Portic.Tests.Common.csproj" Id="c4f6425d-4876-42a4-aeb7-5cb6cfb022ba" />
+    <Project Path="Portic.Tests/Portic.Transport.InMemory.UnitTests/Portic.Transport.InMemory.UnitTests.csproj" />
+    <Project Path="Portic.Tests/Portic.Transport.RabbitMQ.IntegrationTests/Portic.Transport.RabbitMQ.IntegrationTests.csproj" Id="73a33ce1-918c-4dc0-a972-dbff3c96d10a" />
     <Project Path="Portic.Tests/Portic.Transport.RabbitMQ.UnitTests/Portic.Transport.RabbitMQ.UnitTests.csproj" Id="643c1c52-31cd-4644-b244-e4c939188b8d" />
   </Folder>
   <Folder Name="/Tests/Props/">
@@ -25,6 +24,7 @@
   </Folder>
   <Folder Name="/Workflows/">
     <File Path="../.github/workflows/PublishNuget.yaml" />
+    <File Path="../.github/workflows/RunTests.yaml" />
   </Folder>
   <Project Path="Portic.Middleware.Polly/Portic.Middleware.Polly.csproj" Id="6a23ba8e-cb4a-4785-969a-7f25463c6087" />
   <Project Path="Portic.Transport.InMemory/Portic.Transport.InMemory.csproj" Id="7c485c68-069b-455a-bd37-0e76989cdc7b" />
