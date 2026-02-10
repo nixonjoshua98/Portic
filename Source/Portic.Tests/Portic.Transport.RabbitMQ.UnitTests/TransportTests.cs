@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Portic.Tests.Common.Helpers;
 using Portic.Transport.RabbitMQ.Extensions;
-using Portic.Transport.RabbitMQ.UnitTests.Testers;
+using Portic.Transport.RabbitMQ.UnitTests.Helpers;
 using Testcontainers.RabbitMq;
 using Xunit;
 
@@ -25,25 +25,37 @@ namespace Portic.Transport.RabbitMQ.UnitTests
 
         public async Task DisposeAsync()
         {
-            await _rabbitMqContainer.DisposeAsync();
+            await _rabbitMqContainer.StopAsync();
         }
 
         [Fact]
         public async Task PublishAsync_ShouldPublishMessageToRabbitMQ()
         {
+            // Arrange
+
             using var host = RabbitMQHost.CreateHost(_rabbitMqContainer);
 
             await host.StartAsync(CancellationToken.None);
 
             await using var serviceScope = host.Services.CreateAsyncScope();
 
+            var completionSource = serviceScope.ServiceProvider.GetRequiredService<TaskCompletionSource<TestMessage>>();
+
             var transport = serviceScope.ServiceProvider.GetRequiredService<IMessageTransport>();
 
             var testMessage = new TestMessage();
 
-            await transport.PublishAsync(testMessage, CancellationToken.None);
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
 
-            Assert.True(true);
+            // Act
+
+            await transport.PublishAsync(testMessage, cts.Token);
+
+            var message = await completionSource.Task.WaitAsync(cts.Token);
+
+            // Assert
+
+            Assert.Equal(testMessage, message);
         }
     }
 }

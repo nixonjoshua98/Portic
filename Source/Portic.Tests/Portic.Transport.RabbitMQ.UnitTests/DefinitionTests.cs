@@ -11,6 +11,8 @@ namespace Portic.Transport.RabbitMQ.UnitTests
         [Fact]
         public void ValidateEndpoint_ShouldAllowOnlyOneMessageConsumer()
         {
+            // Arrange
+
             var messageDefinition = new MockMessageDefinition(typeof(TestMessage), "TestMessage");
 
             var consumer1 = new MockConsumerDefinition(typeof(TestMessageConsumer), "TestMessageConsumer", messageDefinition);
@@ -19,6 +21,8 @@ namespace Portic.Transport.RabbitMQ.UnitTests
             var endpoint = new MockEndpointDefinition("TestMessage", 0, [consumer1, consumer2]);
 
             ITransportDefinition transportDefinition = new RabbitMQTransportDefinition();
+
+            // Assert
 
             Assert.Throws<RabbitMQMultipleMessageConsumerException>(() => transportDefinition.ValidateEndpoint(endpoint));
         }
