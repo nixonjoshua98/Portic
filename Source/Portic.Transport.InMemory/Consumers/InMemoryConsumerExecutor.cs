@@ -31,7 +31,7 @@ namespace Portic.Transport.InMemory.Consumers
         }
 
         private async Task ConsumeAsync<TMessage>(InMemoryQueuedMessage message, CancellationToken cancellationToken)
-        {           
+        {
             var settlement = new InMemoryMessageSettlement(message, _transport);
 
             var messageReceived = new TransportMessageReceived<TMessage>(

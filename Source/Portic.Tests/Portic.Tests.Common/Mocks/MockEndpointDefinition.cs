@@ -4,7 +4,7 @@ using Portic.Endpoints;
 namespace Portic.Tests.Common.Mocks
 {
     public sealed class MockEndpointDefinition(
-        string name, 
+        string name,
         byte maxRedeliveryAttempts,
         IEnumerable<IConsumerDefinition>? consumerDefinitions = null
     ) : IEndpointDefinition

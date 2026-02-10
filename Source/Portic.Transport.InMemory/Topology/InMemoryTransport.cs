@@ -47,7 +47,7 @@ namespace Portic.Transport.InMemory.Topology
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-               
+
                 if (MessageQueue.TryDequeue(out var result))
                 {
                     return result;
