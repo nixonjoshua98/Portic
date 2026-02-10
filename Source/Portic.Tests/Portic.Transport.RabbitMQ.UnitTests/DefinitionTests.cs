@@ -9,7 +9,7 @@ namespace Portic.Transport.RabbitMQ.UnitTests
     public class DefinitionTests
     {
         [Fact]
-        public void ValidateEndpoint_ShouldAllowOnlyOneMessageConsumer()
+        public void ValidateEndpoint_ShouldThrow_WhenMultipleMessageConsumersRegistered()
         {
             // Arrange
             var messageDefinition = new MockMessageDefinition(typeof(TestMessage), "TestMessage");
