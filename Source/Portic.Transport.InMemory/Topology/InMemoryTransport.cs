@@ -1,14 +1,18 @@
 ﻿using Portic.Configuration;
 using Portic.Transport.InMemory.Extensions;
-using System.Collections.Concurrent;
+using System.Threading.Channels;
 
 namespace Portic.Transport.InMemory.Topology
 {
     internal sealed class InMemoryTransport(IPorticConfiguration _configuration) : IInMemoryTransport
     {
-        private readonly ConcurrentQueue<InMemoryQueuedMessage> MessageQueue = new();
+        private readonly Channel<InMemoryQueuedMessage> _messageChannel = Channel.CreateUnbounded<InMemoryQueuedMessage>(new UnboundedChannelOptions
+        {
+            SingleReader = false,
+            SingleWriter = false
+        });
 
-        public Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) where TMessage : class
+        public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) where TMessage : class
         {
             var messageDefinition = _configuration.GetMessageDefinition<TMessage>();
             var endpointConsumers = _configuration.GetConsumers(messageDefinition);
@@ -24,37 +28,23 @@ namespace Portic.Transport.InMemory.Topology
                     endpointDefinition
                 );
 
-                MessageQueue.Enqueue(queued);
+                await _messageChannel.Writer.WriteAsync(queued, cancellationToken);
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task PublishDeferredAsync(InMemoryQueuedMessage message, Exception exception, CancellationToken cancellationToken)
+        public async Task PublishDeferredAsync(InMemoryQueuedMessage message, Exception exception, CancellationToken cancellationToken)
         {
             var queued = message with
             {
                 DeliveryCount = Convert.ToByte(message.DeliveryCount + 1)
             };
 
-            MessageQueue.Enqueue(queued);
-
-            return Task.CompletedTask;
+            await _messageChannel.Writer.WriteAsync(queued, cancellationToken);
         }
 
         public async Task<InMemoryQueuedMessage> WaitForMessageAsync(CancellationToken cancellationToken)
         {
-            while (true)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if (MessageQueue.TryDequeue(out var result))
-                {
-                    return result;
-                }
-
-                await Task.Delay(10, cancellationToken); // We can probably use a cts?
-            }
+            return await _messageChannel.Reader.ReadAsync(cancellationToken);
         }
     }
 }
