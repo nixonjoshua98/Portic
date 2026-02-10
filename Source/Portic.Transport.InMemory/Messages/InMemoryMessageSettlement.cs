@@ -5,7 +5,7 @@ using Portic.Transport.InMemory.Topology;
 namespace Portic.Transport.InMemory.Messages
 {
     internal sealed class InMemoryMessageSettlement(
-        InMemoryQueuedMessage Message, 
+        InMemoryQueuedMessage Message,
         IInMemoryTransport Transport,
         ILogger<InMemoryMessageSettlement> _logger
     ) : IMessageSettlement

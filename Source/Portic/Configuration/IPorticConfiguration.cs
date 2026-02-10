@@ -7,9 +7,7 @@ namespace Portic.Configuration
     public interface IPorticConfiguration
     {
         IReadOnlyList<IEndpointDefinition> Endpoints { get; }
-
-        internal ITransportDefinition TransportDefinition { get; }
-        internal IReadOnlyList<Type> Middleware { get; }
+        IReadOnlyList<Type> Middleware { get; }
 
         IMessageDefinition GetMessageDefinition<TMessage>();
     }
