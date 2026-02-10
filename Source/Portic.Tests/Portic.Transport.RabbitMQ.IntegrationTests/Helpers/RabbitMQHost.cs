@@ -24,9 +24,7 @@ namespace Portic.Transport.RabbitMQ.IntegrationTests.Helpers
                 });
             });
 
-            host.Services.AddSingleton(
-                new TaskCompletionSource<TestMessage>()
-            );
+            host.Services.AddSingleton(typeof(TrackableMessageSource<>));
 
             return host.Build();
         }

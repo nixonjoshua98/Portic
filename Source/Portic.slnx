@@ -12,9 +12,6 @@
     <File Path="Portic.Samples/Directory.Build.props" />
     <File Path="Portic.Samples/Directory.Packages.props" />
   </Folder>
-  <Folder Name="/Solution Items/">
-    <File Path=".editorconfig" />
-  </Folder>
   <Folder Name="/Tests/">
     <Project Path="Portic.Tests/Portic.Tests.Common/Portic.Tests.Common.csproj" Id="c4f6425d-4876-42a4-aeb7-5cb6cfb022ba" />
     <Project Path="Portic.Tests/Portic.Transport.InMemory.UnitTests/Portic.Transport.InMemory.UnitTests.csproj" />
