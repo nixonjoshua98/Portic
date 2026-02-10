@@ -46,5 +46,10 @@ namespace Portic.Transport.InMemory.Topology
         {
             return await _messageChannel.Reader.ReadAsync(cancellationToken);
         }
+
+        public IAsyncEnumerable<InMemoryQueuedMessage> GetMessagesAsync(CancellationToken cancellationToken)
+        {
+            return _messageChannel.Reader.ReadAllAsync(cancellationToken);
+        }
     }
 }

@@ -10,10 +10,8 @@ namespace Portic.Transport.InMemory.Topology
     {
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            await foreach (var message in _transport.GetMessagesAsync(stoppingToken))
             {
-                var message = await _transport.WaitForMessageAsync(stoppingToken);
-
                 await _consumerExecutor.ExecuteAsync(message, stoppingToken);
             }
         }
