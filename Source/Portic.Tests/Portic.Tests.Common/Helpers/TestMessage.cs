@@ -1,6 +1,4 @@
 namespace Portic.Tests.Common.Helpers
 {
-    public sealed class TestMessage;
-
-    public sealed class TestMessage2;
+    public sealed record TestMessage(Guid Value);
 }

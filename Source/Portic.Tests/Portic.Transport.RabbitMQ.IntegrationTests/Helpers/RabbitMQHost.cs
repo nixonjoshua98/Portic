@@ -3,10 +3,10 @@ using Microsoft.Extensions.Hosting;
 using Portic.Extensions;
 using Portic.Tests.Common.Helpers;
 using Portic.Transport.RabbitMQ.Extensions;
-using Portic.Transport.RabbitMQ.UnitTests.Consumers;
+using Portic.Transport.RabbitMQ.IntegrationTests.Consumers;
 using Testcontainers.RabbitMq;
 
-namespace Portic.Transport.RabbitMQ.UnitTests.Helpers
+namespace Portic.Transport.RabbitMQ.IntegrationTests.Helpers
 {
     internal static class RabbitMQHost
     {
