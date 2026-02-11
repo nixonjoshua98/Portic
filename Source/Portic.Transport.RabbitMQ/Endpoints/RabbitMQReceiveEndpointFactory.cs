@@ -8,19 +8,18 @@ namespace Portic.Transport.RabbitMQ.Endpoints
 {
     internal sealed class RabbitMQReceiveEndpointFactory(
         RabbitMQConnectionContext _connectionContext,
-        RabbitMQTopologyService _topologyService,
         RabbitMQConsumerExecutor _consumerExecutor
     ) : IReceiveEndpointFactory
     {
         public async Task<IReceiveEndpoint> CreateEndpointReceiverAsync(IEndpointDefinition endpointDefinition, CancellationToken cancellationToken)
         {
-            var channel = await _connectionContext.CreateChannelAsync(cancellationToken);
+            var channel = await _connectionContext.GetChannelAsync(cancellationToken);
 
             await channel.BasicQosAsync(0, endpointDefinition.PrefetchCount, global: false, cancellationToken);
 
             foreach (var consumerDefinition in endpointDefinition.ConsumerDefinitions)
             {
-                await _topologyService.BindQueueAsync(endpointDefinition, consumerDefinition, cancellationToken);
+                await channel.BindConsumerToEndpointAsync(endpointDefinition, consumerDefinition, cancellationToken);
             }
 
             return new RabbitMQBasicConsumer(

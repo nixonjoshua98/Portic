@@ -1,37 +1,56 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 using System.Collections.Concurrent;
+using System.Threading.Channels;
 
 namespace Portic.Transport.RabbitMQ.Channels
 {
-    internal sealed class RabbitMQChannelPool(IConnection connection, int maxPoolSize = 256) : IDisposable
+    internal sealed class RabbitMQChannelPool(
+        IConnection connection,
+        ILoggerFactory loggerFactory,
+        int maxPoolSize = 256
+    ) : IDisposable
     {
+        private bool _isDisposed;
+
         private readonly IConnection _connection = connection;
         private readonly ConcurrentQueue<IChannel> _idleChannels = new();
         private readonly SemaphoreSlim _creationLock = new(maxPoolSize, maxPoolSize);
+        private readonly ILogger<RabbitMQChannel> _rabbitMqChannelLogger = loggerFactory.CreateLogger<RabbitMQChannel>();
 
-        private bool _isDisposed;
+        public async Task<RabbitMQChannel> GetNonRentedChannelAsync(CancellationToken cancellationToken)
+        {
+            var channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
-        public async Task<RabbitMQRentedChannel> RentAsync(CancellationToken cancellationToken)
+            return WrapChannel(channel);
+        }
+
+        public async Task<RabbitMQChannel> GetChannelAsync(CancellationToken cancellationToken)
         {
             ObjectDisposedException.ThrowIf(_isDisposed, this);
 
             if (_idleChannels.TryDequeue(out var channel))
             {
-                return new RabbitMQRentedChannel(this, channel);
+                return WrapChannel(channel);
             }
 
             await _creationLock.WaitAsync(cancellationToken);
 
             try
             {
-                var newChannel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
+                channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
-                return new RabbitMQRentedChannel(this, newChannel);
+                return WrapChannel(channel);
             }
             finally
             {
                 _creationLock.Release();
             }
+        }
+
+        private RabbitMQChannel WrapChannel(IChannel rawChannel)
+        {
+            return new RabbitMQChannel(rawChannel, _rabbitMqChannelLogger, this);
         }
 
         public void Release(IChannel channel)

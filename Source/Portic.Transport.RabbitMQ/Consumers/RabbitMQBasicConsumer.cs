@@ -1,23 +1,27 @@
 ﻿using Portic.Consumers;
 using Portic.Endpoints;
+using Portic.Transport.RabbitMQ.Channels;
 using Portic.Transport.RabbitMQ.Messages;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace Portic.Transport.RabbitMQ.Consumers
 {
-    internal sealed class RabbitMQBasicConsumer :
-        IReceiveEndpoint,
+    internal sealed class RabbitMQBasicConsumer(
+        RabbitMQChannel channel,
+        IEndpointDefinition endpoint,
+        RabbitMQConsumerExecutor consumerExecutor
+    ) : IReceiveEndpoint,
         IAsyncBasicConsumer
     {
         private bool _isDisposed;
-        private IChannel? _channel;
+        private RabbitMQChannel? _channel = channel;
 
-        public readonly IEndpointDefinition Endpoint;
+        public readonly IEndpointDefinition Endpoint = endpoint;
 
-        private readonly RabbitMQConsumerExecutor ConsumerExecutor;
+        private readonly RabbitMQConsumerExecutor ConsumerExecutor = consumerExecutor;
 
-        public IChannel Channel
+        public RabbitMQChannel Channel
         {
             get
             {
@@ -27,15 +31,7 @@ namespace Portic.Transport.RabbitMQ.Consumers
             }
         }
 
-        public RabbitMQBasicConsumer(
-            IChannel channel,
-            IEndpointDefinition endpoint,
-            RabbitMQConsumerExecutor consumerExecutor)
-        {
-            _channel = channel;
-            Endpoint = endpoint;
-            ConsumerExecutor = consumerExecutor;
-        }
+        IChannel? IAsyncBasicConsumer.Channel => Channel.RawChannel;
 
         public async Task RunAsync(CancellationToken cancellationToken)
         {

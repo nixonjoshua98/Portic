@@ -2,6 +2,7 @@
 using Portic.Endpoints;
 using Portic.Exceptions;
 using Portic.Messages;
+using Portic.Transport.RabbitMQ.Channels;
 using Portic.Transport.RabbitMQ.Consumers;
 using Portic.Transport.RabbitMQ.Extensions;
 using RabbitMQ.Client;
@@ -10,7 +11,7 @@ namespace Portic.Transport.RabbitMQ.Messages
 {
     internal sealed class RabbitMQRawMessageReceived
     {
-        public IChannel Channel { get; }
+        public RabbitMQChannel Channel { get; }
         public ulong DeliveryTag { get; }
 
         public IEndpointDefinition EndpointDefinition { get; }

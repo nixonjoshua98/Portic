@@ -1,32 +1,34 @@
-﻿using Portic.Transport.RabbitMQ.Channels;
+﻿using Microsoft.Extensions.Logging;
+using Portic.Transport.RabbitMQ.Channels;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Transport
 {
-    internal sealed class RabbitMQConnectionContext(IRabbitMQTransportDefinition _configuration) : IDisposable
+    internal sealed class RabbitMQConnectionContext(IRabbitMQTransportDefinition _configuration, ILoggerFactory _loggerFactory) : IDisposable
     {
         private bool _isDisposed;
+
         private readonly SemaphoreSlim _connectionLock = new(1, 1);
 
         private IConnection? _connection;
         private RabbitMQChannelPool? _channelPool;
 
-        public async ValueTask<RabbitMQRentedChannel> RentChannelAsync(CancellationToken cancellationToken = default)
+        public async ValueTask<RabbitMQChannel> GetChannelAsync(CancellationToken cancellationToken = default)
         {
             ObjectDisposedException.ThrowIf(_isDisposed, this);
 
-            var channelPool = await GetChannelPoolAsync(cancellationToken);
+            var pool = await GetChannelPoolAsync(cancellationToken);
 
-            return await channelPool.RentAsync(cancellationToken);
+            return await pool.GetNonRentedChannelAsync(cancellationToken);
         }
 
-        public async ValueTask<IChannel> CreateChannelAsync(CancellationToken cancellationToken = default)
+        public async ValueTask<RabbitMQChannel> RentChannelAsync(CancellationToken cancellationToken = default)
         {
             ObjectDisposedException.ThrowIf(_isDisposed, this);
 
-            var connection = await GetConnectionAsync(cancellationToken);
+            var pool = await GetChannelPoolAsync(cancellationToken);
 
-            return await connection.CreateChannelAsync(cancellationToken: cancellationToken);
+            return await pool.GetChannelAsync(cancellationToken);
         }
 
         private async ValueTask<RabbitMQChannelPool> GetChannelPoolAsync(CancellationToken cancellationToken = default)
@@ -39,7 +41,7 @@ namespace Portic.Transport.RabbitMQ.Transport
 
             var connection = await GetConnectionAsync(cancellationToken);
 
-            return _channelPool ??= new RabbitMQChannelPool(connection);
+            return _channelPool ??= new RabbitMQChannelPool(connection, _loggerFactory);
         }
 
         private async ValueTask<IConnection> GetConnectionAsync(CancellationToken cancellationToken = default)

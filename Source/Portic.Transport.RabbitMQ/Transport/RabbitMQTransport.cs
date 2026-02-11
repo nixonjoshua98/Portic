@@ -8,7 +8,6 @@ namespace Portic.Transport.RabbitMQ.Transport
 {
     internal sealed class RabbitMQTransport(
         RabbitMQConnectionContext _connectionContext,
-        RabbitMQTopologyService _topologyService,
         IPorticConfiguration _configuration,
         IPorticSerializer _serializer
     ) : IMessageTransport
@@ -37,12 +36,7 @@ namespace Portic.Transport.RabbitMQ.Transport
 
             // We want to ensure the exchange and queue are declared and bound before we publish the faulted message,
             // otherwise we might lose messages if the exchange or queue are not yet created.
-
-            await _topologyService.BindFaultedQueueAsync(
-                message.MessageDefinition,
-                message.EndpointDefinition,
-                cancellationToken
-            );
+            await message.Channel.BindFaultedQueueAsync(message.MessageDefinition, message.EndpointDefinition, cancellationToken);
 
             await PublishAsync(
                 message.MessageDefinition.FaultedExchangeName,
@@ -85,7 +79,7 @@ namespace Portic.Transport.RabbitMQ.Transport
         {
             using var rented = await _connectionContext.RentChannelAsync(cancellationToken);
 
-            await rented.Channel.BasicPublishAsync(
+            await rented.BasicPublishAsync(
                 exchange: exchange,
                 routingKey: string.Empty,
                 mandatory: mandatory,
