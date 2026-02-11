@@ -32,9 +32,9 @@ namespace Portic.Endpoints
             }
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartedAsync(CancellationToken cancellationToken)
         {
-            await Task.WhenAll(_receiverEndpoints.Select(x => x.RunAsync(cancellationToken)));
+            _ = Task.WhenAll(_receiverEndpoints.Select(x => x.RunAsync(cancellationToken)));
         }
 
         private void DisposeEndpoints()
@@ -43,7 +43,7 @@ namespace Portic.Endpoints
             _receiverEndpoints.Clear();
         }
 
-        public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
