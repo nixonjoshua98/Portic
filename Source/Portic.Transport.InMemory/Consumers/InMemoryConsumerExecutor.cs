@@ -8,7 +8,7 @@ using System.Reflection;
 namespace Portic.Transport.InMemory.Consumers
 {
     internal sealed class InMemoryConsumerExecutor(
-        IInMemoryTransport _transport,
+        InMemoryTransport _transport,
         IConsumerExecutor _consumerExecutor,
         ILoggerFactory _loggerFactory
     )

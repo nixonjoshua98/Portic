@@ -2,7 +2,8 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Configuration;
 using Portic.Transport.RabbitMQ.Consumers;
-using Portic.Transport.RabbitMQ.Topology;
+using Portic.Transport.RabbitMQ.Endpoints;
+using Portic.Transport.RabbitMQ.Transport;
 
 namespace Portic.Transport.RabbitMQ.Extensions
 {
@@ -28,7 +29,7 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
                 var transportDefinition = busBuilder.Build();
 
-                builder.SetTransportDefinition(transportDefinition);
+                builder.SetTransportDefinition<RabbitMQTransport, RabbitMQReceiveEndpointFactory>(transportDefinition);
 
                 builder.Services.TryAddSingleton(transportDefinition);
 
@@ -40,14 +41,6 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
         private static void AddCoreServices(IServiceCollection services)
         {
-            services.TryAddSingleton<IRabbitMQTransport, RabbitMQTransport>();
-
-            services.TryAddSingleton<IMessageTransport>(
-                provider => provider.GetRequiredService<IRabbitMQTransport>()
-            );
-
-            services.AddHostedService<RabbitMQTopologyHostedService>();
-
             services.TryAddSingleton<RabbitMQTopologyService>();
 
             services.TryAddSingleton<RabbitMQConsumerExecutor>();

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Configuration;
 using Portic.Transport.InMemory.Consumers;
+using Portic.Transport.InMemory.Endpoints;
 using Portic.Transport.InMemory.Topology;
 
 namespace Portic.Transport.InMemory.Extensions
@@ -26,7 +27,10 @@ namespace Portic.Transport.InMemory.Extensions
 
             var transportDefinition = busBuilder.ToDefinition();
 
-            builder.SetTransportDefinition(transportDefinition);
+            builder.SetTransportDefinition<
+                InMemoryTransport,
+                InMemoryReceiveEndpointFactory
+            >(transportDefinition);
 
             AddCoreServices(builder.Services);
 
@@ -35,15 +39,7 @@ namespace Portic.Transport.InMemory.Extensions
 
         private static void AddCoreServices(IServiceCollection services)
         {
-            services.TryAddSingleton<IInMemoryTransport, InMemoryTransport>();
-
-            services.TryAddSingleton<IMessageTransport>(
-                provider => provider.GetRequiredService<IInMemoryTransport>()
-            );
-
             services.TryAddSingleton<InMemoryConsumerExecutor>();
-
-            services.AddHostedService<InMemoryBackgroundDequeuer>();
         }
     }
 }

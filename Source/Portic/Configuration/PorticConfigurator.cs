@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Consumers;
 using Portic.Endpoints;
 using Portic.Exceptions;
@@ -35,7 +36,9 @@ namespace Portic.Configuration
             return this;
         }
 
-        public IPorticConfigurator SetTransportDefinition(ITransportDefinition transportDefinition)
+        public IPorticConfigurator SetTransportDefinition<TTransport, TReceiveEndpointFactory>(ITransportDefinition transportDefinition)
+            where TTransport : class, IMessageTransport
+            where TReceiveEndpointFactory : class, IReceiveEndpointFactory
         {
             if (TransportDefinition is not null)
             {
@@ -43,6 +46,14 @@ namespace Portic.Configuration
             }
 
             TransportDefinition = transportDefinition;
+
+            // Transport
+            Services.TryAddSingleton<TTransport>();
+            Services.TryAddSingleton<IMessageTransport>(sp => sp.GetRequiredService<TTransport>());
+
+            // Receive Endpoint Factory
+            Services.TryAddSingleton<TReceiveEndpointFactory>();
+            Services.TryAddSingleton<IReceiveEndpointFactory>(sp => sp.GetRequiredService<TReceiveEndpointFactory>());
 
             return this;
         }
@@ -146,11 +157,9 @@ namespace Portic.Configuration
                 var endpointConsumers = allConsumerDefinitions
                     .Where(consumer => consumer.EndpointName == configurator.Name);
 
-                var endpointDefinition = configurator.Build(this, endpointConsumers);
+                var endpointDefinition = configurator.ToDefinition(this, endpointConsumers);
 
-                // Each transport may have specific requirements for the endpoint definition,
-                // so we validate it against the transport definition before returning it.
-                transportDefinition.ValidateEndpoint(endpointDefinition);
+                CommonDefinitionValidator.ValidateSingleMessageConsumerEndpoint(endpointDefinition);
 
                 yield return endpointDefinition;
             }

@@ -4,14 +4,14 @@ using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Messages;
 using RabbitMQ.Client;
 
-namespace Portic.Transport.RabbitMQ.Topology
+namespace Portic.Transport.RabbitMQ.Transport
 {
     internal sealed class RabbitMQTransport(
         RabbitMQConnectionContext _connectionContext,
         RabbitMQTopologyService _topologyService,
         IPorticConfiguration _configuration,
         IPorticSerializer _serializer
-    ) : IRabbitMQTransport
+    ) : IMessageTransport
     {
         public async Task PublishDeferredAsync(RabbitMQRawMessageReceived message, Exception exception, CancellationToken cancellationToken)
         {

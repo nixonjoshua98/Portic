@@ -1,7 +1,7 @@
-﻿using Portic.Tests.Common.Helpers;
+﻿using Portic.Exceptions;
+using Portic.Tests.Common.Helpers;
 using Portic.Tests.Common.Mocks;
-using Portic.Transport.RabbitMQ.Exceptions;
-using Portic.Transport.RabbitMQ.Topology;
+using Portic.Validation;
 using Xunit;
 
 namespace Portic.Transport.RabbitMQ.UnitTests
@@ -19,10 +19,8 @@ namespace Portic.Transport.RabbitMQ.UnitTests
 
             var endpoint = new MockEndpointDefinition("TestMessage", 0, [consumer1, consumer2]);
 
-            ITransportDefinition transportDefinition = new RabbitMQTransportDefinition();
-
             // Assert
-            Assert.Throws<RabbitMQMultipleMessageConsumerException>(() => transportDefinition.ValidateEndpoint(endpoint));
+            Assert.Throws<MultipleMessageConsumerException>(() => CommonDefinitionValidator.ValidateSingleMessageConsumerEndpoint(endpoint));
         }
     }
 }

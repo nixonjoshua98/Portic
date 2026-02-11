@@ -1,4 +1,4 @@
-﻿namespace Portic.Transport.RabbitMQ.Topology
+﻿namespace Portic.Transport.RabbitMQ.Transport
 {
     public interface IRabbitMQTransportConfigurator
     {

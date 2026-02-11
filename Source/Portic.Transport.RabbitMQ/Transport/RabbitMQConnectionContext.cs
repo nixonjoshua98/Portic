@@ -1,7 +1,7 @@
 ﻿using Portic.Transport.RabbitMQ.Channels;
 using RabbitMQ.Client;
 
-namespace Portic.Transport.RabbitMQ.Topology
+namespace Portic.Transport.RabbitMQ.Transport
 {
     internal sealed class RabbitMQConnectionContext(IRabbitMQTransportDefinition _configuration) : IDisposable
     {

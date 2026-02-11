@@ -1,6 +1,6 @@
 ﻿using RabbitMQ.Client;
 
-namespace Portic.Transport.RabbitMQ.Topology
+namespace Portic.Transport.RabbitMQ.Transport
 {
     internal interface IRabbitMQTransportDefinition : ITransportDefinition
     {

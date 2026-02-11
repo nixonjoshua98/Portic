@@ -6,7 +6,7 @@ namespace Portic.Transport.InMemory.Messages
 {
     internal sealed class InMemoryMessageSettlement(
         InMemoryQueuedMessage Message,
-        IInMemoryTransport Transport,
+        InMemoryTransport Transport,
         ILogger<InMemoryMessageSettlement> _logger
     ) : IMessageSettlement
     {

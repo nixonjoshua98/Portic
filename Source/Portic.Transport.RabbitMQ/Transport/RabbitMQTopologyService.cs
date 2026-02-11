@@ -5,7 +5,7 @@ using Portic.Messages;
 using Portic.Transport.RabbitMQ.Extensions;
 using RabbitMQ.Client;
 
-namespace Portic.Transport.RabbitMQ.Topology
+namespace Portic.Transport.RabbitMQ.Transport
 {
     internal sealed class RabbitMQTopologyService(
         RabbitMQConnectionContext _connectionContext,

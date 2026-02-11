@@ -12,7 +12,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="Portic.Transport.RabbitMQ.UnitTests" />
+		<InternalsVisibleTo Include="Portic.Transport.RabbitMQ.Tests" />
 	</ItemGroup>
 
 	<ItemGroup>

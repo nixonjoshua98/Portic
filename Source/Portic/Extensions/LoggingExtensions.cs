@@ -12,5 +12,8 @@ namespace Portic.Logging
 
         [LoggerMessage(Level = LogLevel.Warning, Message = "Message '{MessageId}' has been deferred (Delivery: {DeliveryCount} of {MaxRedeliveryAttempts})")]
         public static partial void LogDeferredMessage(this ILogger logger, string messageId, Exception exception, int deliveryCount, int maxRedeliveryAttempts);
+
+        [LoggerMessage(Level = LogLevel.Debug, Message = "Endpoint '{EndpointName}' created consumer '{ConsumerTypeName}'")]
+        public static partial void LogEndpointConsumerCreation(this ILogger logger, string endpointName, string consumerTypeName);
     }
 }

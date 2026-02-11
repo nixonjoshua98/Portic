@@ -5,7 +5,6 @@ using Portic.Messages;
 using Portic.Transport.RabbitMQ.Consumers;
 using Portic.Transport.RabbitMQ.Extensions;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 namespace Portic.Transport.RabbitMQ.Messages
 {
@@ -24,16 +23,19 @@ namespace Portic.Transport.RabbitMQ.Messages
         public string? MessageId => BasicProperties.PorticMessageId;
         public byte DeliveryCount => BasicProperties.DeliveryCount;
 
-        public RabbitMQRawMessageReceived(RabbitMQEndpointConsumerState state, BasicDeliverEventArgs deliverArgs)
+        public RabbitMQRawMessageReceived(
+            RabbitMQBasicConsumer state,
+            ReadOnlyMemory<byte> body,
+            ulong deliveryTag,
+            IReadOnlyBasicProperties basicProperties)
         {
-            Channel = state.GetChannelOrThrow();
+            ConsumerDefinition = GetConsumerDefinition(state.Endpoint, basicProperties.MessageName);
 
-            ConsumerDefinition = GetConsumerDefinition(state.Endpoint, deliverArgs.BasicProperties.MessageName);
-
-            RawBody = deliverArgs.Body;
+            RawBody = body;
+            Channel = state.Channel;
+            DeliveryTag = deliveryTag;
+            BasicProperties = basicProperties;
             EndpointDefinition = state.Endpoint;
-            DeliveryTag = deliverArgs.DeliveryTag;
-            BasicProperties = deliverArgs.BasicProperties;
             MessageDefinition = ConsumerDefinition.Message;
         }
 

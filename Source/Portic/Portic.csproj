@@ -12,7 +12,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="Portic.Transport.InMemory.UnitTests" />
+		<InternalsVisibleTo Include="Portic.Tests" />
+		<InternalsVisibleTo Include="Portic.Transport.InMemory.Tests" />
 	</ItemGroup>
 
 	<ItemGroup>

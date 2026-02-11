@@ -1,7 +1,7 @@
 ﻿using Portic.Consumers;
 using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Messages;
-using Portic.Transport.RabbitMQ.Topology;
+using Portic.Transport.RabbitMQ.Transport;
 using System.Collections.Concurrent;
 using System.Reflection;
 
@@ -10,7 +10,7 @@ namespace Portic.Transport.RabbitMQ.Consumers
     internal sealed class RabbitMQConsumerExecutor(
         IPorticSerializer _serializer,
         IConsumerExecutor _consumerExecutor,
-        IRabbitMQTransport _transport
+        RabbitMQTransport _transport
     )
     {
         private delegate Task ConsumeDelegate(RabbitMQConsumerExecutor instance, RabbitMQRawMessageReceived message, CancellationToken cancellationToken);

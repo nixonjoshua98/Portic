@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Configuration;
 using Portic.Consumers;
+using Portic.Endpoints;
 using Portic.Serializer;
 
 namespace Portic.Extensions
@@ -25,6 +26,8 @@ namespace Portic.Extensions
 
         private static void AddCoreServices(IServiceCollection services)
         {
+            services.AddHostedService<ReceiveEndpointBackgroundService>();
+
             services.TryAddSingleton<IConsumerExecutor, ConsumerExecutor>();
 
             services.TryAddSingleton<IPorticSerializer, SystemTextJsonSerializer>();

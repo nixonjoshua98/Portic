@@ -4,7 +4,7 @@ using System.Threading.Channels;
 
 namespace Portic.Transport.InMemory.Topology
 {
-    internal sealed class InMemoryTransport(IPorticConfiguration _configuration) : IInMemoryTransport
+    internal sealed class InMemoryTransport(IPorticConfiguration _configuration) : IMessageTransport
     {
         private readonly Channel<InMemoryQueuedMessage> _messageChannel = Channel.CreateUnbounded<InMemoryQueuedMessage>(new UnboundedChannelOptions
         {

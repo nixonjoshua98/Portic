@@ -6,7 +6,7 @@ using Portic.Transport.InMemory.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
+    .MinimumLevel.Debug()
     .WriteTo.Console()
     .CreateLogger();
 
@@ -18,7 +18,8 @@ builder.Services.AddHostedService<PingPublisher>();
 
 builder.Services.AddPortic(configurator =>
 {
-    configurator.ConfigureConsumer<PingMessage, PingConsumer>();
+    configurator.ConfigureConsumer<PingMessage, PingConsumer>()
+        .WithEndpointName("test-endpoint");
 
     configurator.ConfigureConsumer<PingMessage, PingConsumer2>();
 
