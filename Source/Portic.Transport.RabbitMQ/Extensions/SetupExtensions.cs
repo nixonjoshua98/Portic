@@ -2,6 +2,7 @@
 using Portic.Configuration;
 using Portic.Transport.RabbitMQ.Consumers;
 using Portic.Transport.RabbitMQ.Endpoints;
+using Portic.Transport.RabbitMQ.Serializer;
 using Portic.Transport.RabbitMQ.Transport;
 
 namespace Portic.Transport.RabbitMQ.Extensions
@@ -29,6 +30,8 @@ namespace Portic.Transport.RabbitMQ.Extensions
                 builder.SetTransportDefinition<RabbitMQTransport, RabbitMQReceiveEndpointFactory>(definition);
 
                 builder.Services.TryAddSingleton(definition);
+
+                builder.Services.TryAddSingleton<SystemTextJsonSerializer>();
 
                 builder.Services.TryAddSingleton<RabbitMQConsumerExecutor>();
 

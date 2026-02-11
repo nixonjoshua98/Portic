@@ -41,6 +41,6 @@ namespace Portic.Transport.RabbitMQ.Transport
         public async Task<IConnection> CreateConnectionAsync(CancellationToken cancellationToken)
         {
             return await ConnectionFactory.CreateConnectionAsync(cancellationToken);
-        }=
+        }
     }
 }

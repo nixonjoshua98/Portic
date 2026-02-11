@@ -2,6 +2,7 @@
 using Portic.Consumers;
 using Portic.Endpoints;
 using Portic.Messages;
+using Portic.Middleware;
 using Portic.Transport;
 
 namespace Portic.Configuration

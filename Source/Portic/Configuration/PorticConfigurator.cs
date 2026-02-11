@@ -4,6 +4,7 @@ using Portic.Consumers;
 using Portic.Endpoints;
 using Portic.Exceptions;
 using Portic.Messages;
+using Portic.Middleware;
 using Portic.Models;
 using Portic.Transport;
 using Portic.Validation;
@@ -143,10 +144,14 @@ namespace Portic.Configuration
                 .Select(c => c.Build(messageDefinitions[c.MessageType]))
                 .ToList();
 
+            var middleware = _middleware
+                .Select(m => new MiddlewareDefinition(m))
+                .ToList();
+
             return new PorticConfiguration(
                 messageDefinitions,
                 BuildEndpointDefinitions(transport, consumers),
-                _middleware
+                middleware
             );
         }
 

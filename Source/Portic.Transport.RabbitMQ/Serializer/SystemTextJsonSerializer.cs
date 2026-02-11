@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 
-namespace Portic.Serializer
+namespace Portic.Transport.RabbitMQ.Serializer
 {
-    internal sealed class SystemTextJsonSerializer : IPorticSerializer
+    internal sealed class SystemTextJsonSerializer
     {
         private readonly JsonSerializerOptions _serializerOptions = new()
         {

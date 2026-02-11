@@ -1,6 +1,6 @@
 ﻿using Portic.Consumers;
-using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Messages;
+using Portic.Transport.RabbitMQ.Serializer;
 using Portic.Transport.RabbitMQ.Transport;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -8,7 +8,7 @@ using System.Reflection;
 namespace Portic.Transport.RabbitMQ.Consumers
 {
     internal sealed class RabbitMQConsumerExecutor(
-        IPorticSerializer _serializer,
+        SystemTextJsonSerializer _serializer,
         IConsumerExecutor _consumerExecutor,
         RabbitMQTransport _transport
     )

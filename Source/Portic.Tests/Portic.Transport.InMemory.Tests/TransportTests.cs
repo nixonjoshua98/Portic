@@ -2,6 +2,7 @@ using Portic.Configuration;
 using Portic.Messages;
 using Portic.Tests.Common.Helpers;
 using Portic.Tests.Common.Mocks;
+using Portic.Transport.InMemory.Transport;
 using Xunit;
 
 namespace Portic.Transport.InMemory.Tests

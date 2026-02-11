@@ -1,7 +1,7 @@
 ﻿using Portic.Configuration;
-using Portic.Serializer;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Messages;
+using Portic.Transport.RabbitMQ.Serializer;
 using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Transport
@@ -9,7 +9,7 @@ namespace Portic.Transport.RabbitMQ.Transport
     internal sealed class RabbitMQTransport(
         RabbitMQConnectionContext _connectionContext,
         IPorticConfiguration _configuration,
-        IPorticSerializer _serializer
+        SystemTextJsonSerializer _serializer
     ) : IMessageTransport
     {
         public async Task PublishDeferredAsync(RabbitMQRawMessageReceived message, Exception exception, CancellationToken cancellationToken)
