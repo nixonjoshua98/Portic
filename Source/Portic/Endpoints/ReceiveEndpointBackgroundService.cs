@@ -11,13 +11,12 @@ namespace Portic.Endpoints
         ILogger<ReceiveEndpointBackgroundService> _logger
     ) : IHostedLifecycleService
     {
+        readonly List<IReceiveEndpoint> _receiverEndpoints = [];
         public async Task StartingAsync(CancellationToken cancellationToken)
         {
-            List<IReceiveEndpoint> receiverEndpoints = [];
-
             cancellationToken.Register(() =>
             {
-                DisposeEndpoints(receiverEndpoints);
+                DisposeEndpoints();
             });
 
             foreach (var endpointDefinition in _porticConfigurator.Endpoints)
@@ -29,19 +28,20 @@ namespace Portic.Endpoints
                     _logger.LogEndpointConsumerCreation(endpointDefinition.Name, consumer.ConsumerType.Name ?? string.Empty);
                 }
 
-                receiverEndpoints.Add(receiver);
-
-                _ = receiver.StartAsync(cancellationToken);
+                _receiverEndpoints.Add(receiver);
             }
         }
 
-        private static void DisposeEndpoints(List<IReceiveEndpoint> endpoints)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            endpoints.ForEach(x => x.Dispose());
-            endpoints.Clear();
+            await Task.WhenAll(_receiverEndpoints.Select(x => x.RunAsync(cancellationToken)));
         }
 
-        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        private void DisposeEndpoints()
+        {
+            _receiverEndpoints.ForEach(x => x.Dispose());
+            _receiverEndpoints.Clear();
+        }
 
         public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 

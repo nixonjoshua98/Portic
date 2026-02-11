@@ -31,7 +31,7 @@ namespace Portic.Transport.RabbitMQ.Consumers
 
         IChannel? IAsyncBasicConsumer.Channel => Channel.RawChannel;
 
-        protected override async Task RunAsync(CancellationToken cancellationToken)
+        protected override async Task StartAsync(CancellationToken cancellationToken)
         {
             await Channel.BasicConsumeAsync(
                 Endpoint.Name,
@@ -43,15 +43,21 @@ namespace Portic.Transport.RabbitMQ.Consumers
                 consumer: this,
                 cancellationToken: cancellationToken
             );
+
+            await CompletedTask.WaitAsync(cancellationToken);
         }
 
         public Task HandleBasicCancelAsync(string consumerTag, CancellationToken cancellationToken = default)
         {
+            SetCompleted();
+
             return Task.CompletedTask;
         }
 
         public Task HandleBasicCancelOkAsync(string consumerTag, CancellationToken cancellationToken = default)
         {
+            SetCompleted();
+
             return Task.CompletedTask;
         }
 
@@ -83,6 +89,8 @@ namespace Portic.Transport.RabbitMQ.Consumers
 
         public Task HandleChannelShutdownAsync(object channel, ShutdownEventArgs reason)
         {
+            SetCompleted();
+
             return Task.CompletedTask;
         }
 

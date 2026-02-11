@@ -2,6 +2,6 @@
 {
     public interface IReceiveEndpoint : IDisposable
     {
-        Task StartAsync(CancellationToken cancellationToken);
+        Task RunAsync(CancellationToken cancellationToken);
     }
 }

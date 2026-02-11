@@ -33,7 +33,6 @@ namespace Portic.Transport.RabbitMQ.Transport
 
         private async ValueTask<RabbitMQChannelPool> GetChannelPoolAsync(CancellationToken cancellationToken = default)
         {
-            // Skip accessing the connection + lock
             if (_channelPool is not null)
             {
                 return _channelPool;
@@ -46,7 +45,6 @@ namespace Portic.Transport.RabbitMQ.Transport
 
         private async ValueTask<IConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
         {
-            // Skip acquiring the lock
             if (_connection is not null)
             {
                 return _connection;

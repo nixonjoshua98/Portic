@@ -4,16 +4,26 @@
     {
         protected bool _isDisposed;
 
-        private CancellationTokenSource? _lifetimeSource = default;
+        private CancellationTokenSource? _lifetimeSource;
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        private readonly TaskCompletionSource _cancelledSource = new();
+        private readonly TaskCompletionSource _completionSource = new();
+
+        protected Task CompletedTask => _completionSource.Task;
+
+        public async Task RunAsync(CancellationToken cancellationToken)
         {
             _lifetimeSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            await RunAsync(_lifetimeSource.Token);
+            await StartAsync(_lifetimeSource.Token);
         }
 
-        protected abstract Task RunAsync(CancellationToken cancellationToken);
+        protected void SetCompleted()
+        {
+            _completionSource.TrySetResult();
+        }
+
+        protected abstract Task StartAsync(CancellationToken cancellationToken);
 
         protected virtual void Dispose(bool disposing)
         {

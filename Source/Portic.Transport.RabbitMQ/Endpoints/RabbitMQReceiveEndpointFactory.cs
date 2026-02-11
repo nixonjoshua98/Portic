@@ -21,11 +21,7 @@ namespace Portic.Transport.RabbitMQ.Endpoints
                 await channel.BindConsumerToEndpointAsync(endpointDefinition, consumerDefinition, cancellationToken);
             }
 
-            return new RabbitMQBasicConsumer(
-                channel,
-                endpointDefinition,
-                _consumerExecutor
-            );
+            return new RabbitMQBasicConsumer(channel, endpointDefinition, _consumerExecutor);
         }
     }
 }
