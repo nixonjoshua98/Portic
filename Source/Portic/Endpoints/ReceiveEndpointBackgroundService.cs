@@ -11,7 +11,7 @@ namespace Portic.Endpoints
         ILogger<ReceiveEndpointBackgroundService> _logger
     ) : IHostedLifecycleService
     {
-        readonly List<IReceiveEndpoint> _receiverEndpoints = [];
+        private readonly List<IReceiveEndpoint> _receiverEndpoints = [];
         public async Task StartingAsync(CancellationToken cancellationToken)
         {
             cancellationToken.Register(() =>
