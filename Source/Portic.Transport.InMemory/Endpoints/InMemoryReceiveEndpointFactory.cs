@@ -9,11 +9,11 @@ namespace Portic.Transport.InMemory.Endpoints
         InMemoryConsumerExecutor _consumerExecutor
     ) : IReceiveEndpointFactory
     {
-        public async Task<IReceiveEndpoint> CreateReceiveEndpointAsync(IEndpointDefinition endpointDefinition, CancellationToken cancellationToken)
+        public Task<IReceiveEndpoint> CreateReceiveEndpointAsync(IEndpointDefinition _, CancellationToken cancellationToken)
         {
             var receiver = new InMemoryReceiveEndpoint(_transport, _consumerExecutor);
 
-            return receiver;
+            return Task.FromResult<IReceiveEndpoint>(receiver);
         }
     }
 }
