@@ -4,7 +4,7 @@ using Portic.Tests.Common.Mocks;
 using Portic.Validation;
 using Xunit;
 
-namespace Portic.Transport.RabbitMQ.UnitTests
+namespace Portic.Tests
 {
     public class DefinitionTests
     {

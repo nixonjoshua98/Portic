@@ -2,7 +2,7 @@
 
 namespace Portic.Transport.RabbitMQ.Transport
 {
-    internal sealed class RabbitMQTransportDefinition : IRabbitMQTransportConfigurator, IRabbitMQTransportDefinition
+    internal sealed class RabbitMQTransportDefinition : IRabbitMQTransportConfigurator, ITransportDefinition
     {
         private readonly ConnectionFactory ConnectionFactory = new();
 
@@ -41,11 +41,6 @@ namespace Portic.Transport.RabbitMQ.Transport
         public async Task<IConnection> CreateConnectionAsync(CancellationToken cancellationToken)
         {
             return await ConnectionFactory.CreateConnectionAsync(cancellationToken);
-        }
-
-        public IRabbitMQTransportDefinition Build()
-        {
-            return this;
-        }
+        }=
     }
 }

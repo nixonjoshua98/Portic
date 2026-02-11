@@ -1,21 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using System.Collections.Concurrent;
-using System.Threading.Channels;
 
 namespace Portic.Transport.RabbitMQ.Channels
 {
-    internal sealed class RabbitMQChannelPool(
-        IConnection connection,
-        ILoggerFactory loggerFactory,
-        int maxPoolSize = 256
-    ) : IDisposable
+    internal sealed class RabbitMQChannelPool(IConnection connection, ILoggerFactory loggerFactory) : IDisposable
     {
         private bool _isDisposed;
 
         private readonly IConnection _connection = connection;
         private readonly ConcurrentQueue<IChannel> _idleChannels = new();
-        private readonly SemaphoreSlim _creationLock = new(maxPoolSize, maxPoolSize);
         private readonly ILogger<RabbitMQChannel> _rabbitMqChannelLogger = loggerFactory.CreateLogger<RabbitMQChannel>();
 
         public async Task<RabbitMQChannel> GetNonRentedChannelAsync(CancellationToken cancellationToken)
@@ -34,18 +28,9 @@ namespace Portic.Transport.RabbitMQ.Channels
                 return WrapChannel(channel);
             }
 
-            await _creationLock.WaitAsync(cancellationToken);
+            channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
-            try
-            {
-                channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
-
-                return WrapChannel(channel);
-            }
-            finally
-            {
-                _creationLock.Release();
-            }
+            return WrapChannel(channel);
         }
 
         private RabbitMQChannel WrapChannel(IChannel rawChannel)
@@ -64,8 +49,6 @@ namespace Portic.Transport.RabbitMQ.Channels
             {
                 if (disposing)
                 {
-                    _creationLock.Dispose();
-
                     while (_idleChannels.TryDequeue(out var channel))
                     {
                         channel?.Dispose();

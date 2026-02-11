@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Portic.Transport.InMemory.Extensions;
-using Portic.Transport.InMemory.Topology;
+using Portic.Transport.InMemory.Transport;
 
 namespace Portic.Transport.InMemory.Messages
 {

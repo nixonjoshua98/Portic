@@ -1,4 +1,4 @@
-﻿namespace Portic.Transport.InMemory.Topology
+﻿namespace Portic.Transport.InMemory.Transport
 {
     public interface IInMemoryTransportConfigurator
     {

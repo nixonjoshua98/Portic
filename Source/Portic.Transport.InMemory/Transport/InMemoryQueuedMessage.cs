@@ -2,7 +2,7 @@
 using Portic.Endpoints;
 using Portic.Messages;
 
-namespace Portic.Transport.InMemory.Topology
+namespace Portic.Transport.InMemory.Transport
 {
     internal sealed record InMemoryQueuedMessage(
         string MessageId,

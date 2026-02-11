@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Portic.Consumers;
 using Portic.Transport.InMemory.Messages;
-using Portic.Transport.InMemory.Topology;
+using Portic.Transport.InMemory.Transport;
 using System.Collections.Concurrent;
 using System.Reflection;
 

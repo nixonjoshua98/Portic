@@ -1,12 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Portic.Tests.Common.Helpers;
 using Portic.Transport.RabbitMQ.Extensions;
-using Portic.Transport.RabbitMQ.IntegrationTests.Fixtures;
-using Portic.Transport.RabbitMQ.IntegrationTests.Helpers;
+using Portic.Transport.RabbitMQ.Tests.Fixtures;
+using Portic.Transport.RabbitMQ.Tests.Helpers;
 using Testcontainers.RabbitMq;
 using Xunit;
 
-namespace Portic.Transport.RabbitMQ.IntegrationTests
+namespace Portic.Transport.RabbitMQ.Tests
 {
     public class TransportTests(RabbitMQFixture fixture) : IClassFixture<RabbitMQFixture>
     {

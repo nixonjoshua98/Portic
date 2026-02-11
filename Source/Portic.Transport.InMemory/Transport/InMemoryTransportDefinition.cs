@@ -1,12 +1,7 @@
-﻿namespace Portic.Transport.InMemory.Topology
+﻿namespace Portic.Transport.InMemory.Transport
 {
     internal sealed class InMemoryTransportDefinition : ITransportDefinition, IInMemoryTransportConfigurator
     {
         public string DisplayName { get; } = "InMemory";
-
-        public ITransportDefinition ToDefinition()
-        {
-            return this;
-        }
     }
 }

@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Configuration;
 using Portic.Transport.InMemory.Consumers;
 using Portic.Transport.InMemory.Endpoints;
-using Portic.Transport.InMemory.Topology;
+using Portic.Transport.InMemory.Transport;
 
 namespace Portic.Transport.InMemory.Extensions
 {
@@ -21,25 +20,15 @@ namespace Portic.Transport.InMemory.Extensions
         /// <returns>The same builder instance, configured to use in-memory transport.</returns>
         public static IPorticConfigurator UsingInMemory(this IPorticConfigurator builder, Action<IInMemoryTransportConfigurator>? callback = null)
         {
-            var busBuilder = new InMemoryTransportDefinition();
+            var definition = new InMemoryTransportDefinition();
 
-            callback?.Invoke(busBuilder);
+            callback?.Invoke(definition);
 
-            var transportDefinition = busBuilder.ToDefinition();
+            builder.SetTransportDefinition<InMemoryTransport, InMemoryReceiveEndpointFactory>(definition);
 
-            builder.SetTransportDefinition<
-                InMemoryTransport,
-                InMemoryReceiveEndpointFactory
-            >(transportDefinition);
-
-            AddCoreServices(builder.Services);
+            builder.Services.TryAddSingleton<InMemoryConsumerExecutor>();
 
             return builder;
-        }
-
-        private static void AddCoreServices(IServiceCollection services)
-        {
-            services.TryAddSingleton<InMemoryConsumerExecutor>();
         }
     }
 }

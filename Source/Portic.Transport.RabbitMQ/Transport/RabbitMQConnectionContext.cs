@@ -4,7 +4,7 @@ using RabbitMQ.Client;
 
 namespace Portic.Transport.RabbitMQ.Transport
 {
-    internal sealed class RabbitMQConnectionContext(IRabbitMQTransportDefinition _configuration, ILoggerFactory _loggerFactory) : IDisposable
+    internal sealed class RabbitMQConnectionContext(RabbitMQTransportDefinition _configuration, ILoggerFactory _loggerFactory) : IDisposable
     {
         private bool _isDisposed;
 

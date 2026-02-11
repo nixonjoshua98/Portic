@@ -2,7 +2,7 @@
 using Portic.Transport.InMemory.Extensions;
 using System.Threading.Channels;
 
-namespace Portic.Transport.InMemory.Topology
+namespace Portic.Transport.InMemory.Transport
 {
     internal sealed class InMemoryTransport(IPorticConfiguration _configuration) : IMessageTransport
     {

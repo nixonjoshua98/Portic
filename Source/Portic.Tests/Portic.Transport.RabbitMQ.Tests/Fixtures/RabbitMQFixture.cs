@@ -1,7 +1,7 @@
 ﻿using Testcontainers.RabbitMq;
 using Xunit;
 
-namespace Portic.Transport.RabbitMQ.IntegrationTests.Fixtures
+namespace Portic.Transport.RabbitMQ.Tests.Fixtures
 {
     public sealed class RabbitMQFixture : IAsyncLifetime
     {

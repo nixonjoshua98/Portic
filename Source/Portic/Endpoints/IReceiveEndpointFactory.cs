@@ -1,9 +1,7 @@
-﻿using Portic.Consumers;
-
-namespace Portic.Endpoints
+﻿namespace Portic.Endpoints
 {
     public interface IReceiveEndpointFactory
     {
-        Task<IReceiveEndpoint> CreateEndpointReceiverAsync(IEndpointDefinition endpointDefinition, CancellationToken cancellationToken);
+        Task<IReceiveEndpoint> CreateReceiveEndpointAsync(IEndpointDefinition endpointDefinition, CancellationToken cancellationToken);
     }
 }

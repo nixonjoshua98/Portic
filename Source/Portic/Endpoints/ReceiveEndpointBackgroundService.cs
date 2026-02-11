@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Portic.Configuration;
-using Portic.Consumers;
 using Portic.Logging;
 
 namespace Portic.Endpoints
@@ -12,29 +11,18 @@ namespace Portic.Endpoints
         ILogger<ReceiveEndpointBackgroundService> _logger
     ) : IHostedLifecycleService
     {
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task StartedAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
         public async Task StartingAsync(CancellationToken cancellationToken)
         {
             List<IReceiveEndpoint> receiverEndpoints = [];
 
             cancellationToken.Register(() =>
             {
-                receiverEndpoints.ForEach(x => x.Dispose());
-                receiverEndpoints.Clear();
+                DisposeEndpoints(receiverEndpoints);
             });
 
             foreach (var endpointDefinition in _porticConfigurator.Endpoints)
             {
-                var receiver = await _endpointFactory.CreateEndpointReceiverAsync(endpointDefinition, cancellationToken);
+                var receiver = await _endpointFactory.CreateReceiveEndpointAsync(endpointDefinition, cancellationToken);
 
                 foreach (var consumer in endpointDefinition.ConsumerDefinitions)
                 {
@@ -43,23 +31,24 @@ namespace Portic.Endpoints
 
                 receiverEndpoints.Add(receiver);
 
-                _ = receiver.RunAsync(cancellationToken);
+                _ = receiver.StartAsync(cancellationToken);
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        private static void DisposeEndpoints(List<IReceiveEndpoint> endpoints)
         {
-            return Task.CompletedTask;
+            endpoints.ForEach(x => x.Dispose());
+            endpoints.Clear();
         }
 
-        public Task StoppedAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public Task StoppingAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+        public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

@@ -1,5 +1,4 @@
-﻿using Portic.Consumers;
-using Portic.Endpoints;
+﻿using Portic.Endpoints;
 using Portic.Transport.RabbitMQ.Channels;
 using Portic.Transport.RabbitMQ.Messages;
 using RabbitMQ.Client;
@@ -11,10 +10,9 @@ namespace Portic.Transport.RabbitMQ.Consumers
         RabbitMQChannel channel,
         IEndpointDefinition endpoint,
         RabbitMQConsumerExecutor consumerExecutor
-    ) : IReceiveEndpoint,
+    ) : ReceiveEndpointBase,
         IAsyncBasicConsumer
     {
-        private bool _isDisposed;
         private RabbitMQChannel? _channel = channel;
 
         public readonly IEndpointDefinition Endpoint = endpoint;
@@ -33,9 +31,18 @@ namespace Portic.Transport.RabbitMQ.Consumers
 
         IChannel? IAsyncBasicConsumer.Channel => Channel.RawChannel;
 
-        public async Task RunAsync(CancellationToken cancellationToken)
+        protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            await BasicConsumeAsync(cancellationToken);
+            await Channel.BasicConsumeAsync(
+                Endpoint.Name,
+                autoAck: false,
+                consumerTag: string.Empty,
+                noLocal: false,
+                exclusive: false,
+                arguments: null,
+                consumer: this,
+                cancellationToken: cancellationToken
+            );
         }
 
         public Task HandleBasicCancelAsync(string consumerTag, CancellationToken cancellationToken = default)
@@ -79,22 +86,10 @@ namespace Portic.Transport.RabbitMQ.Consumers
             return Task.CompletedTask;
         }
 
-        private async Task BasicConsumeAsync(CancellationToken cancellationToken)
+        protected override void Dispose(bool disposing)
         {
-            await Channel.BasicConsumeAsync(
-                Endpoint.Name,
-                autoAck: false,
-                consumerTag: string.Empty,
-                noLocal: false,
-                exclusive: false,
-                arguments: null,
-                consumer: this,
-                cancellationToken: cancellationToken
-            );
-        }
+            base.Dispose(disposing);
 
-        private void Dispose(bool disposing)
-        {
             if (!_isDisposed)
             {
                 if (disposing)
@@ -105,12 +100,6 @@ namespace Portic.Transport.RabbitMQ.Consumers
                 _channel = null;
                 _isDisposed = true;
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }

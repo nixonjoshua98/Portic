@@ -1,48 +1,17 @@
-﻿using Portic.Consumers;
+﻿using Portic.Endpoints;
 using Portic.Transport.InMemory.Consumers;
-using Portic.Transport.InMemory.Topology;
+using Portic.Transport.InMemory.Transport;
 
 namespace Portic.Transport.InMemory.Endpoints
 {
-    internal sealed class InMemoryReceiveEndpoint(InMemoryTransport _transport, InMemoryConsumerExecutor _consumerExecutor) : IReceiveEndpoint
+    internal sealed class InMemoryReceiveEndpoint(InMemoryTransport _transport, InMemoryConsumerExecutor _consumerExecutor) : ReceiveEndpointBase
     {
-        private bool _isDisposed;
-
-        private CancellationTokenSource? _lifetimeSource;
-
-        public async Task RunAsync(CancellationToken cancellationToken)
+        protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            _lifetimeSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            await foreach (var message in _transport.GetMessagesAsync(_lifetimeSource.Token))
+            await foreach (var message in _transport.GetMessagesAsync(cancellationToken))
             {
-                await _consumerExecutor.ExecuteAsync(message, _lifetimeSource.Token);
+                await _consumerExecutor.ExecuteAsync(message, cancellationToken);
             }
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    if (_lifetimeSource is { IsCancellationRequested: false })
-                    {
-                        _lifetimeSource.Cancel();
-                    }
-
-                    _lifetimeSource?.Dispose();
-                }
-
-                _lifetimeSource = null;
-                _isDisposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }

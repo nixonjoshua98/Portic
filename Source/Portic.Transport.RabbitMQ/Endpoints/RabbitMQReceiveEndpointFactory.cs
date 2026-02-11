@@ -1,5 +1,4 @@
-﻿using Portic.Consumers;
-using Portic.Endpoints;
+﻿using Portic.Endpoints;
 using Portic.Transport.RabbitMQ.Consumers;
 using Portic.Transport.RabbitMQ.Extensions;
 using Portic.Transport.RabbitMQ.Transport;
@@ -11,7 +10,7 @@ namespace Portic.Transport.RabbitMQ.Endpoints
         RabbitMQConsumerExecutor _consumerExecutor
     ) : IReceiveEndpointFactory
     {
-        public async Task<IReceiveEndpoint> CreateEndpointReceiverAsync(IEndpointDefinition endpointDefinition, CancellationToken cancellationToken)
+        public async Task<IReceiveEndpoint> CreateReceiveEndpointAsync(IEndpointDefinition endpointDefinition, CancellationToken cancellationToken)
         {
             var channel = await _connectionContext.GetChannelAsync(cancellationToken);
 

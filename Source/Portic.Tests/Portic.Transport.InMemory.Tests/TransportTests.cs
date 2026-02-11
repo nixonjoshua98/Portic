@@ -2,10 +2,9 @@ using Portic.Configuration;
 using Portic.Messages;
 using Portic.Tests.Common.Helpers;
 using Portic.Tests.Common.Mocks;
-using Portic.Transport.InMemory.Topology;
 using Xunit;
 
-namespace Portic.Transport.InMemory.UnitTests
+namespace Portic.Transport.InMemory.Tests
 {
     public class TransportTests
     {
