@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Configuration;
 using Portic.Consumers;
-using Portic.Serializer;
+using Portic.Endpoints;
 
 namespace Portic.Extensions
 {
@@ -18,16 +18,11 @@ namespace Portic.Extensions
 
             services.TryAddSingleton(definition);
 
-            AddCoreServices(services);
+            services.AddHostedService<ReceiveEndpointBackgroundService>();
 
-            return services;
-        }
-
-        private static void AddCoreServices(IServiceCollection services)
-        {
             services.TryAddSingleton<IConsumerExecutor, ConsumerExecutor>();
 
-            services.TryAddSingleton<IPorticSerializer, SystemTextJsonSerializer>();
+            return services;
         }
     }
 }

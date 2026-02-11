@@ -24,7 +24,7 @@ namespace Portic.Endpoints
             return this;
         }
 
-        public IEndpointDefinition Build(PorticConfigurator configurator, IEnumerable<IConsumerDefinition> consumers)
+        public IEndpointDefinition ToDefinition(PorticConfigurator configurator, IEnumerable<IConsumerDefinition> consumers)
         {
             return new EndpointDefinition(
                 Name,

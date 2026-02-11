@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Portic.Configuration;
 using Portic.Transport.RabbitMQ.Consumers;
-using Portic.Transport.RabbitMQ.Topology;
+using Portic.Transport.RabbitMQ.Endpoints;
+using Portic.Transport.RabbitMQ.Serializer;
+using Portic.Transport.RabbitMQ.Transport;
 
 namespace Portic.Transport.RabbitMQ.Extensions
 {
@@ -22,37 +23,22 @@ namespace Portic.Transport.RabbitMQ.Extensions
             /// <returns>The same configurator instance, enabling further configuration chaining.</returns>
             public IPorticConfigurator UsingRabbitMQ(Action<IRabbitMQTransportConfigurator>? callback = null)
             {
-                var busBuilder = new RabbitMQTransportDefinition();
+                var definition = new RabbitMQTransportDefinition();
 
-                callback?.Invoke(busBuilder);
+                callback?.Invoke(definition);
 
-                var transportDefinition = busBuilder.Build();
+                builder.SetTransportDefinition<RabbitMQTransport, RabbitMQReceiveEndpointFactory>(definition);
 
-                builder.SetTransportDefinition(transportDefinition);
+                builder.Services.TryAddSingleton(definition);
 
-                builder.Services.TryAddSingleton(transportDefinition);
+                builder.Services.TryAddSingleton<SystemTextJsonSerializer>();
 
-                AddCoreServices(builder.Services);
+                builder.Services.TryAddSingleton<RabbitMQConsumerExecutor>();
+
+                builder.Services.TryAddSingleton<RabbitMQConnectionContext>();
 
                 return builder;
             }
-        }
-
-        private static void AddCoreServices(IServiceCollection services)
-        {
-            services.TryAddSingleton<IRabbitMQTransport, RabbitMQTransport>();
-
-            services.TryAddSingleton<IMessageTransport>(
-                provider => provider.GetRequiredService<IRabbitMQTransport>()
-            );
-
-            services.AddHostedService<RabbitMQTopologyHostedService>();
-
-            services.TryAddSingleton<RabbitMQTopologyService>();
-
-            services.TryAddSingleton<RabbitMQConsumerExecutor>();
-
-            services.TryAddSingleton<RabbitMQConnectionContext>();
         }
     }
 }

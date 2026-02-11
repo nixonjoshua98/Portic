@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Portic.Configuration;
 using Portic.Exceptions;
 using Portic.Logging;
+using Portic.Middleware;
 using Portic.Transport;
 
 namespace Portic.Consumers
@@ -59,22 +60,22 @@ namespace Portic.Consumers
                 await ExecuteConsumerAsync(context);
             };
 
-            foreach (var middlewareType in _configuration.Middleware.Reverse())
+            foreach (var middleware in _configuration.Middleware.Reverse())
             {
-                AddMiddlewareToPipeline(ref pipeline, middlewareType);
+                AddMiddlewareToPipeline(ref pipeline, middleware);
             }
 
             return pipeline;
         }
 
-        private static void AddMiddlewareToPipeline(ref ConsumerMiddlewareDelegate pipeline, Type middlewareType)
+        private static void AddMiddlewareToPipeline(ref ConsumerMiddlewareDelegate pipeline, IMiddlewareDefinition middlewareDefinition)
         {
             var currentPipeline = pipeline;
 
             pipeline = async context =>
             {
-                var middleware = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, middlewareType) as IConsumerMiddleware
-                    ?? throw MiddlewareCreationException.FromType(middlewareType);
+                var middleware = ActivatorUtilities.GetServiceOrCreateInstance(context.Services, middlewareDefinition.Type) as IConsumerMiddleware
+                    ?? throw MiddlewareCreationException.FromType(middlewareDefinition.Type);
 
                 await middleware.InvokeAsync(context, currentPipeline);
             };

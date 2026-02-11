@@ -1,10 +1,10 @@
-﻿using Portic.Transport.RabbitMQ.Topology;
+﻿using Portic.Transport.RabbitMQ.Transport;
 
 namespace Portic.Transport.RabbitMQ.Messages
 {
     internal sealed class RabbitMQMessageSettlement<TMessage>(
         RabbitMQRawMessageReceived RawMessage,
-        IRabbitMQTransport Transport
+        RabbitMQTransport Transport
     ) : IMessageSettlement
     {
         public async Task CompleteAsync(CancellationToken cancellationToken)

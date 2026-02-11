@@ -6,7 +6,6 @@ namespace Portic.Transport.RabbitMQ.Extensions
     public static class CustomPropertyExtensions
     {
         private const string PrefetchCountKey = "rmq-prefetchcount";
-        private const string ChannelCountKey = "rmq-channelcount";
         private const string AutoDeleteKey = "rmq-autodelete";
         private const string ExclusiveKey = "rmq-exclusive";
         private const string MandatoryKey = "rmq-mandatory";
@@ -38,9 +37,6 @@ namespace Portic.Transport.RabbitMQ.Extensions
             public IEndpointConfigurator WithDurable(bool value = true) =>
                 configurator.SetProperty(DurableKey, value);
 
-            public IEndpointConfigurator WithChannelCount(byte value) =>
-                configurator.SetProperty(ChannelCountKey, value);
-
             public IEndpointConfigurator WithExclusive(bool value = true) =>
                 configurator.SetProperty(ExclusiveKey, value);
         }
@@ -55,9 +51,6 @@ namespace Portic.Transport.RabbitMQ.Extensions
 
             internal bool Durable =>
                 configurator.GetPropertyOrDefault(DurableKey, true);
-
-            internal byte ChannelCount =>
-                configurator.GetPropertyOrDefault<byte>(ChannelCountKey, 1);
 
             internal bool Exclusive =>
                 configurator.GetPropertyOrDefault(ExclusiveKey, false);
